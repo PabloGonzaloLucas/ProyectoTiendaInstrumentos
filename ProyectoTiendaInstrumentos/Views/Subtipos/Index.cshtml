@@ -1,0 +1,10 @@
+﻿@model List<Subtipo>
+
+<ul>
+    @foreach(Subtipo subtipo in Model)
+    {
+        <li>
+            <a asp-controller="Productos" asp-action="Index" asp-route-idSubtipo="@subtipo.IdSubtipo">@subtipo.Nombre</a>
+        </li>
+    }
+</ul>

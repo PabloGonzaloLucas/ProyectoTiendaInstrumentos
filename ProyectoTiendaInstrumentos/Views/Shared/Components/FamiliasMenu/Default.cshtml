@@ -1,0 +1,14 @@
+﻿@model IEnumerable<ProyectoTiendaInstrumentos.Models.Familia>
+
+<div class="familias-menu-wrapper">
+    <ul class="familias-menu">
+        @foreach (var familia in Model)
+        {
+            <li>
+                <a asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@familia.IdFamilia">
+                    @familia.Nombre
+                </a>
+            </li>
+        }
+    </ul>
+</div></nav>

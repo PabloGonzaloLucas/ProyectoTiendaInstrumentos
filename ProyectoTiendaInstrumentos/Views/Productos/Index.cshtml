@@ -1,0 +1,30 @@
+﻿@model List<VwCatalogoProducto>
+
+<h1>Productos</h1>
+<ul>
+    @foreach(VwCatalogoProducto producto in Model){
+        <li>@producto.Modelo - @producto.Precio €
+            <ul>
+
+            @foreach(string spec in producto.Especificaciones)
+            {
+              <li>@spec</li>
+            }
+            </ul>
+
+            @if(producto.Stock < 5)
+            {
+                <span style="color:orange">Quedan pocas unidades!</span>
+            }
+            else if(producto.Stock >= 5)
+            {
+                <span style="color:green">En stock!</span>
+            }
+            else if(producto.Stock < 1)
+            {
+                <span style="color:red">No hay stock</span>
+            }
+        </li>
+
+    }
+</ul>
