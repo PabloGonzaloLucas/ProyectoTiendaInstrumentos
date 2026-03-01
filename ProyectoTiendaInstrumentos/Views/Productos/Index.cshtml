@@ -1,29 +1,51 @@
-﻿@model List<VwCatalogoProducto>
-
+@model List<VwCatalogoProducto>
+@{
+    Subtipo subtipo;
+    if(ViewBag.Subtipo != null)
+    {
+        subtipo = ViewBag.Subtipo as Subtipo;
+        <p>
+            <a asp-controller="Subtipos" asp-action="Index" asp-route-idTipo="@subtipo.IdTipo">@subtipo.Nombre</a>
+        </p>
+    }
+   
+}
 <h1>Productos</h1>
 <ul>
     @foreach(VwCatalogoProducto producto in Model){
-        <li>@producto.Modelo - @producto.Precio €
-            <ul>
 
-            @foreach(string spec in producto.Especificaciones)
-            {
-              <li>@spec</li>
-            }
-            </ul>
+              
+        <li>
+            <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto">
+                @producto.Modelo - @producto.Precio �
+                <ul>
 
-            @if(producto.Stock < 5)
-            {
-                <span style="color:orange">Quedan pocas unidades!</span>
-            }
-            else if(producto.Stock >= 5)
-            {
-                <span style="color:green">En stock!</span>
-            }
-            else if(producto.Stock < 1)
-            {
-                <span style="color:red">No hay stock</span>
-            }
+                @foreach(VwEspecificacionesProducto spec in producto.Especificaciones)
+                {
+                  <li>
+                      @spec.Especificacion: @spec.Valor
+                            @if (spec.UnidadMedida != null || spec.UnidadMedida != "")
+                            {
+                                @(" "+spec.UnidadMedida)
+                            }
+                      
+                  </li>
+                }
+                </ul>
+
+                @if(producto.Stock < 5)
+                {
+                    <span style="color:orange">Quedan pocas unidades!</span>
+                }
+                else if(producto.Stock >= 5)
+                {
+                    <span style="color:green">En stock!</span>
+                }
+                else if(producto.Stock < 1)
+                {
+                    <span style="color:red">No hay stock</span>
+                }
+            </a>
         </li>
 
     }

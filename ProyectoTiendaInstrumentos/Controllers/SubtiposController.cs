@@ -13,8 +13,8 @@ namespace ProyectoTiendaInstrumentos.Controllers
         }
         public async Task<IActionResult> Index(int idTipo)
         {
+            ViewBag.Tipo = await this.repo.GetTipoByIdAsync(idTipo); 
             List<Subtipo> subtipos = await this.repo.GetSubtiposByTipoAsync(idTipo);
-
 
             return View(subtipos);
         }

@@ -13,8 +13,17 @@ namespace ProyectoTiendaInstrumentos.Controllers
         }
         public async Task<IActionResult> Index(int idSubtipo)
         {
+            ViewBag.Subtipo = await this.repo.GetSubtipoByIdAsync(idSubtipo);
             List<VwCatalogoProducto> productos = await this.repo.GetVistaCatalogoBySubtipoAsync(idSubtipo);
             return View(productos);
+        }
+
+        public async Task<IActionResult> Details(int idProducto)
+        {
+            ViewBag.ImagenesProductos = await this.repo.GetImagenesProductoByIdAsync(idProducto);
+            ViewBag.Especificaciones = await this.repo.GetEspecificacionesAsync(idProducto);
+            VwDetallesProducto producto = await this.repo.GetDetallesProductoAsync(idProducto);
+            return View(producto);
         }
     }
 }

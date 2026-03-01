@@ -1,0 +1,146 @@
+/* Tipos Index Styles */
+
+.tipos-container {
+    padding: 2rem 0;
+}
+
+.tipos-container h1 {
+    color: var(--dark-bg);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.tipos-container h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-green), var(--accent-green));
+    border-radius: 2px;
+}
+
+.tipos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+}
+
+.tipos-grid li {
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.tipos-grid li:hover {
+    transform: translateY(-5px);
+}
+
+.tipo-card {
+    display: block;
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-gray) 100%);
+    color: var(--white);
+    text-decoration: none;
+    padding: 2.5rem 2rem;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tipo-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+}
+
+.tipo-card:hover::before {
+    opacity: 1;
+}
+
+.tipo-card span {
+    position: relative;
+    z-index: 1;
+}
+
+.tipo-card:hover {
+    border-color: var(--primary-green);
+    box-shadow: 0 8px 30px rgba(127, 227, 170, 0.4);
+    color: var(--dark-bg);
+    transform: translateY(-3px);
+}
+
+.tipo-card::after {
+    content: '?';
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%) translateX(10px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    font-size: 1.5rem;
+    z-index: 1;
+}
+
+.tipo-card:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+.empty-message {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: var(--light-gray);
+    border-radius: 15px;
+    margin: 2rem 0;
+}
+
+.empty-message h1 {
+    color: var(--dark-gray);
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .tipos-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .tipo-card {
+        padding: 2rem 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    .tipos-container h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .tipos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}

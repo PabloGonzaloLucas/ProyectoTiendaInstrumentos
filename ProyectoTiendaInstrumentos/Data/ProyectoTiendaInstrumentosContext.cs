@@ -23,8 +23,10 @@ namespace ProyectoTiendaInstrumentos.Data
         public DbSet<ProductoImagen> ProductosImagenes { get; set; }
         public DbSet<SeguridadUsuario> SeguridadUsuarios { get; set; }
         public DbSet<VwCatalogoProducto> CatalogoProductos { get; set; }
+        public DbSet<VwDetallesProducto> DetallesProductos { get; set; }
         public DbSet<VwFichaTecnicaProducto> FichaTecnicaProductos { get; set; }
         public DbSet<VwHistorialPedido> HistorialPedidos { get; set; }
         public DbSet<VwEspecificacionesProducto> EspecificacionesProducto { get; set; }
+        public DbSet<VwLoginUser> ValidacionesUsuarios { get; set; }
     }
 }

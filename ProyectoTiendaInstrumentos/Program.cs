@@ -7,11 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
-string connectionString = builder.Configuration.GetConnectionString("SqlTienda");
+string connectionString = builder.Configuration.GetConnectionString("SqlTiendaCasa");
 builder.Services.AddDbContext<ProyectoTiendaInstrumentosContext>(opt => opt.UseSqlServer(connectionString));
 builder.Services.AddTransient<RepositoryProductos>();
 builder.Services.AddTransient<RepositoryTipos>();
 builder.Services.AddTransient<RepositorySubtipos>();
+builder.Services.AddTransient<RepositoryUser>();
 builder.Services.AddControllersWithViews();
 var app = builder.Build();
 

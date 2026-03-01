@@ -41,5 +41,5 @@ public partial class VwCatalogoProducto
     public string? ImagenPrincipal { get; set; }
 
     [NotMapped]
-    public List<string>? Especificaciones { get; set; }
+    public List<VwEspecificacionesProducto>? Especificaciones { get; set; }
 }

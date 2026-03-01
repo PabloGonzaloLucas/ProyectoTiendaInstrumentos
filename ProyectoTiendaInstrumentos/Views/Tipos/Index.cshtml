@@ -1,10 +1,17 @@
 ﻿@model List<Tipo>
 
-<ul>
-    @foreach(Tipo tipo in Model)
-    {
-        <li>
-            <a asp-controller="Subtipos" asp-action="Index" asp-route-idTipo="@tipo.IdTipo">@tipo.Nombre</a>
-        </li>
-    }
-</ul>
+@if(Model.Count > 0)
+{
+    <ul>
+        @foreach(Tipo tipo in Model)
+        {
+            <li>
+                <a asp-controller="Subtipos" asp-action="Index" asp-route-idTipo="@tipo.IdTipo">@tipo.Nombre</a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <h1>No hay Tipos disponibles</h1>
+}

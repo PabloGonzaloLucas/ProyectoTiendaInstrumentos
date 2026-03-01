@@ -1,5 +1,10 @@
 ﻿@model List<Subtipo>
-
+@{
+    Tipo tipo = ViewBag.Tipo as Tipo;
+}
+<p>
+    <a asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@tipo.IdFamilia">@tipo.Nombre</a>
+</p>
 <ul>
     @foreach(Subtipo subtipo in Model)
     {

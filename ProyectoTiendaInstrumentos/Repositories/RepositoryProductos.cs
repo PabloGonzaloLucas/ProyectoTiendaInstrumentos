@@ -18,11 +18,25 @@ namespace ProyectoTiendaInstrumentos.Repositories
                            select datos;
             return await consulta.ToListAsync();
         }
-        public async Task<List<string>> GetNombresEspecificacionesAsync(int idProducto)
+        public async Task<Producto> GetProductoAsync(int idProducto)
+        {
+            var consulta = from datos in this.context.Productos
+                           where datos.IdProducto == idProducto
+                           select datos;
+            return await consulta.FirstOrDefaultAsync();
+        }
+        public async Task<VwDetallesProducto> GetDetallesProductoAsync(int idProducto)
+        {
+            var consulta = from datos in this.context.DetallesProductos
+                           where datos.IdProducto == idProducto
+                           select datos;
+            return await consulta.FirstOrDefaultAsync();
+        }
+        public async Task<List<VwEspecificacionesProducto>> GetEspecificacionesAsync(int idProducto)
         {
             var consulta = from datos in this.context.EspecificacionesProducto
                            where datos.IdProducto == idProducto
-                           select datos.Especificacion;
+                           select datos;
             return await consulta.ToListAsync();
         }
         public async Task<List<VwCatalogoProducto>> GetVistaCatalogoAsync()
@@ -32,7 +46,7 @@ namespace ProyectoTiendaInstrumentos.Repositories
             List<VwCatalogoProducto> catalogo = await consulta.ToListAsync();
             foreach (VwCatalogoProducto producto in catalogo)
             {
-                producto.Especificaciones = await this.GetNombresEspecificacionesAsync(producto.IdProducto);
+                producto.Especificaciones = await this.GetEspecificacionesAsync(producto.IdProducto);
             }
             return catalogo;
         }
@@ -44,9 +58,24 @@ namespace ProyectoTiendaInstrumentos.Repositories
             List<VwCatalogoProducto> catalogo = await consulta.ToListAsync();
             foreach (VwCatalogoProducto producto in catalogo)
             {
-                producto.Especificaciones = await this.GetNombresEspecificacionesAsync(producto.IdProducto);
+                producto.Especificaciones = await this.GetEspecificacionesAsync(producto.IdProducto);
             }
             return catalogo;
+        }
+        public async Task<List<ProductoImagen>> GetImagenesProductoByIdAsync(int idProducto)
+        {
+            var consulta = from datos in this.context.ProductosImagenes
+                           where datos.IdProducto == idProducto
+                           select datos;
+            
+            return await consulta.ToListAsync();
+        }
+        public async Task<Subtipo> GetSubtipoByIdAsync(int idSubtipo)
+        {
+            var consulta = from datos in this.context.Subtipos
+                           where datos.IdSubtipo == idSubtipo
+                           select datos;
+            return await consulta.FirstOrDefaultAsync();
         }
     }
 }

@@ -1,0 +1,222 @@
+/* Productos Index Styles */
+
+.productos-container {
+    padding: 2rem 0;
+}
+
+.breadcrumb-nav {
+    margin-bottom: 2rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(127, 227, 170, 0.3);
+}
+
+.breadcrumb-nav a {
+    color: var(--dark-bg);
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    padding: 0.3rem 0.8rem;
+    border-radius: 5px;
+}
+
+.breadcrumb-nav a::before {
+    content: '?';
+    font-size: 1.3rem;
+    transition: transform 0.3s ease;
+}
+
+.breadcrumb-nav a:hover {
+    background-color: rgba(26, 28, 27, 0.1);
+    transform: translateX(-3px);
+}
+
+.breadcrumb-nav a:hover::before {
+    transform: translateX(-3px);
+}
+
+.productos-header {
+    color: var(--dark-bg);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.productos-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-green), var(--accent-green));
+    border-radius: 2px;
+}
+
+.productos-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+}
+
+.producto-item {
+    transition: transform 0.3s ease;
+}
+
+.producto-card {
+    display: block;
+    background-color: var(--white);
+    border: 2px solid var(--light-gray);
+    text-decoration: none;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+.producto-card:hover {
+    border-color: var(--primary-green);
+    box-shadow: 0 8px 30px rgba(127, 227, 170, 0.3);
+    transform: translateY(-5px);
+}
+
+.producto-header {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-gray) 100%);
+    color: var(--white);
+}
+
+.producto-modelo {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: var(--white);
+}
+
+.producto-precio {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-green);
+    margin: 0;
+}
+
+.producto-body {
+    padding: 1.5rem;
+}
+
+.producto-specs {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+}
+
+.producto-specs li {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--light-gray);
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.producto-specs li:last-child {
+    border-bottom: none;
+}
+
+.spec-label {
+    font-weight: 600;
+    color: var(--dark-bg);
+}
+
+.spec-value {
+    color: var(--dark-gray);
+}
+
+.producto-stock {
+    text-align: center;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-top: 1rem;
+}
+
+.stock-bajo {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 2px solid #ffc107;
+}
+
+.stock-disponible {
+    background-color: #d4edda;
+    color: #155724;
+    border: 2px solid #28a745;
+}
+
+.stock-agotado {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 2px solid #dc3545;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: var(--light-gray);
+    border-radius: 15px;
+    margin: 2rem 0;
+}
+
+.empty-message h1 {
+    color: var(--dark-gray);
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .productos-list {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .productos-header {
+        font-size: 2rem;
+    }
+
+    .breadcrumb-nav a {
+        font-size: 1rem;
+    }
+
+    .producto-modelo {
+        font-size: 1.1rem;
+    }
+
+    .producto-precio {
+        font-size: 1.5rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .productos-list {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
+@media (min-width: 1400px) {
+    .productos-list {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+}

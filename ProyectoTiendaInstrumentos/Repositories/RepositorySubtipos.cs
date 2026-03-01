@@ -25,5 +25,20 @@ namespace ProyectoTiendaInstrumentos.Repositories
                            select datos;
             return await consulta.ToListAsync();
         }
+
+        public async Task<Tipo> GetTipoByIdAsync(int idTipo)
+        {
+            var consulta = from datos in this.context.Tipos
+                           where datos.IdTipo == idTipo
+                           select datos;
+            return await consulta.FirstOrDefaultAsync();
+        }
+        public async Task<string> GetNombreTipoByIdAsync(int idTipo)
+        {
+            var consulta = from datos in this.context.Tipos
+                           where datos.IdTipo == idTipo
+                           select datos.Nombre;
+            return await consulta.FirstOrDefaultAsync();
+        }
     }
 }

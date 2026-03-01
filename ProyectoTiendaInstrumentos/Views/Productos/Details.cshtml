@@ -1,0 +1,82 @@
+﻿@model VwDetallesProducto
+@{
+    List<VwEspecificacionesProducto> specs = ViewBag.Especificaciones as List<VwEspecificacionesProducto>;
+    List<ProductoImagen> imagenesProducto = ViewBag.ImagenesProducto as List<ProductoImagen>;
+
+}
+<p><a asp-controller="Productos" asp-action="Index" asp-route-idSubtipo="@Model.IdSubtipo">Volver</a></p>
+<div>
+    <h1>@(Model.NombreMarca + " " + Model.Modelo) </h1>
+    <div>
+        <p><strong>@Model.Puntuacion</strong></p>
+        <img src="@Model.LogoMarca"/>
+        <div>
+            <img src="@Model.Imagen" alt="@Model.Modelo"/>
+        </div>
+        <div>
+            @if (imagenesProducto != null)
+            {
+                @foreach (ProductoImagen imagen in imagenesProducto)
+                {
+                    <img src="@imagen.Imagen" alt="@Model.Modelo" />
+                }
+            }
+            else
+            {
+                <h1>No hay imagenes para el producto</h1>
+            }
+        </div>
+        <p><strong>Descripción: </strong>@Model.Descripcion</p>
+        <p>Número de producto: @Model.IdProducto<p/>
+            @if(specs.Count > 0)
+            {
+                <table>
+                    <thead>
+                        @foreach(VwEspecificacionesProducto spec in specs)
+                        {
+                            <th>@spec.Especificacion</th>  
+                        }
+                        
+                    </thead>
+                    <tbody>
+                        @foreach (VwEspecificacionesProducto spec in specs)
+                        {
+                            <td>
+                                @spec.Valor 
+                                @if(spec.UnidadMedida != null || spec.UnidadMedida != "")
+                                {
+                                     @(" "+spec.UnidadMedida)
+                                }
+                            </td>
+                        }
+                    </tbody>
+                </table>
+            }
+            <div>
+            <p><strong>@Model.Precio €</strong></p>
+            @if (@Model.Stock < 5)
+            {
+                <p>
+                    <span style="color:orange">Quedan pocas unidades!</span>
+                </p>
+            }
+            else if (@Model.Stock >= 5)
+            {
+                <p>
+                    <span style="color:green">En stock!</span>
+                </p>
+            }
+            else if (Model.Stock < 1)
+            {
+                <p>
+                    <span style="color:red">No hay stock</span>
+                </p>
+            }
+            <form method="post">
+                <input type="hidden" name="idProducto" value="@Model.IdProducto" />
+                <button type="button">Añadir al carrito</button>
+            </form>
+            <p>Ventas: @Model.Ventas</p>
+        </div>
+    </div>
+</div>
