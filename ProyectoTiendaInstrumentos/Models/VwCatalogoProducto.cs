@@ -42,4 +42,6 @@ public partial class VwCatalogoProducto
 
     [NotMapped]
     public List<VwEspecificacionesProducto>? Especificaciones { get; set; }
+    [NotMapped]
+    public int? Cantidad { get; set; }
 }

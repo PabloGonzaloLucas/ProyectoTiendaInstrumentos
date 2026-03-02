@@ -72,10 +72,12 @@ namespace ProyectoTiendaInstrumentos.Repositories
         }
         public async Task<Subtipo> GetSubtipoByIdAsync(int idSubtipo)
         {
+            
             var consulta = from datos in this.context.Subtipos
                            where datos.IdSubtipo == idSubtipo
                            select datos;
             return await consulta.FirstOrDefaultAsync();
         }
+
     }
 }

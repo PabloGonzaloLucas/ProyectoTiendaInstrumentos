@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ProyectoTiendaInstrumentos.Extensions;
 using ProyectoTiendaInstrumentos.Models;
 using ProyectoTiendaInstrumentos.Repositories;
 
@@ -27,7 +28,7 @@ namespace ProyectoTiendaInstrumentos.Controllers
         {
             await this.repo.RegisterUserFakePassAsync(nombre, email, imagen, password, telefono, direccion);
             ViewBag.MENSAJE = "Usuario en el sistema!!";
-            return View();
+            return RedirectToAction("Login");
         }
 
         public IActionResult Login()
@@ -46,8 +47,23 @@ namespace ProyectoTiendaInstrumentos.Controllers
             }
             else
             {
-                return View(user);
+                HttpContext.Session.SetObject("Usuario", user);
+                return RedirectToAction("Index", "Home");
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            if(HttpContext.Session.GetObject<Usuario>("Usuario") != null)
+            {
+                HttpContext.Session.SetObject("Usuario", null);
+            }
+            return RedirectToAction("Index", "Home");
+
+            
+        }
+
+
     }
 }

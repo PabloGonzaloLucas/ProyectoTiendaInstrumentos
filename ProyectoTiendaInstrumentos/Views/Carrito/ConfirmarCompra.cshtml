@@ -1,0 +1,55 @@
+﻿@model List<VwCatalogoProducto>
+
+<h1>Carrito</h1>
+@if (Model != null && Model.Count > 0)
+{
+    <form method="post" asp-action="ConfirmarCompra">
+        <ul>
+            @foreach(VwCatalogoProducto producto in Model)
+            {
+                <li>
+                    <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto">
+                        <img src="@producto.ImagenPrincipal" alt="@producto.Modelo" />
+                        <p>
+                            <span style="font-weight:400">
+                                @(producto.Marca + " ")
+                            </span>
+                            <span>
+                                @producto.Modelo
+                            </span>
+                        </p>
+                        <span>
+                            @producto.Precio €
+                        </span>
+                        <span>
+                            @producto.Cantidad €
+                        </span>
+                    </a>
+
+                  
+                </li>
+            }
+        </ul>
+
+        <div class="carrito-resumen">
+            <p>
+                <strong>Total: </strong>
+                <span class="total-precio">@Model.Sum(p => p.Precio) €</span>
+            </p>
+            <button type="submit" name="accion" value="confirmar" class="btn-comprar">
+                Confirmar compra
+            </button>
+            <button type="submit" name="accion" value="cancelar" class="btn-secondary">
+                Cancelar
+            </button>
+        </div>
+    </form>
+
+}
+else
+{
+    <div class="carrito-vacio">
+        <i class="bi bi-cart-x"></i>
+        <h2>Error al obtener los productos</h2>
+    </div>
+}

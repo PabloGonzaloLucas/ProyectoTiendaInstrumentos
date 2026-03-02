@@ -72,9 +72,21 @@
                     <span style="color:red">No hay stock</span>
                 </p>
             }
-            <form method="post">
+            <form method="post" asp-action="AddToCart">
                 <input type="hidden" name="idProducto" value="@Model.IdProducto" />
-                <button type="button">Añadir al carrito</button>
+                <select name="cantidad" class="cantidad-select">
+                    @{
+                        int stock = @Model.Stock ?? 0;
+                        int maxCantidad = Math.Min(10, stock);
+                    }
+                    @for (int i = 1; i <= maxCantidad; i++)
+                    {
+                        <option value="@i" selected="@(i == 1)">
+                            @i
+                        </option>
+                    }
+                </select>
+                <button type="submit">Añadir al carrito</button>
             </form>
             <p>Ventas: @Model.Ventas</p>
         </div>

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoTiendaInstrumentos.Data;
+using ProyectoTiendaInstrumentos.Extensions;
+using ProyectoTiendaInstrumentos.Models;
 
 namespace ProyectoTiendaInstrumentos.ViewComponents
 {
@@ -15,19 +17,16 @@ namespace ProyectoTiendaInstrumentos.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var userId = HttpContext.Session.GetString("UserId");
+            var user = HttpContext.Session.GetObject<Usuario>("Usuario");
 
-            if (string.IsNullOrEmpty(userId))
+            if (user == null)
             {
                 // Usuario no autenticado
                 return View("NotAuthenticated");
             }
 
-            // Usuario autenticado - obtener datos
-            var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.IdUsuario == int.Parse(userId));
 
-            return View("Authenticated", usuario);
+            return View("Authenticated", user);
         }
     }
 }

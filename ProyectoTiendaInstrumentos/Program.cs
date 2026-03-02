@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProyectoTiendaInstrumentos.Data;
 using ProyectoTiendaInstrumentos.Repositories;
+using ProyectoTiendaInstrumentos.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,10 @@ builder.Services.AddTransient<RepositoryTipos>();
 builder.Services.AddTransient<RepositorySubtipos>();
 builder.Services.AddTransient<RepositoryUser>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddTransient<IRepositoryCarrito, RepositoryCarritoSession>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

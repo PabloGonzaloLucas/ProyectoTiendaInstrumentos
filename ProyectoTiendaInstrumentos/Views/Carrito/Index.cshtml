@@ -1,0 +1,97 @@
+﻿@model List<VwCatalogoProducto>
+
+<h1>Carrito</h1>
+@if (Model != null && Model.Count > 0)
+{
+    <form method="post" asp-action="ProcesarCompra">
+        <ul>
+            @for (int index = 0; index < Model.Count; index++)
+            {
+                VwCatalogoProducto producto = Model[index];
+                <li>
+                    <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto">
+                        <img src="@producto.ImagenPrincipal" alt="@producto.Modelo" />
+                        <p>
+                            <span style="font-weight:400">
+                                @(producto.Marca + " ")
+                            </span>
+                            <span>
+                                @producto.Modelo
+                            </span>
+                        </p>
+                        <span>
+                            @producto.Precio €
+                        </span>
+
+                        @if (producto.Stock < 5 && producto.Stock > 0)
+                        {
+                            <span style="color:orange">Quedan pocas unidades!</span>
+                        }
+                        else if (producto.Stock >= 5)
+                        {
+                            <span style="color:green">En stock!</span>
+                        }
+                        else if (producto.Stock < 1)
+                        {
+                            <span style="color:red">No hay stock</span>
+                        }
+                    </a>
+
+                    <div class="producto-actions">
+                        <!-- Campo oculto con el ID del producto -->
+                        <input type="hidden" name="productos[@index].IdProducto" value="@producto.IdProducto" />
+
+                        <!-- Select con nombre único usando indexación -->
+                        <select name="productos[@index].Cantidad" class="cantidad-select">
+                            @{
+                                int stock = producto.Stock ?? 0;
+                                int maxCantidad = Math.Min(10, stock);
+                            }
+                            @for (int i = 1; i <= maxCantidad; i++)
+                            {
+                                <option value="@i" selected="@(i == producto.Cantidad)">
+                                    @i
+                                </option>
+                            }
+                        </select>
+
+                        <!-- Botón para eliminar producto -->
+                        <button type="submit"
+                                asp-action="EliminarProducto"
+                                asp-route-idProducto="@producto.IdProducto"
+                                class="btn-eliminar">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </li>
+            }
+        </ul>
+
+        <div class="carrito-resumen">
+            <p>
+                <strong>Total: </strong>
+                <span class="total-precio">@Model.Sum(p => p.Precio) €</span>
+            </p>
+            <button type="submit" class="btn-comprar">
+                Procesar compra
+            </button>
+        </div>
+    </form>
+
+    <form method="post" asp-action="VaciarCarrito" style="margin-top: 1rem;">
+        <button type="submit" class="btn-secondary">
+            Vaciar carrito
+        </button>
+    </form>
+}
+else
+{
+    <div class="carrito-vacio">
+        <i class="bi bi-cart-x"></i>
+        <h2>Tu carrito está vacío</h2>
+        <p>Añade productos para comenzar tu compra</p>
+        <a asp-controller="Tipos" asp-action="Index" class="btn-continuar">
+            Continuar comprando
+        </a>
+    </div>
+}
