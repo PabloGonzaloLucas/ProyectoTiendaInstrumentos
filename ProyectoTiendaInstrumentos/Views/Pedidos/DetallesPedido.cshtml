@@ -1,0 +1,48 @@
+﻿@model Pedido
+
+<p>
+    <a asp-controller="Pedidos" asp-action="MisPedidos">Volver a mis pedidos</a>
+</p>
+
+<h1>Detalles del pedido @Model.IdPedido</h1>
+
+<div>
+    <h2>@Model.PrecioTotal</h2>
+    <span>@Model.Estado</span>
+    <p>Se entregará el @Model.FechaEntrega.ToString()<p/>
+    
+    <ul>
+        @foreach (VwProductosPedido producto in Model.ProductosPedido)
+        {
+            <li>
+                <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto">
+                    <img src="@producto.Imagen" alt="@producto.Modelo" />
+                    <p>
+                        <span style="font-weight:400">
+                            @(producto.Marca + " ")
+                        </span>
+                        <span>
+                            @producto.Modelo
+                        </span>
+                    </p>
+                    <span>
+                        @producto.PrecioUnitario €
+                    </span>
+                    <span>
+                        Cantidad: @producto.Cantidad
+                    </span>
+                    <span>
+                        Subtotal: @(producto.SubtotalLinea) €
+                    </span>
+                </a>
+            </li>
+
+        }
+
+    </ul>
+    <div>
+        <span>
+            Pedido el @Model.FechaCreacion.ToString()
+        </span>
+    </div>
+</div>

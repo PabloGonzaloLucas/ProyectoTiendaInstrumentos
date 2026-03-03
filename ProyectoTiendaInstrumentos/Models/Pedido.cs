@@ -12,9 +12,12 @@ public partial class Pedido
     [Column("IdUsuario")]
 
     public int? IdUsuario { get; set; }
-    [Column("Fecha")]
+    [Column("FechaCreacion")]
 
-    public DateTime? Fecha { get; set; }
+    public DateTime? FechaCreacion { get; set; }
+    [Column("FechaEntrega")]
+
+    public DateTime? FechaEntrega { get; set; }
     [Column("Estado")]
 
     public string? Estado { get; set; }
@@ -22,4 +25,8 @@ public partial class Pedido
 
     public decimal PrecioTotal { get; set; }
 
+    [NotMapped]
+    public List<string>? ImagenesProductos { get; set; }
+    [NotMapped]
+    public List<VwProductosPedido>? ProductosPedido { get; set; }
 }

@@ -1,0 +1,30 @@
+﻿@model List<Pedido>
+
+<h1>Mis Pedidos</h1>
+
+<div>
+    @if(Model.Count > 0)
+    {
+        <ul>
+            @foreach(Pedido pedido in Model)
+            {
+                <li>
+                    <a asp-controller="Pedidos" asp-action="DetallesPedido" asp-route-idPedido="@pedido.IdPedido">
+                        Pedido #@pedido.IdPedido - @pedido.FechaEntrega.ToString() - Total: @pedido.PrecioTotal € - Estado: @pedido.Estado
+                        <div class="bloqueImagen">
+                            @foreach(string imagen in @pedido.ImagenesProductos)
+                            {
+                                <img src="@imagen" alt="Imagen del producto" class="imagen-pedido" />
+                            }
+    
+                        </div>
+                    </a>
+                </li>
+            }
+
+        </ul>        
+    }
+    else{
+        <h1>No tienes ningún pedido</h1>
+    }
+</div>

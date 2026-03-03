@@ -14,6 +14,7 @@ builder.Services.AddTransient<RepositoryProductos>();
 builder.Services.AddTransient<RepositoryTipos>();
 builder.Services.AddTransient<RepositorySubtipos>();
 builder.Services.AddTransient<RepositoryUser>();
+builder.Services.AddTransient<RepositoryPedidos>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IRepositoryCarrito, RepositoryCarritoSession>();
