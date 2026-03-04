@@ -54,7 +54,13 @@
             }
             <div>
             <p><strong>@Model.Precio €</strong></p>
-            @if (@Model.Stock < 5)
+            @if (Model.Stock < 1)
+            {
+                <p>
+                    <span style="color:red">No hay stock</span>
+                </p>
+            }
+            else if (@Model.Stock < 5)
             {
                 <p>
                     <span style="color:orange">Quedan pocas unidades!</span>
@@ -66,12 +72,7 @@
                     <span style="color:green">En stock!</span>
                 </p>
             }
-            else if (Model.Stock < 1)
-            {
-                <p>
-                    <span style="color:red">No hay stock</span>
-                </p>
-            }
+           
             <form method="post" asp-action="AddToCart">
                 <input type="hidden" name="idProducto" value="@Model.IdProducto" />
                 <select name="cantidad" class="cantidad-select">

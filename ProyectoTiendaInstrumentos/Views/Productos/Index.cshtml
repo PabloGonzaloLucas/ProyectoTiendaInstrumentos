@@ -44,7 +44,11 @@
                 }
                 </ul>
 
-                @if(producto.Stock < 5)
+                @if(producto.Stock < 1)
+                {
+                    <span style="color:red">No hay stock</span>
+                }
+                else if(producto.Stock < 5)
                 {
                     <span style="color:orange">Quedan pocas unidades!</span>
                 }
@@ -52,10 +56,7 @@
                 {
                     <span style="color:green">En stock!</span>
                 }
-                else if(producto.Stock < 1)
-                {
-                    <span style="color:red">No hay stock</span>
-                }
+             
             </a>
         </li>
 

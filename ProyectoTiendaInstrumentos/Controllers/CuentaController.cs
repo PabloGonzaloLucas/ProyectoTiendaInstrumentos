@@ -2,6 +2,7 @@
 using ProyectoTiendaInstrumentos.Extensions;
 using ProyectoTiendaInstrumentos.Models;
 using ProyectoTiendaInstrumentos.Repositories;
+using System.Threading.Tasks;
 
 namespace ProyectoTiendaInstrumentos.Controllers
 {
@@ -16,6 +17,76 @@ namespace ProyectoTiendaInstrumentos.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+        public async Task<IActionResult> Perfil()
+        {
+            if (HttpContext.Session.GetObject<Usuario>("Usuario") == null)
+            {
+                return RedirectToAction("Login", "Cuenta");
+            }
+            Usuario user = HttpContext.Session.GetObject<Usuario>("Usuario");
+
+            return View(user);
+        }
+        public async Task<IActionResult> CambiarPassword()
+        {
+            if (HttpContext.Session.GetObject<Usuario>("Usuario") == null)
+            {
+                return RedirectToAction("Login", "Cuenta");
+            }
+            Usuario user = HttpContext.Session.GetObject<Usuario>("Usuario");
+
+            return View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CambiarPassword(string passwordActual, string passwordNueva, string passwordConfirmar)
+        {
+            if (HttpContext.Session.GetObject<Usuario>("Usuario") == null)
+            {
+                return RedirectToAction("Login", "Cuenta");
+            }
+
+            Usuario user = HttpContext.Session.GetObject<Usuario>("Usuario");
+
+            if (string.IsNullOrWhiteSpace(passwordActual) || string.IsNullOrWhiteSpace(passwordNueva) || string.IsNullOrWhiteSpace(passwordConfirmar))
+            {
+                TempData["Error"] = "Todos los campos son obligatorios.";
+                return View(user);
+            }
+
+            if (passwordNueva != passwordConfirmar)
+            {
+                TempData["Error"] = "La nueva contraseña y la confirmación no coinciden.";
+                return View(user);
+            }
+
+            if (passwordNueva.Length < 5)
+            {
+                TempData["Error"] = "La nueva contraseña debe tener al menos 5 caracteres.";
+                return View(user);
+            }
+
+            bool passwordValida = await this.repo.VerificarPasswordActualAsync(user.IdUsuario, passwordActual);
+
+            if (!passwordValida)
+            {
+                TempData["Error"] = "La contraseña actual es incorrecta.";
+                return View(user);
+            }
+
+            bool cambioExitoso = await this.repo.CambiarPasswordAsync(user.IdUsuario, passwordNueva);
+
+            if (cambioExitoso)
+            {
+                TempData["Success"] = "Contraseña actualizada correctamente.";
+                return RedirectToAction("Perfil");
+            }
+            else
+            {
+                TempData["Error"] = "Ocurrió un error al cambiar la contraseña. Inténtalo de nuevo.";
+                return View(user);
+            }
         }
 
         public IActionResult Register()
@@ -60,10 +131,6 @@ namespace ProyectoTiendaInstrumentos.Controllers
                 HttpContext.Session.SetObject("Usuario", null);
             }
             return RedirectToAction("Index", "Home");
-
-            
         }
-
-
     }
 }

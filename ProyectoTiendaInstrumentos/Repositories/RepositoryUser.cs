@@ -115,5 +115,39 @@ namespace ProyectoTiendaInstrumentos.Repositories
                 return user;
             }
         }
+
+        public async Task<bool> VerificarPasswordActualAsync(int idUsuario, string passwordActual)
+        {
+            SeguridadUsuario seguridad = await this.context.SeguridadUsuarios
+                .FirstOrDefaultAsync(s => s.IdUsuario == idUsuario);
+
+            if (seguridad == null)
+            {
+                return false;
+            }
+
+            byte[] passwordEncriptada = HelperCryptography.EncryptPassword(passwordActual, seguridad.Salt);
+            return HelperTools.CompareArrays(passwordEncriptada, seguridad.Password);
+        }
+
+        public async Task<bool> CambiarPasswordAsync(int idUsuario, string passwordNueva)
+        {
+            SeguridadUsuario seguridad = await this.context.SeguridadUsuarios
+                .FirstOrDefaultAsync(s => s.IdUsuario == idUsuario);
+
+            if (seguridad == null)
+            {
+                return false;
+            }
+
+            string nuevoSalt = HelperTools.GenerateSalt();
+            seguridad.Salt = nuevoSalt;
+            seguridad.Password = HelperCryptography.EncryptPassword(passwordNueva, nuevoSalt);
+
+            this.context.SeguridadUsuarios.Update(seguridad);
+            await this.context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

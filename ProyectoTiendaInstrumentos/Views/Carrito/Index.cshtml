@@ -19,7 +19,8 @@
                                 @producto.Modelo
                             </span>
                         </p>
-                        <span>
+
+                        <span class="precio-unitario" data-precio="@producto.Precio">
                             @producto.Precio €
                         </span>
 
@@ -38,24 +39,29 @@
                     </a>
 
                     <div class="producto-actions">
-                        <!-- Campo oculto con el ID del producto -->
                         <input type="hidden" name="productos[@index].IdProducto" value="@producto.IdProducto" />
 
-                        <!-- Select con nombre único usando indexación -->
-                        <select name="productos[@index].Cantidad" class="cantidad-select">
+                        <select name="productos[@index].Cantidad"
+                                class="cantidad-select"
+                                data-idproducto="@producto.IdProducto"
+                                data-precio="@producto.Precio">
                             @{
                                 int stock = producto.Stock ?? 0;
                                 int maxCantidad = Math.Min(10, stock);
+                                int cantidadActual = producto.Cantidad ?? 1;
                             }
                             @for (int i = 1; i <= maxCantidad; i++)
                             {
-                                <option value="@i" selected="@(i == producto.Cantidad)">
+                                <option value="@i" selected="@(i == cantidadActual)">
                                     @i
                                 </option>
                             }
                         </select>
 
-                        <!-- Botón para eliminar producto -->
+                        <span class="subtotal-linea" data-idproducto="@producto.IdProducto">
+                            @(producto.Precio * (producto.Cantidad ?? 1)) €
+                        </span>
+
                         <button type="submit"
                                 asp-action="EliminarProducto"
                                 asp-route-idProducto="@producto.IdProducto"
@@ -70,7 +76,9 @@
         <div class="carrito-resumen">
             <p>
                 <strong>Total: </strong>
-                <span class="total-precio">@Model.Sum(p => p.Precio) €</span>
+                <span class="total-precio">
+                    @Model.Sum(p => p.Precio * (p.Cantidad ?? 1)) €
+                </span>
             </p>
             <button type="submit" class="btn-comprar">
                 Procesar compra
@@ -83,6 +91,50 @@
             Vaciar carrito
         </button>
     </form>
+
+    <script>
+        (function () {
+            function parseDecimal(value) {
+                if (value === null || value === undefined) return 0;
+                var normalized = String(value).replace(',', '.');
+                var n = Number(normalized);
+                return Number.isFinite(n) ? n : 0;
+            }
+
+            function formatEuros(value) {
+                return value.toFixed(2) + ' €';
+            }
+
+            function recalcular() {
+                var total = 0;
+
+                document.querySelectorAll('select.cantidad-select').forEach(function (select) {
+                    var precio = parseDecimal(select.getAttribute('data-precio'));
+                    var cantidad = parseDecimal(select.value);
+                    var id = select.getAttribute('data-idproducto');
+
+                    var subtotal = precio * cantidad;
+                    total += subtotal;
+
+                    var subtotalSpan = document.querySelector('.subtotal-linea[data-idproducto="' + id + '"]');
+                    if (subtotalSpan) {
+                        subtotalSpan.textContent = formatEuros(subtotal);
+                    }
+                });
+
+                var totalSpan = document.querySelector('.total-precio');
+                if (totalSpan) {
+                    totalSpan.textContent = formatEuros(total);
+                }
+            }
+
+            document.querySelectorAll('select.cantidad-select').forEach(function (select) {
+                select.addEventListener('change', recalcular);
+            });
+
+            recalcular();
+        })();
+    </script>
 }
 else
 {

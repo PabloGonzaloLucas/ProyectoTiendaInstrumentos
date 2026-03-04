@@ -1,12 +1,15 @@
 ﻿@model List<VwCatalogoProducto>
-
+@{
+    decimal total = 0;
+}
 <h1>Carrito</h1>
 @if (Model != null && Model.Count > 0)
 {
     <form method="post" asp-action="ConfirmarCompra">
         <ul>
-            @foreach(VwCatalogoProducto producto in Model)
+            @for (int index = 0; index < Model.Count; index++)
             {
+                VwCatalogoProducto producto = Model[index];
                 <li>
                     <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto">
                         <img src="@producto.ImagenPrincipal" alt="@producto.Modelo" />
@@ -22,19 +25,26 @@
                             @producto.Precio €
                         </span>
                         <span>
-                            @producto.Cantidad €
+                            x @(producto.Cantidad ?? 0)
                         </span>
                     </a>
-
-                  
                 </li>
+
+                <input type="hidden" name="productos[@index].IdProducto" value="@producto.IdProducto" />
+                <input type="hidden" name="productos[@index].Cantidad" value="@(producto.Cantidad ?? 0)" />
+
+                
+                    decimal precio = producto.Precio;
+                    int cantidad = producto.Cantidad ?? 0;
+                    total += precio * cantidad;
+                
             }
         </ul>
 
         <div class="carrito-resumen">
             <p>
                 <strong>Total: </strong>
-                <span class="total-precio">@Model.Sum(p => p.Precio) €</span>
+                <span class="total-precio">@total €</span>
             </p>
             <button type="submit" name="accion" value="confirmar" class="btn-comprar">
                 Confirmar compra

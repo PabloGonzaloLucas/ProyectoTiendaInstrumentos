@@ -93,5 +93,107 @@ namespace ProyectoTiendaInstrumentos.Repositories
                 }
             }
         }
+
+        public async Task<int> ComprarProductosAsync(List<ProductoCarritoCantidad> productos, int idUsuario)
+        {
+            if (productos == null || productos.Count == 0)
+            {
+                return 0;
+            }
+
+            List<ProductoCarritoCantidad> productosValidos = productos
+                .Where(p => p != null && p.IdProducto > 0 && p.Cantidad > 0)
+                .ToList();
+
+            if (productosValidos.Count == 0)
+            {
+                return 0;
+            }
+
+            await using var transaction = await this.context.Database.BeginTransactionAsync();
+
+            Pedido pedido = new Pedido();
+
+            foreach (ProductoCarritoCantidad producto in productosValidos)
+            {
+                Producto? productoDb = await this.context.Productos
+                    .FirstOrDefaultAsync(p => p.IdProducto == producto.IdProducto);
+
+                if (productoDb == null)
+                {
+                    await transaction.RollbackAsync();
+                    return 0;
+                }
+
+                int stockProducto = productoDb.Stock ?? 0;
+                if (stockProducto < producto.Cantidad)
+                {
+                    await transaction.RollbackAsync();
+                    return 0;
+                }
+
+                pedido.PrecioTotal += productoDb.Precio * producto.Cantidad;
+            }
+
+            int nextPedidoId = await this.FindMaxIdPedidoAsync() + 1;
+            pedido.IdPedido = nextPedidoId;
+            pedido.FechaCreacion = DateTime.Now;
+            pedido.IdUsuario = idUsuario;
+            pedido.Estado = "Procesando";
+
+            this.context.Pedidos.Add(pedido);
+            await this.context.SaveChangesAsync();
+
+            int idPedido = pedido.IdPedido;
+
+            int nextDetalleId = await this.FindMaxIdDetallePedidoAsync() + 1;
+
+            foreach (ProductoCarritoCantidad producto in productosValidos)
+            {
+                Producto? productoDb = await this.context.Productos
+                    .FirstOrDefaultAsync(p => p.IdProducto == producto.IdProducto);
+
+                if (productoDb == null)
+                {
+                    await transaction.RollbackAsync();
+                    return 0;
+                }
+
+                DetallePedido detallePedido = new DetallePedido
+                {
+                    IdDetallePedido = nextDetalleId,
+                    IdPedido = idPedido,
+                    IdProducto = producto.IdProducto,
+                    Cantidad = producto.Cantidad,
+                    PrecioUnitario = productoDb.Precio
+                };
+
+                nextDetalleId++;
+
+                this.context.DetallePedidos.Add(detallePedido);
+
+                int stockActual = productoDb.Stock ?? 0;
+                productoDb.Stock = stockActual - producto.Cantidad;
+                productoDb.Ventas += producto.Cantidad;
+
+                this.context.Productos.Update(productoDb);
+            }
+
+            await this.context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return pedido.IdPedido;
+        }
+
+        private async Task<int>FindMaxIdPedidoAsync()
+        {
+            int maxId = this.context.Pedidos.Max(p => p.IdPedido);
+            return maxId;
+        }
+        private async Task<int>FindMaxIdDetallePedidoAsync()
+        {
+            int maxId = this.context.DetallePedidos.Max(p => p.IdDetallePedido);
+            return maxId;
+        }
     }
 }

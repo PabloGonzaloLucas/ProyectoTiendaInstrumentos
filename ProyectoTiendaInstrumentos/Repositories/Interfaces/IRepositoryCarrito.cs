@@ -10,5 +10,6 @@ namespace ProyectoTiendaInstrumentos.Repositories.Interfaces
         Task ClearCartAsync(int idUsuario);
         Task<int> GetNumProductosCarritoAsync(int idUsuario);
         Task ActualizarCantidadAsync(int idProducto, int cantidad, int idUsuario);
+        Task<int> ComprarProductosAsync(List<ProductoCarritoCantidad> productos, int idUsuario);
     }
 }

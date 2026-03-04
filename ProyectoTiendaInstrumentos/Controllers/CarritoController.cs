@@ -33,28 +33,40 @@ namespace ProyectoTiendaInstrumentos.Controllers
             return View(productosCarrito);
         }
         [HttpPost]
-        public async Task<IActionResult> ConfirmarCompra(string accion)
+        public async Task<IActionResult> ConfirmarCompra(string accion, List<ProductoCarritoCantidad> productos)
         {
             if(HttpContext.Session.GetObject<Usuario>("Usuario") == null)
             {
                 return RedirectToAction("Login", "Cuenta");
             }
             int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;
-            if(accion == "cancelar")
+
+            if (accion == "cancelar")
             {
                 return RedirectToAction("Index");
             }
-            else if(accion == "confirmar")
+            else if (accion == "confirmar")
             {
+                if (productos == null || productos.Count == 0)
+                {
+                    TempData["Error"] = "No se han recibido productos para confirmar la compra.";
+                    return RedirectToAction("Index");
+                }
+
+                int idPedido = await this.repo.ComprarProductosAsync(productos, idUsuario);
+                if(idPedido == 0)
+                {
+                    TempData["Error"] = "No se pudo procesar la compra. Por favor, inténtalo de nuevo.";
+                    return RedirectToAction("Index");
+                }
                 await this.repo.ClearCartAsync(idUsuario);
                 //REDIRIJIR AL PEDIDO
-                return RedirectToAction("Index");
+                return RedirectToAction("DetallesPedido", "Pedidos", new { idPedido = idPedido });
             }
             else
             {
                 return RedirectToAction("Index");
             }
-
         }
 
         [HttpPost]
