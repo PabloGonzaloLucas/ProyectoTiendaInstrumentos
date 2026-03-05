@@ -29,5 +29,6 @@ namespace ProyectoTiendaInstrumentos.Data
         public DbSet<VwEspecificacionesProducto> EspecificacionesProducto { get; set; }
         public DbSet<VwLoginUser> ValidacionesUsuarios { get; set; }
         public DbSet<VwProductosPedido> ProductosPedidos { get; set; }
+        public DbSet<VwValoracionesProducto> ValoracionesProductos { get; set; }
     }
 }

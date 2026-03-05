@@ -16,7 +16,7 @@
         {
             <li>
                 <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto">
-                    <img src="@producto.Imagen" alt="@producto.Modelo" />
+                    <img src="~/images/productosMain/@producto.Imagen" alt="@producto.Modelo" />
                     <p>
                         <span style="font-weight:400">
                             @(producto.Marca + " ")

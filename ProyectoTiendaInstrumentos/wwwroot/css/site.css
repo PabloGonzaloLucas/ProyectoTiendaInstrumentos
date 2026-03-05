@@ -347,6 +347,21 @@ a:hover {
   .navbar-brand {
     font-size: 1.2rem;
   }
+
+  .search-form {
+    width: 100%;
+    margin: 1rem 0;
+    max-width: none;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+    min-width: auto;
+  }
 }
 
 @keyframes fadeIn {
@@ -362,4 +377,86 @@ a:hover {
 
 main {
   animation: fadeIn 0.5s ease;
+}
+
+/* Search Form Styles */
+
+.search-form {
+  margin: 0 2rem;
+  flex: 0 1 auto;
+  max-width: 500px;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--white);
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.search-container:focus-within {
+  box-shadow: 0 4px 15px rgba(127, 227, 170, 0.3);
+  transform: scale(1.02);
+}
+
+.search-input {
+  border: none;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  flex: 1;
+  background-color: transparent;
+  outline: none;
+  color: var(--dark-bg);
+  min-width: 200px;
+}
+
+.search-input::placeholder {
+  color: var(--dark-gray);
+  opacity: 0.7;
+}
+
+.search-input:focus {
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.search-button {
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  color: var(--dark-bg);
+  font-weight: 700;
+  transition: all 0.3s ease;
+  border-radius: 0;
+}
+
+.search-button:hover {
+  background: linear-gradient(135deg, var(--accent-green) 0%, var(--primary-green) 100%);
+  color: var(--white);
+}
+
+.search-button i {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .search-form {
+    width: 100%;
+    margin: 1rem 0;
+    max-width: none;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+    min-width: auto;
+  }
 }

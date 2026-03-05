@@ -12,7 +12,7 @@
                 VwCatalogoProducto producto = Model[index];
                 <li>
                     <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto">
-                        <img src="@producto.ImagenPrincipal" alt="@producto.Modelo" />
+                        <img src="~/images/productosMain/@producto.ImagenPrincipal" alt="@producto.Modelo" />
                         <p>
                             <span style="font-weight:400">
                                 @(producto.Marca + " ")

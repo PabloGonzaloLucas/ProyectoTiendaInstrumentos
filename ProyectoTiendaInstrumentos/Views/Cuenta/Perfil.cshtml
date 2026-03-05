@@ -12,7 +12,7 @@
             <div class="mt-4 mb-3">
                 @if (!string.IsNullOrWhiteSpace(Model?.Imagen))
                 {
-                    <img src="@Model.Imagen" alt="@Model.Nombre" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid var(--primary-green); box-shadow: 0 4px 15px rgba(127, 227, 170, 0.3);" />
+                    <img src="~/images/users/@Model.Imagen" alt="@Model.Nombre" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid var(--primary-green); box-shadow: 0 4px 15px rgba(127, 227, 170, 0.3);" />
                 }
                 else
                 {

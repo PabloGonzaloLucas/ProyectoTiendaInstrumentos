@@ -62,6 +62,30 @@ namespace ProyectoTiendaInstrumentos.Repositories
             }
             return catalogo;
         }
+        public async Task<List<VwCatalogoProducto>> BuscarProductosPorNombreAsync(string termino)
+        {
+            if (string.IsNullOrWhiteSpace(termino))
+            {
+                return new List<VwCatalogoProducto>();
+            }
+
+            var consulta = from datos in this.context.CatalogoProductos
+                           where datos.Modelo.Contains(termino) 
+                              || datos.Marca.Contains(termino)
+                              || datos.Tipo.Contains(termino)
+                              || datos.Subtipo.Contains(termino)
+                              || datos.Familia.Contains(termino)
+                           select datos;
+
+            List<VwCatalogoProducto> catalogo = await consulta.ToListAsync();
+            
+            foreach (VwCatalogoProducto producto in catalogo)
+            {
+                producto.Especificaciones = await this.GetEspecificacionesAsync(producto.IdProducto);
+            }
+            
+            return catalogo;
+        }
         public async Task<List<ProductoImagen>> GetImagenesProductoByIdAsync(int idProducto)
         {
             var consulta = from datos in this.context.ProductosImagenes

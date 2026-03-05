@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProyectoTiendaInstrumentos.Data;
+using ProyectoTiendaInstrumentos.Helpers;
 using ProyectoTiendaInstrumentos.Repositories;
 using ProyectoTiendaInstrumentos.Repositories.Interfaces;
 
@@ -15,6 +16,8 @@ builder.Services.AddTransient<RepositoryTipos>();
 builder.Services.AddTransient<RepositorySubtipos>();
 builder.Services.AddTransient<RepositoryUser>();
 builder.Services.AddTransient<RepositoryPedidos>();
+builder.Services.AddTransient<RepositoryValoraciones>();
+builder.Services.AddSingleton<HelperPathProvider>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IRepositoryCarrito, RepositoryCarritoSession>();
@@ -31,7 +34,9 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
+
 
 app.UseAuthorization();
 

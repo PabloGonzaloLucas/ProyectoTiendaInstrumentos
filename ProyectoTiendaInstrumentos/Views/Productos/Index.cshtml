@@ -1,64 +1,92 @@
 @model List<VwCatalogoProducto>
 @{
-    Subtipo subtipo;
-    if(ViewBag.Subtipo != null)
+    ViewData["Title"] = "Catálogo";
+    string termino = ViewBag.TerminoBusqueda ?? "";
+    int numResultados = ViewBag.NumeroResultados ?? 0;
+    bool esBusqueda = !string.IsNullOrEmpty(termino);
+
+    Subtipo subtipo = ViewBag.Subtipo as Subtipo;
+}
+
+@if (esBusqueda)
+{
+    <div class="busqueda-header">
+        <h1>Resultados de búsqueda</h1>
+        <p class="termino-busqueda">
+            Búsqueda: <strong>"@termino"</strong>
+            <span class="num-resultados">(@numResultados @(numResultados == 1 ? "producto encontrado" : "productos encontrados"))</span>
+        </p>
+    </div>
+}
+else
+{
+    <h1>@(subtipo != null ? subtipo.Nombre : "Catálogo")</h1>
+    @if (subtipo != null)
     {
-        subtipo = ViewBag.Subtipo as Subtipo;
         <p>
             <a asp-controller="Subtipos" asp-action="Index" asp-route-idTipo="@subtipo.IdTipo">@subtipo.Nombre</a>
         </p>
     }
-   
 }
-<h1>Productos</h1>
-<ul>
-    @foreach(VwCatalogoProducto producto in Model){
 
-              
-        <li>
-            <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto">
-                <img src="@producto.ImagenPrincipal" alt="@producto.Modelo"/>
-                <p>
-                    <span style="font-weight:400">
-                        @(producto.Marca + " ")
-                    </span>
-                    <span>
-                        @producto.Modelo
-                    </span>
-                </p>
-                <span>
-                    @producto.Precio €
-                </span>
-                <ul>
+@if (Model != null && Model.Count > 0)
+{
+    <div class="productos-grid">
+        @foreach (VwCatalogoProducto producto in Model)
+        {
+            <div class="producto-card">
+                <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto" class="producto-link">
+                    <div class="producto-image-container">
+                        <img src="~/images/productosMain/@producto.ImagenPrincipal" alt="@producto.Modelo" class="producto-image" />
+                        @if (producto.Stock < 1)
+                        {
+                            <div class="badge-agotado">Agotado</div>
+                        }
+                        else if (producto.Stock < 5)
+                        {
+                            <div class="badge-pocas">Pocas unidades</div>
+                        }
+                    </div>
 
-                @foreach(VwEspecificacionesProducto spec in producto.Especificaciones)
-                {
-                  <li>
-                      @spec.Especificacion: @spec.Valor
-                            @if (spec.UnidadMedida != null || spec.UnidadMedida != "")
-                            {
-                                @(" "+spec.UnidadMedida)
-                            }
-                      
-                  </li>
-                }
-                </ul>
+                    <div class="producto-info">
+                        <div class="producto-marca">@producto.Marca</div>
+                        <h3 class="producto-nombre">@producto.Modelo</h3>
 
-                @if(producto.Stock < 1)
-                {
-                    <span style="color:red">No hay stock</span>
-                }
-                else if(producto.Stock < 5)
-                {
-                    <span style="color:orange">Quedan pocas unidades!</span>
-                }
-                else if(producto.Stock >= 5)
-                {
-                    <span style="color:green">En stock!</span>
-                }
-             
-            </a>
-        </li>
+                        <div class="producto-categoria">
+                            <i class="bi bi-tag"></i> @producto.Tipo - @producto.Subtipo
+                        </div>
 
-    }
-</ul>
+                        @if (producto.Estrellas > 0)
+                        {
+                            <div class="producto-rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= producto.Estrellas)
+                                    {
+                                        <i class="bi bi-star-fill"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-star"></i>
+                                    }
+                                }
+                                <span class="rating-value">@producto.Estrellas</span>
+                            </div>
+                        }
+
+                        <div class="producto-precio">@producto.Precio.ToString("C")</div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}
+else if (esBusqueda)
+{
+    <div class="sin-resultados">
+        <i class="bi bi-search"></i>
+        <h2>No se encontraron productos</h2>
+        <p>No hay productos que coincidan con "<strong>@termino</strong>"</p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Volver al inicio</a>
+    </div>
+}
