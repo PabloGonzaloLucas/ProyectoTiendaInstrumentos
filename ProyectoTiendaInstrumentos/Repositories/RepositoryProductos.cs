@@ -103,5 +103,56 @@ namespace ProyectoTiendaInstrumentos.Repositories
             return await consulta.FirstOrDefaultAsync();
         }
 
+        public async Task<List<Especificacion>> GetEspecificacionesBySubtipoAsync(int idSubtipo)
+        {
+            var consulta = from datos in this.context.Especificaciones
+                                         join categoriaFiltro in this.context.CategoriaFiltros on datos.IdEspecificacion equals categoriaFiltro.IdEspecificacion
+                                         where categoriaFiltro.IdSubtipo == idSubtipo 
+                                         select datos;
+
+            List<Especificacion> specs =await consulta.ToListAsync();
+            return specs;
+        }
+
+        public async Task<List<ValoresEspecificacion>> GetValoresEspecificacionesByEspecifiacionAsync(int idEspecificacion)
+        {
+            var consulta = from datos in this.context.ValoresEspecifiaciones
+                           where datos.IdEspecificacion == idEspecificacion
+                           select datos;
+            return await consulta.ToListAsync();
+        }
+        public async Task<List<ValoresEspecificacion>> GetValoresEspecificacionesByEspecifiacionSubtipoAsync(int idEspecificacion, int idSubtipo)
+        {
+            var valores = await (
+                from datos in this.context.ValoresEspecifiaciones
+                join categoriaFiltro in this.context.CategoriaFiltros
+                    on datos.IdEspecificacion equals categoriaFiltro.IdEspecificacion
+                where datos.IdEspecificacion == idEspecificacion
+                   && categoriaFiltro.IdSubtipo == idSubtipo
+                group datos by datos.Valor into g
+                select g.First()
+            ).ToListAsync();
+
+            return valores;
+        }
+        public async Task<List<VwCatalogoProducto>> GetVistaCatalogoBySubtipoAndFiltroAsync(int idSubtipo, int idEspecificacion, string valor)
+        {
+            var consulta =
+                from producto in this.context.CatalogoProductos
+                join spec in this.context.EspecificacionesProducto on producto.IdProducto equals spec.IdProducto
+                where producto.IdSubtipo == idSubtipo
+                   && spec.IdEspecificacion == idEspecificacion
+                   && spec.Valor == valor
+                select producto;
+
+            List<VwCatalogoProducto> catalogo = await consulta.Distinct().ToListAsync();
+            foreach (VwCatalogoProducto producto in catalogo)
+            {
+                producto.Especificaciones = await this.GetEspecificacionesAsync(producto.IdProducto);
+            }
+
+            return catalogo;
+        }
+
     }
 }

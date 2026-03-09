@@ -14,6 +14,7 @@ namespace ProyectoTiendaInstrumentos.Data
         public DbSet<Familia> Familias { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<DetallePedido> DetallePedidos { get; set; }
+        public DbSet<CategoriaFiltro> CategoriaFiltros { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Tipo> Tipos { get; set; }
         public DbSet<Subtipo> Subtipos { get; set; }

@@ -5,7 +5,11 @@
     int numResultados = ViewBag.NumeroResultados ?? 0;
     bool esBusqueda = !string.IsNullOrEmpty(termino);
 
+    List<Especificacion> specs = ViewBag.Specs as List<Especificacion>;
     Subtipo subtipo = ViewBag.Subtipo as Subtipo;
+
+    int? idEspecificacionSeleccionada = ViewBag.IdEspecificacionSeleccionada as int?;
+    List<ValoresEspecificacion> valores = ViewBag.ValoresEspecificacion as List<ValoresEspecificacion>;
 }
 
 @if (esBusqueda)
@@ -21,64 +25,37 @@
 else
 {
     <h1>@(subtipo != null ? subtipo.Nombre : "Catálogo")</h1>
-    @if (subtipo != null)
-    {
-        <p>
-            <a asp-controller="Subtipos" asp-action="Index" asp-route-idTipo="@subtipo.IdTipo">@subtipo.Nombre</a>
-        </p>
-    }
+    <p>
+        @(subtipo != null ? Html.ActionLink(subtipo.Nombre, "Index", "Subtipos", new { idTipo = subtipo.IdTipo }, null) : null)
+    </p>
 }
 
 @if (Model != null && Model.Count > 0)
 {
-    <div class="productos-grid">
-        @foreach (VwCatalogoProducto producto in Model)
-        {
-            <div class="producto-card">
-                <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto" class="producto-link">
-                    <div class="producto-image-container">
-                        <img src="~/images/productosMain/@producto.ImagenPrincipal" alt="@producto.Modelo" class="producto-image" />
-                        @if (producto.Stock < 1)
-                        {
-                            <div class="badge-agotado">Agotado</div>
-                        }
-                        else if (producto.Stock < 5)
-                        {
-                            <div class="badge-pocas">Pocas unidades</div>
-                        }
+    if (specs != null && specs.Count > 0)
+    {
+        <div class="filtros">
+            <h3>Filtrar:</h3>
+            <div class="filtros-especificaciones">
+                @foreach (Especificacion spec in specs)
+                {
+                    <div class="filtro-especificacion">
+                        <a class="filtro-especificacion-titulo js-spec"
+                           href="#"
+                           data-idsubtipo="@(subtipo?.IdSubtipo ?? 0)"
+                           data-idespecificacion="@spec.IdEspecificacion">
+                            @spec.Nombre
+                        </a>
+
+                        <div class="js-valores-host" data-idespecificacion="@spec.IdEspecificacion"></div>
                     </div>
-
-                    <div class="producto-info">
-                        <div class="producto-marca">@producto.Marca</div>
-                        <h3 class="producto-nombre">@producto.Modelo</h3>
-
-                        <div class="producto-categoria">
-                            <i class="bi bi-tag"></i> @producto.Tipo - @producto.Subtipo
-                        </div>
-
-                        @if (producto.Estrellas > 0)
-                        {
-                            <div class="producto-rating">
-                                @for (int i = 1; i <= 5; i++)
-                                {
-                                    if (i <= producto.Estrellas)
-                                    {
-                                        <i class="bi bi-star-fill"></i>
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-star"></i>
-                                    }
-                                }
-                                <span class="rating-value">@producto.Estrellas</span>
-                            </div>
-                        }
-
-                        <div class="producto-precio">@producto.Precio.ToString("C")</div>
-                    </div>
-                </a>
+                }
             </div>
-        }
+        </div>
+    }
+
+    <div class="js-productos-host">
+        @await Html.PartialAsync("_ProductosGrid", Model)
     </div>
 }
 else if (esBusqueda)
@@ -89,4 +66,84 @@ else if (esBusqueda)
         <p>No hay productos que coincidan con "<strong>@termino</strong>"</p>
         <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Volver al inicio</a>
     </div>
+}
+
+@section Scripts {
+    <script>
+        $(function () {
+            function closeAllValores() {
+                $('.js-valores-host .filtro-valores:visible').stop(true, true).slideUp(200);
+                $('.filtro-especificacion-titulo').removeClass('is-active is-loading');
+                $('.filtro-especificacion').removeClass('is-expanded');
+            }
+
+            $('.js-spec').on('click', function (e) {
+                e.preventDefault();
+
+                var $link = $(this);
+                var idSubtipo = $link.data('idsubtipo');
+                var idEspecificacion = $link.data('idespecificacion');
+
+                var $container = $link.closest('.filtro-especificacion');
+                var $host = $container.find('.js-valores-host');
+
+                var $existing = $host.find('.filtro-valores');
+                if ($existing.length) {
+                    var isVisible = $existing.is(':visible');
+                    closeAllValores();
+
+                    if (!isVisible) {
+                        $link.addClass('is-active');
+                        $container.addClass('is-expanded');
+                        $existing.stop(true, true).slideDown(200);
+                    }
+
+                    return;
+                }
+
+                closeAllValores();
+                $link.addClass('is-loading');
+
+                $.get('@Url.Action("ValoresEspecificacionPartial", "Productos")', {
+                    idSubtipo: idSubtipo,
+                    idEspecificacion: idEspecificacion
+                })
+                    .done(function (html) {
+                        $link.removeClass('is-loading').addClass('is-active');
+                        $container.addClass('is-expanded');
+                        $host.html(html);
+                        $host.find('.filtro-valores').stop(true, true).slideDown(200);
+                    })
+                    .fail(function () {
+                        $link.removeClass('is-loading');
+                        alert('Error al cargar los valores. Por favor, inténtalo de nuevo.');
+                    });
+            });
+
+            $(document).on('click', '.js-valor', function (e) {
+                e.preventDefault();
+
+                var $valor = $(this);
+                var valor = $valor.data('valor');
+
+                var $specContainer = $valor.closest('.filtro-especificacion');
+                var $specLink = $specContainer.find('.js-spec');
+
+                var idSubtipo = $specLink.data('idsubtipo');
+                var idEspecificacion = $specLink.data('idespecificacion');
+
+                $.get('@Url.Action("FiltrarPorValor", "Productos")', {
+                    idSubtipo: idSubtipo,
+                    idEspecificacion: idEspecificacion,
+                    valor: valor
+                })
+                    .done(function (html) {
+                        $('.js-productos-host').html(html);
+                    })
+                    .fail(function () {
+                        alert('Error al filtrar productos.');
+                    });
+            });
+        });
+    </script>
 }

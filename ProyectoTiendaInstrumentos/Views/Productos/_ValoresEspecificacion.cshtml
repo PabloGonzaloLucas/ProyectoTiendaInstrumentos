@@ -1,0 +1,8 @@
+@model List<ValoresEspecificacion>
+
+<div class="filtro-valores" style="display:none">
+@foreach (ValoresEspecificacion v in Model)
+{
+    <a class="filtro-valor js-valor" href="#" data-valor="@v.Valor">@v.Valor</a>
+}
+</div>

@@ -24,11 +24,15 @@ namespace ProyectoTiendaInstrumentos.Controllers
                 List<VwCatalogoProducto> resultados = await this.repo.BuscarProductosPorNombreAsync(q);
                 ViewBag.TerminoBusqueda = q;
                 ViewBag.NumeroResultados = resultados.Count;
+                List<Especificacion> especificaciones = await this.repo.GetEspecificacionesBySubtipoAsync(idSubtipo);
+                ViewBag.Especificaciones = especificaciones;
                 return View(resultados);
             }
 
             ViewBag.Subtipo = await this.repo.GetSubtipoByIdAsync(idSubtipo);
             List<VwCatalogoProducto> productos = await this.repo.GetVistaCatalogoBySubtipoAsync(idSubtipo);
+            List<Especificacion> specs = await this.repo.GetEspecificacionesBySubtipoAsync(idSubtipo);
+            ViewBag.Specs = specs;
             return View(productos);
         }
 
@@ -119,6 +123,59 @@ namespace ProyectoTiendaInstrumentos.Controllers
             }
 
             return RedirectToAction("Details", new { idProducto = idProducto });
+        }
+
+        public async Task<IActionResult> ValoresEspecificacion(int idSubtipo, int idEspecificacion, string q = null)
+        {
+            ViewBag.Subtipo = await this.repo.GetSubtipoByIdAsync(idSubtipo);
+            ViewBag.Specs = await this.repo.GetEspecificacionesBySubtipoAsync(idSubtipo);
+
+            ViewBag.IdEspecificacionSeleccionada = idEspecificacion;
+            ViewBag.ValoresEspecificacion = await this.repo.GetValoresEspecificacionesByEspecifiacionSubtipoAsync(idEspecificacion, idSubtipo);
+
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                List<VwCatalogoProducto> resultados = await this.repo.BuscarProductosPorNombreAsync(q);
+                ViewBag.TerminoBusqueda = q;
+                ViewBag.NumeroResultados = resultados.Count;
+                return View("Index", resultados);
+            }
+
+            List<VwCatalogoProducto> productos = await this.repo.GetVistaCatalogoBySubtipoAsync(idSubtipo);
+            return View("Index", productos);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ValoresEspecificacionPartial(int idSubtipo, int idEspecificacion)
+        {
+            List<ValoresEspecificacion> valores = await this.repo
+                .GetValoresEspecificacionesByEspecifiacionSubtipoAsync(idEspecificacion, idSubtipo);
+
+            return PartialView("_ValoresEspecificacion", valores);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FiltrarPorValor(int idSubtipo, int idEspecificacion, string valor, string? q = null)
+        {
+            ViewBag.Subtipo = await this.repo.GetSubtipoByIdAsync(idSubtipo);
+            ViewBag.Specs = await this.repo.GetEspecificacionesBySubtipoAsync(idSubtipo);
+
+            ViewBag.IdEspecificacionSeleccionada = idEspecificacion;
+            ViewBag.ValoresEspecificacion = await this.repo.GetValoresEspecificacionesByEspecifiacionSubtipoAsync(idEspecificacion, idSubtipo);
+            ViewBag.ValorSeleccionado = valor;
+
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                List<VwCatalogoProducto> resultados = await this.repo.BuscarProductosPorNombreAsync(q);
+                resultados = resultados
+                    .Where(p => p.IdSubtipo == idSubtipo)
+                    .ToList();
+
+                return PartialView("_ProductosGrid", resultados);
+            }
+
+            List<VwCatalogoProducto> productos = await this.repo.GetVistaCatalogoBySubtipoAndFiltroAsync(idSubtipo, idEspecificacion, valor);
+            return PartialView("_ProductosGrid", productos);
         }
     }
 }
