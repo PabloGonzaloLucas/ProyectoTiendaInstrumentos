@@ -1,4 +1,6 @@
-﻿:root {
+﻿/*** Incluyendo cambios sugeridos ***/
+
+:root {
   --primary-green: #7FE3AA;
   --dark-bg: #1A1C1B;
   --light-green: #A8F0C9;
@@ -618,6 +620,54 @@ main {
 .filtro-valor:active {
   transform: translateY(0) scale(1.02);
   box-shadow: 0 2px 6px rgba(127, 227, 170, 0.3);
+}
+
+/* ================================================
+   FILTROS GENERALES DE BÚSQUEDA
+   ================================================ */
+
+.filtro-valor-activo {
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+  border-color: var(--accent-green);
+  color: var(--dark-bg) !important;
+  box-shadow: 0 4px 12px rgba(127, 227, 170, 0.35);
+}
+
+.filtro-rango-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--dark-bg);
+  padding: 0 0.25rem;
+}
+
+.filtro-range {
+  width: 100%;
+  accent-color: var(--primary-green);
+  cursor: pointer;
+}
+
+.filtro-panel {
+  padding: 0.75rem 1.25rem 1.25rem 1.25rem;
+  background: linear-gradient(180deg, rgba(127, 227, 170, 0.06) 0%, rgba(127, 227, 170, 0.02) 100%);
+  border-top: 1px solid rgba(127, 227, 170, 0.2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.sin-resultados-filtro {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--dark-bg);
+  opacity: 0.6;
+}
+
+.sin-resultados-filtro i {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
 }
 
 /* ================================================

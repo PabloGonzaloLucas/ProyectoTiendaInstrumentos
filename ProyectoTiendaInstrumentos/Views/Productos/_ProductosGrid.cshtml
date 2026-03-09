@@ -3,7 +3,10 @@
 <div class="productos-grid">
 @foreach (VwCatalogoProducto producto in Model)
 {
-    <div class="producto-card">
+    <div class="producto-card"
+         data-precio="@producto.Precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+         data-estrellas="@producto.Estrellas"
+         data-stock="@(producto.Stock ?? 0)">
         <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto" class="producto-link">
             <div class="producto-image-container">
                 <img src="~/images/productosMain/@producto.ImagenPrincipal" alt="@producto.Modelo" class="producto-image" />

@@ -24,8 +24,19 @@ namespace ProyectoTiendaInstrumentos.Controllers
                 List<VwCatalogoProducto> resultados = await this.repo.BuscarProductosPorNombreAsync(q);
                 ViewBag.TerminoBusqueda = q;
                 ViewBag.NumeroResultados = resultados.Count;
-                List<Especificacion> especificaciones = await this.repo.GetEspecificacionesBySubtipoAsync(idSubtipo);
-                ViewBag.Especificaciones = especificaciones;
+
+                if (resultados.Count > 0)
+                {
+                    var subtiposEncontrados = resultados.Select(p => p.IdSubtipo).Distinct().ToList();
+                    
+                    if (subtiposEncontrados.Count == 1)
+                    {
+                        int subtipoInferido = subtiposEncontrados[0];
+                        ViewBag.Subtipo = await this.repo.GetSubtipoByIdAsync(subtipoInferido);
+                        ViewBag.Specs = await this.repo.GetEspecificacionesBySubtipoAsync(subtipoInferido);
+                    }
+                }
+
                 return View(resultados);
             }
 
@@ -138,6 +149,11 @@ namespace ProyectoTiendaInstrumentos.Controllers
                 List<VwCatalogoProducto> resultados = await this.repo.BuscarProductosPorNombreAsync(q);
                 ViewBag.TerminoBusqueda = q;
                 ViewBag.NumeroResultados = resultados.Count;
+
+                // Asegura que el menú de filtros aparezca también en modo búsqueda
+                ViewBag.Subtipo = await this.repo.GetSubtipoByIdAsync(idSubtipo);
+                ViewBag.Specs = await this.repo.GetEspecificacionesBySubtipoAsync(idSubtipo);
+
                 return View("Index", resultados);
             }
 

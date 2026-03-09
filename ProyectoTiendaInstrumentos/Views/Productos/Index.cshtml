@@ -1,6 +1,6 @@
-@model List<VwCatalogoProducto>
+﻿@model List<VwCatalogoProducto>
 @{
-    ViewData["Title"] = "Cat�logo";
+    ViewData["Title"] = "Catálogo";
     string termino = ViewBag.TerminoBusqueda ?? "";
     int numResultados = ViewBag.NumeroResultados ?? 0;
     bool esBusqueda = !string.IsNullOrEmpty(termino);
@@ -10,21 +10,24 @@
 
     int? idEspecificacionSeleccionada = ViewBag.IdEspecificacionSeleccionada as int?;
     List<ValoresEspecificacion> valores = ViewBag.ValoresEspecificacion as List<ValoresEspecificacion>;
+
+    decimal precioMin = Model != null && Model.Count > 0 ? Math.Floor(Model.Min(p => p.Precio)) : 0;
+    decimal precioMax = Model != null && Model.Count > 0 ? Math.Ceiling(Model.Max(p => p.Precio)) : 9999;
 }
 
 @if (esBusqueda)
 {
     <div class="busqueda-header">
-        <h1>Resultados de b�squeda</h1>
+        <h1>Resultados de búsqueda</h1>
         <p class="termino-busqueda">
-            B�squeda: <strong>"@termino"</strong>
-            <span class="num-resultados">(@numResultados @(numResultados == 1 ? "producto encontrado" : "productos encontrados"))</span>
+            Búsqueda: <strong>"@termino"</strong>
+            <span class="num-resultados">(<span id="js-count-visible">@numResultados</span> @(numResultados == 1 ? "producto encontrado" : "productos encontrados"))</span>
         </p>
     </div>
 }
 else
 {
-    <h1>@(subtipo != null ? subtipo.Nombre : "Cat�logo")</h1>
+    <h1>@(subtipo != null ? subtipo.Nombre : "Catálogo")</h1>
     <p>
         @(subtipo != null ? Html.ActionLink(subtipo.Nombre, "Index", "Subtipos", new { idTipo = subtipo.IdTipo }, null) : null)
     </p>
@@ -32,7 +35,65 @@ else
 
 @if (Model != null && Model.Count > 0)
 {
-    if (specs != null && specs.Count > 0)
+    if (esBusqueda)
+    {
+        <div class="filtros filtros-busqueda">
+            <h3>Filtrar:</h3>
+            <div class="filtros-especificaciones">
+
+                <div class="filtro-especificacion" id="filtro-precio">
+                    <a class="filtro-especificacion-titulo js-filtro-gen" href="#" data-target="panel-precio">
+                        Precio
+                    </a>
+                    <div class="js-valores-host">
+                        <div class="filtro-valores filtro-panel" id="panel-precio" style="display:none; flex-direction:column; gap:0.75rem;">
+                            <div class="filtro-rango-row">
+                                <label>Min: <strong id="lbl-precio-min">@precioMin.ToString("0")€</strong></label>
+                                <label>Max: <strong id="lbl-precio-max">@precioMax.ToString("0")€</strong></label>
+                            </div>
+                            <input type="range" id="range-precio-min" class="filtro-range" min="@precioMin.ToString("0")" max="@precioMax.ToString("0")" value="@precioMin.ToString("0")" step="1" />
+                            <input type="range" id="range-precio-max" class="filtro-range" min="@precioMin.ToString("0")" max="@precioMax.ToString("0")" value="@precioMax.ToString("0")" step="1" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filtro-especificacion" id="filtro-valoracion">
+                    <a class="filtro-especificacion-titulo js-filtro-gen" href="#" data-target="panel-valoracion">
+                        Valoración mínima
+                    </a>
+                    <div class="js-valores-host">
+                        <div class="filtro-valores filtro-panel" id="panel-valoracion" style="display:none;">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                int stars = i;
+                                <a class="filtro-valor js-filtro-estrellas" href="#" data-estrellas="@stars">
+                                    @for (int s = 1; s <= stars; s++) { <i class="bi bi-star-fill"></i> }
+                                    @for (int s = stars + 1; s <= 5; s++) { <i class="bi bi-star"></i> }
+                                </a>
+                            }
+                            <a class="filtro-valor js-filtro-estrellas filtro-valor-activo" href="#" data-estrellas="0">Todas</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filtro-especificacion" id="filtro-stock">
+                    <a class="filtro-especificacion-titulo js-filtro-gen" href="#" data-target="panel-stock">
+                        Disponibilidad
+                    </a>
+                    <div class="js-valores-host">
+                        <div class="filtro-valores filtro-panel" id="panel-stock" style="display:none;">
+                            <a class="filtro-valor js-filtro-stock filtro-valor-activo" href="#" data-stock="all">Todos</a>
+                            <a class="filtro-valor js-filtro-stock" href="#" data-stock="available">En stock</a>
+                            <a class="filtro-valor js-filtro-stock" href="#" data-stock="low">Pocas unidades</a>
+                            <a class="filtro-valor js-filtro-stock" href="#" data-stock="out">Agotados</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    }
+    else if (specs != null && specs.Count > 0)
     {
         <div class="filtros">
             <h3>Filtrar:</h3>
@@ -46,16 +107,71 @@ else
                            data-idespecificacion="@spec.IdEspecificacion">
                             @spec.Nombre
                         </a>
-
                         <div class="js-valores-host" data-idespecificacion="@spec.IdEspecificacion"></div>
                     </div>
                 }
+
+                <div class="filtro-especificacion" id="filtro-precio">
+                    <a class="filtro-especificacion-titulo js-filtro-gen" href="#" data-target="panel-precio">
+                        Precio
+                    </a>
+                    <div class="js-valores-host">
+                        <div class="filtro-valores filtro-panel" id="panel-precio" style="display:none; flex-direction:column; gap:0.75rem;">
+                            <div class="filtro-rango-row">
+                                <label>Min: <strong id="lbl-precio-min">@precioMin.ToString("0")€</strong></label>
+                                <label>Max: <strong id="lbl-precio-max">@precioMax.ToString("0")€</strong></label>
+                            </div>
+                            <input type="range" id="range-precio-min" class="filtro-range" min="@precioMin.ToString("0")" max="@precioMax.ToString("0")" value="@precioMin.ToString("0")" step="1" />
+                            <input type="range" id="range-precio-max" class="filtro-range" min="@precioMin.ToString("0")" max="@precioMax.ToString("0")" value="@precioMax.ToString("0")" step="1" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filtro-especificacion" id="filtro-valoracion">
+                    <a class="filtro-especificacion-titulo js-filtro-gen" href="#" data-target="panel-valoracion">
+                        Valoración mínima
+                    </a>
+                    <div class="js-valores-host">
+                        <div class="filtro-valores filtro-panel" id="panel-valoracion" style="display:none;">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                int stars = i;
+                                <a class="filtro-valor js-filtro-estrellas" href="#" data-estrellas="@stars">
+                                    @for (int s = 1; s <= stars; s++) { <i class="bi bi-star-fill"></i> }
+                                    @for (int s = stars + 1; s <= 5; s++) { <i class="bi bi-star"></i> }
+                                </a>
+                            }
+                            <a class="filtro-valor js-filtro-estrellas filtro-valor-activo" href="#" data-estrellas="0">Todas</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filtro-especificacion" id="filtro-stock">
+                    <a class="filtro-especificacion-titulo js-filtro-gen" href="#" data-target="panel-stock">
+                        Disponibilidad
+                    </a>
+                    <div class="js-valores-host">
+                        <div class="filtro-valores filtro-panel" id="panel-stock" style="display:none;">
+                            <a class="filtro-valor js-filtro-stock filtro-valor-activo" href="#" data-stock="all">Todos</a>
+                            <a class="filtro-valor js-filtro-stock" href="#" data-stock="available">En stock</a>
+                            <a class="filtro-valor js-filtro-stock" href="#" data-stock="low">Pocas unidades</a>
+                            <a class="filtro-valor js-filtro-stock" href="#" data-stock="out">Agotados</a>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     }
 
     <div class="js-productos-host">
         @await Html.PartialAsync("_ProductosGrid", Model)
+    </div>
+
+    <div class="sin-resultados-filtro" id="js-no-results" style="display:none;">
+        <i class="bi bi-funnel"></i>
+        <h2>Sin resultados</h2>
+        <p>Ningún producto coincide con los filtros aplicados.</p>
     </div>
 }
 else if (esBusqueda)
@@ -71,10 +187,111 @@ else if (esBusqueda)
 @section Scripts {
     <script>
         $(function () {
+
+            // ── Estado de filtros generales ───────────────────────────────────────
+            var filtroEstrellasMin = 0;
+            var filtroStock = 'all';
+            var filtroPrecioMin = parseFloat($('#range-precio-min').val()) || 0;
+            var filtroPrecioMax = parseFloat($('#range-precio-max').val()) || 999999;
+
+            function applyFiltrosGenerales() {
+                var visible = 0;
+                $('.producto-card').each(function () {
+                    var $card = $(this);
+                    var precio = parseFloat($card.data('precio') || 0);
+                    var estrellas = parseInt($card.data('estrellas') || 0);
+                    var stock = parseInt($card.data('stock') || 0);
+
+                    var stockOk = true;
+                    if (filtroStock === 'available') stockOk = stock >= 5;
+                    else if (filtroStock === 'low') stockOk = stock > 0 && stock < 5;
+                    else if (filtroStock === 'out') stockOk = stock <= 0;
+
+                    // filtroPrecioMin es floor del mínimo, filtroPrecioMax es ceil del máximo.
+                    // Comparamos precio < filtroPrecioMin+1 (para incluir decimales dentro del tramo)
+                    // y precio <= filtroPrecioMax (ceil ya cubre los decimales por arriba)
+                    var ok = precio >= filtroPrecioMin
+                          && precio < (filtroPrecioMax + 1)
+                          && estrellas >= filtroEstrellasMin
+                          && stockOk;
+
+                    $card.toggle(ok);
+                    if (ok) visible++;
+                });
+
+                $('#js-count-visible').text(visible);
+                $('#js-no-results').toggle(visible === 0);
+            }
+
+            // Toggle panel accordion (filtros generales)
+            $(document).on('click', '.js-filtro-gen', function (e) {
+                e.preventDefault();
+                var target = $(this).data('target');
+                var $panel = $('#' + target);
+                var $link = $(this);
+                var $container = $link.closest('.filtro-especificacion');
+                var isVisible = $panel.is(':visible');
+
+                $('.filtro-panel').stop(true, true).slideUp(200);
+                $('.js-filtro-gen').removeClass('is-active');
+                $('.filtro-especificacion[id^="filtro-"]').removeClass('is-expanded');
+
+                if (!isVisible) {
+                    $panel.stop(true, true).slideDown(200);
+                    $link.addClass('is-active');
+                    $container.addClass('is-expanded');
+                }
+            });
+
+            // Precio range
+            $('#range-precio-min').on('input', function () {
+                filtroPrecioMin = parseFloat($(this).val());
+                if (filtroPrecioMin > filtroPrecioMax) {
+                    $(this).val(filtroPrecioMax);
+                    filtroPrecioMin = filtroPrecioMax;
+                }
+                $('#lbl-precio-min').text(filtroPrecioMin + '€');
+                applyFiltrosGenerales();
+            });
+
+            $('#range-precio-max').on('input', function () {
+                filtroPrecioMax = parseFloat($(this).val());
+                if (filtroPrecioMax < filtroPrecioMin) {
+                    $(this).val(filtroPrecioMin);
+                    filtroPrecioMax = filtroPrecioMin;
+                }
+                $('#lbl-precio-max').text(filtroPrecioMax + '€');
+                applyFiltrosGenerales();
+            });
+
+            // Estrellas
+            $(document).on('click', '.js-filtro-estrellas', function (e) {
+                e.preventDefault();
+                filtroEstrellasMin = parseInt($(this).data('estrellas'));
+                $('.js-filtro-estrellas').removeClass('filtro-valor-activo');
+                $(this).addClass('filtro-valor-activo');
+                applyFiltrosGenerales();
+            });
+
+            // Stock
+            $(document).on('click', '.js-filtro-stock', function (e) {
+                e.preventDefault();
+                filtroStock = $(this).data('stock');
+                $('.js-filtro-stock').removeClass('filtro-valor-activo');
+                $(this).addClass('filtro-valor-activo');
+                applyFiltrosGenerales();
+            });
+
+            // ── Filtros por especificación (catálogo) ─────────────────────────────
+
             function closeAllValores() {
-                $('.js-valores-host .filtro-valores:visible').stop(true, true).slideUp(200);
-                $('.filtro-especificacion-titulo').removeClass('is-active is-loading');
-                $('.filtro-especificacion').removeClass('is-expanded');
+                // Solo cierra los paneles de especificaciones dinámicas, no los filtros generales
+                $('.js-spec').each(function () {
+                    var $host = $(this).closest('.filtro-especificacion').find('.js-valores-host');
+                    $host.find('.filtro-valores:visible').stop(true, true).slideUp(200);
+                });
+                $('.js-spec').removeClass('is-active is-loading');
+                $('.filtro-especificacion:not([id^="filtro-"])').removeClass('is-expanded');
             }
 
             $('.js-spec').on('click', function (e) {
@@ -116,7 +333,7 @@ else if (esBusqueda)
                     })
                     .fail(function () {
                         $link.removeClass('is-loading');
-                        alert('Error al cargar los valores. Por favor, int�ntalo de nuevo.');
+                        alert('Error al cargar los valores. Por favor, inténtalo de nuevo.');
                     });
             });
 
@@ -139,6 +356,8 @@ else if (esBusqueda)
                 })
                     .done(function (html) {
                         $('.js-productos-host').html(html);
+                        // Re-aplicar filtros generales sobre el nuevo grid cargado
+                        applyFiltrosGenerales();
                     })
                     .fail(function () {
                         alert('Error al filtrar productos.');
