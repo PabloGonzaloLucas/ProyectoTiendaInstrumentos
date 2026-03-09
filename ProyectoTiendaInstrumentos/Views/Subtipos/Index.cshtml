@@ -1,15 +1,24 @@
 ﻿@model List<Subtipo>
 @{
     Tipo tipo = ViewBag.Tipo as Tipo;
+    ViewData["Title"] = tipo?.Nombre ?? "Subtipos";
 }
-<p>
-    <a asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@tipo.IdFamilia">@tipo.Nombre</a>
-</p>
-<ul>
+
+<div class="breadcrumb-nav">
+    <a asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@tipo.IdFamilia">
+        <i class="bi bi-arrow-left"></i> @tipo.Nombre
+    </a>
+</div>
+
+<h1 class="page-title">@tipo.Nombre</h1>
+
+<ul class="subtipos-grid">
     @foreach(Subtipo subtipo in Model)
     {
         <li>
-            <a asp-controller="Productos" asp-action="Index" asp-route-idSubtipo="@subtipo.IdSubtipo">@subtipo.Nombre</a>
+            <a asp-controller="Productos" asp-action="Index" asp-route-idSubtipo="@subtipo.IdSubtipo" class="subtipo-card">
+                <span>@subtipo.Nombre</span>
+            </a>
         </li>
     }
 </ul>
