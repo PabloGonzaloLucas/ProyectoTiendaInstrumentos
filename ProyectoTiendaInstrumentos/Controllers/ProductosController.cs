@@ -171,6 +171,13 @@ namespace ProyectoTiendaInstrumentos.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> TodosLosProductosPartial(int idSubtipo)
+        {
+            List<VwCatalogoProducto> productos = await this.repo.GetVistaCatalogoBySubtipoAsync(idSubtipo);
+            return PartialView("_ProductosGrid", productos);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> FiltrarPorValor(int idSubtipo, int idEspecificacion, string valor, string? q = null)
         {
             ViewBag.Subtipo = await this.repo.GetSubtipoByIdAsync(idSubtipo);

@@ -349,6 +349,30 @@ else if (esBusqueda)
                 var idSubtipo = $specLink.data('idsubtipo');
                 var idEspecificacion = $specLink.data('idespecificacion');
 
+                var yaActivo = $valor.hasClass('filtro-valor-activo');
+
+                $specContainer.find('.js-valor').removeClass('filtro-valor-activo');
+                $specLink.removeClass('tiene-filtro-activo');
+
+                if (yaActivo) {
+                    // Deseleccionar: restaurar todos los productos del subtipo
+                    $.get('@Url.Action("TodosLosProductosPartial", "Productos")', {
+                        idSubtipo: idSubtipo
+                    })
+                        .done(function (html) {
+                            $('.js-productos-host').html(html);
+                            applyFiltrosGenerales();
+                        })
+                        .fail(function () {
+                            alert('Error al restablecer productos.');
+                        });
+                    return;
+                }
+
+                // Seleccionar: marcar valor como activo y filtrar
+                $valor.addClass('filtro-valor-activo');
+                $specLink.addClass('tiene-filtro-activo');
+
                 $.get('@Url.Action("FiltrarPorValor", "Productos")', {
                     idSubtipo: idSubtipo,
                     idEspecificacion: idEspecificacion,
@@ -356,7 +380,6 @@ else if (esBusqueda)
                 })
                     .done(function (html) {
                         $('.js-productos-host').html(html);
-                        // Re-aplicar filtros generales sobre el nuevo grid cargado
                         applyFiltrosGenerales();
                     })
                     .fail(function () {

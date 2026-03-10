@@ -1,4 +1,4 @@
-﻿/*** Incluyendo cambios sugeridos ***/
+﻿/*** Cambios aplicados ***/
 
 :root {
   --primary-green: #7FE3AA;
@@ -631,6 +631,17 @@ main {
   border-color: var(--accent-green);
   color: var(--dark-bg) !important;
   box-shadow: 0 4px 12px rgba(127, 227, 170, 0.35);
+}
+
+.filtro-especificacion-titulo.tiene-filtro-activo {
+  background: linear-gradient(135deg, rgba(127, 227, 170, 0.18) 0%, rgba(127, 227, 170, 0.08) 100%);
+  color: var(--dark-bg);
+}
+
+.filtro-especificacion-titulo.tiene-filtro-activo::before {
+  content: '✓ ';
+  color: var(--accent-green);
+  font-weight: 900;
 }
 
 .filtro-rango-row {

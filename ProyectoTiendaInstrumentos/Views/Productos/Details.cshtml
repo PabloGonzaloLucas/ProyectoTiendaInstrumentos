@@ -3,7 +3,7 @@
 @using ProyectoTiendaInstrumentos.Models
 @{
     List<VwEspecificacionesProducto> specs = ViewBag.Especificaciones as List<VwEspecificacionesProducto>;
-    List<ProductoImagen> imagenesProducto = ViewBag.ImagenesProducto as List<ProductoImagen>;
+    List<ProductoImagen> imagenesProducto = ViewBag.ImagenesProductos as List<ProductoImagen>;
     bool usuarioHaValorado = ViewBag.UsuarioHaValorado ?? false;
     bool usuarioHaComprado = ViewBag.UsuarioHaComprado ?? false;
     bool estaAutenticado = Context.Session.GetObject<Usuario>("Usuario") != null;
@@ -14,22 +14,38 @@
     <div>   
         <p><strong>@Model.Puntuacion</strong></p>
         <img src="~/images/marcas/@Model.LogoMarca" />
-        <div>
-            <img src="~/images/productosMain/@Model.Imagen" alt="@Model.Modelo" />
+        
+        <div class="main-image-container">
+            <img id="main-product-image"
+                 class="main-product-image"
+                 src="~/images/productosMain/@Model.Imagen"
+                 alt="@Model.Modelo" />
         </div>
-        <div>
-            @if (imagenesProducto != null)
-            {
-                @foreach (ProductoImagen imagen in imagenesProducto)
-                {
-                    <img src="~/images/productos/@imagen.Imagen" alt="@Model.Modelo" />
-                }
-            }
-            else
-            {
-                <h1>No hay imagenes para el producto</h1>
-            }
-        </div>
+
+        @if (imagenesProducto != null && imagenesProducto.Count > 0)
+        {
+            <div class="thumbnail-strip">
+                <div class="thumbnail-track-wrapper">
+                    <div class="thumbnail-track">
+                        <div class="gallery-image-container thumb-active"
+                             data-src="@Url.Content("~/images/productosMain/" + Model.Imagen)">
+                            <img class="gallery-image"
+                                 src="~/images/productosMain/@Model.Imagen"
+                                 alt="@Model.Modelo" />
+                        </div>
+                        @foreach (ProductoImagen imagen in imagenesProducto)
+                        {
+                            <div class="gallery-image-container"
+                                 data-src="@Url.Content("~/images/productos/" + imagen.Imagen)">
+                                <img class="gallery-image"
+                                     src="~/images/productos/@imagen.Imagen"
+                                     alt="@Model.Modelo" />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
         <p><strong>Descripción: </strong>@Model.Descripcion</p>
         <p>Número de producto: @Model.IdProducto<p/>
             @if(specs.Count > 0)
@@ -206,27 +222,45 @@
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnMostrar = document.getElementById('btnMostrarFormulario');
-            const btnCancelar = document.getElementById('btnCancelar');
-            const cajaComentario = document.getElementById('cajaComentario');
+        // jQuery script for image gallery and review form
+        $(function () {
 
-            if (btnMostrar) {
-                btnMostrar.addEventListener('click', function() {
-                    cajaComentario.style.display = 'block';
-                    btnMostrar.style.display = 'none';
-                });
-            }
+            // ── Galería de imágenes ───────────────────────────────────────────────
 
-            if (btnCancelar) {
-                btnCancelar.addEventListener('click', function() {
-                    cajaComentario.style.display = 'none';
-                    btnMostrar.style.display = 'inline-block';
-                    
-                    const form = cajaComentario.querySelector('form');
-                    form.reset();
-                });
-            }
+            var $mainImg = $('#main-product-image');
+
+            $(document).on('click', '.gallery-image-container', function () {
+                var src = $(this).data('src');
+                $mainImg.addClass('img-fade-out');
+                setTimeout(function () {
+                    $mainImg.attr('src', src);
+                    $mainImg.removeClass('img-fade-out');
+                }, 180);
+                $('.gallery-image-container').removeClass('thumb-active');
+                $(this).addClass('thumb-active');
+            });
+
+            // ── Formulario de reseña ──────────────────────────────────────────────
+            document.addEventListener('DOMContentLoaded', function() {
+                const btnMostrar = document.getElementById('btnMostrarFormulario');
+                const btnCancelar = document.getElementById('btnCancelar');
+                const cajaComentario = document.getElementById('cajaComentario');
+
+                if (btnMostrar) {
+                    btnMostrar.addEventListener('click', function() {
+                        cajaComentario.style.display = 'block';
+                        btnMostrar.style.display = 'none';
+                    });
+                }
+
+                if (btnCancelar) {
+                    btnCancelar.addEventListener('click', function() {
+                        cajaComentario.style.display = 'none';
+                        btnMostrar.style.display = 'inline-block';
+                        cajaComentario.querySelector('form').reset();
+                    });
+                }
+            });
         });
     </script>
 }
