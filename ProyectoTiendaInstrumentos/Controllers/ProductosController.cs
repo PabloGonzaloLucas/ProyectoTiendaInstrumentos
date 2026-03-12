@@ -17,18 +17,17 @@ namespace ProyectoTiendaInstrumentos.Controllers
             this.repoCarrito = repositoryCarrito;
             this.repoValoraciones = repoValoraciones;
         }
-        public async Task<IActionResult> Index(int idSubtipo, string q = null)
+        public async Task<IActionResult> Index(int idSubtipo, string q = null, int pagina = 1)
         {
+            const int tamañoPagina = 12;
+
             if (!string.IsNullOrWhiteSpace(q))
             {
                 List<VwCatalogoProducto> resultados = await this.repo.BuscarProductosPorNombreAsync(q);
-                ViewBag.TerminoBusqueda = q;
-                ViewBag.NumeroResultados = resultados.Count;
 
                 if (resultados.Count > 0)
                 {
                     var subtiposEncontrados = resultados.Select(p => p.IdSubtipo).Distinct().ToList();
-                    
                     if (subtiposEncontrados.Count == 1)
                     {
                         int subtipoInferido = subtiposEncontrados[0];
@@ -37,14 +36,21 @@ namespace ProyectoTiendaInstrumentos.Controllers
                     }
                 }
 
-                return View(resultados);
+                var paginado = PagedResult<VwCatalogoProducto>.Create(resultados, pagina, tamañoPagina);
+                ViewBag.TerminoBusqueda = q;
+                ViewBag.NumeroResultados = resultados.Count;
+                ViewBag.Paginacion = paginado;
+                return View(paginado.Items);
             }
 
             ViewBag.Subtipo = await this.repo.GetSubtipoByIdAsync(idSubtipo);
             List<VwCatalogoProducto> productos = await this.repo.GetVistaCatalogoBySubtipoAsync(idSubtipo);
             List<Especificacion> specs = await this.repo.GetEspecificacionesBySubtipoAsync(idSubtipo);
             ViewBag.Specs = specs;
-            return View(productos);
+
+            var paginadoCatalogo = PagedResult<VwCatalogoProducto>.Create(productos, pagina, tamañoPagina);
+            ViewBag.Paginacion = paginadoCatalogo;
+            return View(paginadoCatalogo.Items);
         }
 
         public async Task<IActionResult> Buscar(string q)
@@ -58,12 +64,16 @@ namespace ProyectoTiendaInstrumentos.Controllers
             return RedirectToAction("Index", new { q });
         }
 
-        public async Task<IActionResult> Details(int idProducto)
+        public async Task<IActionResult> Details(int idProducto, int paginaResenas = 1)
         {
             ViewBag.ImagenesProductos = await this.repo.GetImagenesProductoByIdAsync(idProducto);
             ViewBag.Especificaciones = await this.repo.GetEspecificacionesAsync(idProducto);
-            ViewBag.Valoraciones = await this.repoValoraciones.GetValoracionesByProductoAsync(idProducto);
-            
+
+            List<VwValoracionesProducto> todasValoraciones = await this.repoValoraciones.GetValoracionesByProductoAsync(idProducto);
+            var paginadoResenas = PagedResult<VwValoracionesProducto>.Create(todasValoraciones, paginaResenas, 5);
+            ViewBag.Valoraciones = paginadoResenas.Items;
+            ViewBag.PaginacionResenas = paginadoResenas;
+
             if (HttpContext.Session.GetObject<Usuario>("Usuario") != null)
             {
                 int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;

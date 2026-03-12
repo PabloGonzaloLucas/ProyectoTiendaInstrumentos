@@ -1,65 +1,49 @@
 ﻿@model List<VwCatalogoProducto>
 @{
-    decimal total = 0;
+    decimal total = Model != null ? Model.Sum(p => p.Precio * (p.Cantidad ?? 0)) : 0;
 }
-<h1>Carrito</h1>
+<h1 class="confirmar-titulo">Confirmar compra</h1>
 @if (Model != null && Model.Count > 0)
 {
     <form method="post" asp-action="ConfirmarCompra">
-        <ul>
+        <ul class="confirmar-lista">
             @for (int index = 0; index < Model.Count; index++)
             {
                 VwCatalogoProducto producto = Model[index];
                 <li>
-                    <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto">
-                        <img src="~/images/productosMain/@producto.ImagenPrincipal" alt="@producto.Modelo" />
-                        <p>
-                            <span style="font-weight:400">
-                                @(producto.Marca + " ")
-                            </span>
-                            <span>
-                                @producto.Modelo
-                            </span>
-                        </p>
-                        <span>
-                            @producto.Precio €
-                        </span>
-                        <span>
-                            x @(producto.Cantidad ?? 0)
-                        </span>
+                    <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto" class="confirmar-item-link">
+                        <img src="~/images/productosMain/@producto.ImagenPrincipal" alt="@producto.Modelo" class="confirmar-item-img" />
+                        <div class="confirmar-item-info">
+                            <span class="confirmar-item-marca">@producto.Marca</span>
+                            <span class="confirmar-item-nombre">@producto.Modelo</span>
+                            <span class="confirmar-item-precio">@producto.Precio €</span>
+                            <span class="confirmar-item-cantidad">x @(producto.Cantidad ?? 0)</span>
+                        </div>
                     </a>
                 </li>
-
                 <input type="hidden" name="productos[@index].IdProducto" value="@producto.IdProducto" />
                 <input type="hidden" name="productos[@index].Cantidad" value="@(producto.Cantidad ?? 0)" />
-
-                
-                    decimal precio = producto.Precio;
-                    int cantidad = producto.Cantidad ?? 0;
-                    total += precio * cantidad;
-                
             }
         </ul>
 
-        <div class="carrito-resumen">
-            <p>
-                <strong>Total: </strong>
-                <span class="total-precio">@total €</span>
-            </p>
-            <button type="submit" name="accion" value="confirmar" class="btn-comprar">
-                Confirmar compra
-            </button>
-            <button type="submit" name="accion" value="cancelar" class="btn-secondary">
-                Cancelar
-            </button>
+        <div class="confirmar-resumen">
+            <span class="confirmar-resumen-label">Total:</span>
+            <span class="confirmar-resumen-total">@total.ToString("C")</span>
+            <div class="confirmar-acciones">
+                <button type="submit" name="accion" value="confirmar" class="confirmar-btn-confirmar">
+                    <i class="bi bi-bag-check"></i> Confirmar compra
+                </button>
+                <button type="submit" name="accion" value="cancelar" class="confirmar-btn-cancelar">
+                    Cancelar
+                </button>
+            </div>
         </div>
     </form>
-
 }
 else
 {
-    <div class="carrito-vacio">
-        <i class="bi bi-cart-x"></i>
+    <div class="confirmar-error">
+        <i class="bi bi-exclamation-circle"></i>
         <h2>Error al obtener los productos</h2>
     </div>
 }

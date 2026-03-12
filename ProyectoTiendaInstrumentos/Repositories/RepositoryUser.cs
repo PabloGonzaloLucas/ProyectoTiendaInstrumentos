@@ -8,9 +8,11 @@ namespace ProyectoTiendaInstrumentos.Repositories
     public class RepositoryUser
     {
         private ProyectoTiendaInstrumentosContext context;
-        public RepositoryUser(ProyectoTiendaInstrumentosContext context)
+        private HelperPathProvider helper;
+        public RepositoryUser(ProyectoTiendaInstrumentosContext context, HelperPathProvider helper)
         {
             this.context = context;
+            this.helper = helper;
         }
         private async Task<int> GetMaxIdUsuarioAsync()
         {
@@ -32,12 +34,27 @@ namespace ProyectoTiendaInstrumentos.Repositories
             return user;
         }
 
-        public async Task RegisterUserAsync(string nombre, string email, string imagen, string password, string telefono, string direccion)
+        public async Task RegisterUserAsync(string nombre, string email, IFormFile imagen, string password, string telefono, string direccion)
         {
             Usuario user = new Usuario();
             user.IdUsuario = await this.GetMaxIdUsuarioAsync();
             user.Nombre = nombre;
-            user.Imagen = imagen;
+
+            if (imagen != null && imagen.Length > 0)
+            {
+                string fileName = imagen.FileName;
+                string path = this.helper.MapPath(fileName, Folders.Users);
+                using (Stream stream = new FileStream(path, FileMode.Create))
+                {
+                    await imagen.CopyToAsync(stream);
+                }
+                user.Imagen = imagen.FileName;
+            }
+            else
+            {
+                user.Imagen = "default.png";
+            }
+
             user.Email = email;
             user.Telefono = telefono;
             user.Direccion = direccion;
@@ -51,12 +68,27 @@ namespace ProyectoTiendaInstrumentos.Repositories
             await this.context.SeguridadUsuarios.AddAsync(usuarioSeguridad);
             await this.context.SaveChangesAsync();
         }
-        public async Task RegisterUserFakePassAsync(string nombre, string email, string imagen, string password, string telefono, string direccion)
+        public async Task RegisterUserFakePassAsync(string nombre, string email, IFormFile imagen, string password, string telefono, string direccion)
         {
             Usuario user = new Usuario();
             user.IdUsuario = await this.GetMaxIdUsuarioAsync();
             user.Nombre = nombre;
-            user.Imagen = imagen;
+
+            if (imagen != null && imagen.Length > 0)
+            {
+                string fileName = imagen.FileName;
+                string path = this.helper.MapPath(fileName, Folders.Users);
+                using (Stream stream = new FileStream(path, FileMode.Create))
+                {
+                    await imagen.CopyToAsync(stream);
+                }
+                user.Imagen = imagen.FileName;
+            }
+            else
+            {
+                user.Imagen = "default.png";
+            }
+
             user.Email = email;
             user.Telefono = telefono;
             user.Direccion = direccion;

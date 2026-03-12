@@ -95,7 +95,7 @@ namespace ProyectoTiendaInstrumentos.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(string nombre, string email, string imagen, string password, string telefono, string direccion)
+        public async Task<IActionResult> Register(string nombre, string email, IFormFile imagen, string password, string telefono, string direccion)
         {
             await this.repo.RegisterUserFakePassAsync(nombre, email, imagen, password, telefono, direccion);
             ViewBag.MENSAJE = "Usuario en el sistema!!";

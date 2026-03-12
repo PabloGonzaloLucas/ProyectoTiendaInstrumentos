@@ -1,0 +1,179 @@
+/* ================================================
+   DETALLES PEDIDO
+   ================================================ */
+
+.detpedido-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    color: var(--dark-bg);
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 3px 10px rgba(127, 227, 170, 0.25);
+}
+
+.detpedido-volver:hover {
+    transform: translateX(-3px);
+    box-shadow: 0 5px 15px rgba(127, 227, 170, 0.4);
+    color: var(--dark-bg);
+    text-decoration: none;
+}
+
+.detpedido-titulo {
+    color: var(--dark-bg);
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 3px solid var(--primary-green);
+}
+
+.detpedido-resumen {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-gray) 100%);
+    border-radius: 14px;
+    padding: 1.25rem 1.75rem;
+    margin-bottom: 2rem;
+    border: 2px solid var(--primary-green);
+    flex-wrap: wrap;
+}
+
+.detpedido-total {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--primary-green);
+}
+
+.detpedido-estado {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+    color: var(--dark-bg);
+}
+
+.detpedido-fecha-entrega {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.detpedido-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detpedido-producto-link {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 1.25rem;
+    background: var(--white);
+    border: 2px solid rgba(127, 227, 170, 0.2);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    text-decoration: none;
+    color: var(--dark-bg);
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.detpedido-producto-link:hover {
+    border-color: var(--primary-green);
+    box-shadow: 0 5px 18px rgba(127, 227, 170, 0.2);
+    transform: translateY(-2px);
+    color: var(--dark-bg);
+    text-decoration: none;
+}
+
+.detpedido-producto-img {
+    width: 90px !important;
+    height: 90px !important;
+    min-width: 90px !important;
+    min-height: 90px !important;
+    max-width: 90px !important;
+    max-height: 90px !important;
+    object-fit: contain;
+    border-radius: 8px;
+    background: var(--light-gray);
+    padding: 4px;
+    flex-shrink: 0 !important;
+    display: block;
+}
+
+.detpedido-producto-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    align-self: center;
+}
+
+.detpedido-producto-marca {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--primary-green);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.detpedido-producto-nombre {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--dark-bg);
+}
+
+.detpedido-producto-meta {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+    font-weight: 600;
+}
+
+.detpedido-producto-precio {
+    color: var(--primary-green);
+    font-weight: 800;
+    font-size: 1rem;
+}
+
+.detpedido-producto-subtotal {
+    margin-left: auto;
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--dark-bg);
+    white-space: nowrap;
+}
+
+.detpedido-footer {
+    margin-top: 2rem;
+    padding: 1rem 1.25rem;
+    background: var(--light-gray);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}

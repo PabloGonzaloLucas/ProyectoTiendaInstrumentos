@@ -1,30 +1,54 @@
 ﻿@model List<Pedido>
+@using ProyectoTiendaInstrumentos.Models
+@{
+    PagedResult<Pedido> paginacion = ViewBag.Paginacion as PagedResult<Pedido>;
+}
 
-<h1>Mis Pedidos</h1>
+<h1 class="mispedidos-titulo">Mis Pedidos</h1>
 
 <div>
     @if(Model.Count > 0)
     {
-        <ul>
+        <ul class="mispedidos-lista">
             @foreach(Pedido pedido in Model)
             {
-                <li>
-                    <a asp-controller="Pedidos" asp-action="DetallesPedido" asp-route-idPedido="@pedido.IdPedido">
-                        Pedido #@pedido.IdPedido - @pedido.FechaEntrega.ToString() - Total: @pedido.PrecioTotal € - Estado: @pedido.Estado
-                        <div class="bloqueImagen">
-                            @foreach(string imagen in @pedido.ImagenesProductos)
+                <li class="mispedidos-item">
+                    <a asp-controller="Pedidos" asp-action="DetallesPedido" asp-route-idPedido="@pedido.IdPedido" class="mispedidos-card">
+                        <div class="mispedidos-info">
+                            <span class="mispedidos-id">Pedido #@pedido.IdPedido</span>
+                            <div class="mispedidos-meta">
+                                <span><i class="bi bi-calendar3"></i> @pedido.FechaEntrega?.ToString("dd/MM/yyyy")</span>
+                            </div>
+                        </div>
+                        <span class="mispedidos-total">@pedido.PrecioTotal.ToString("C")</span>
+                        <span class="mispedidos-estado">@pedido.Estado</span>
+                        <div class="mispedidos-imagenes">
+                            @foreach(string imagen in pedido.ImagenesProductos)
                             {
-                                <img src="~/images/productosMain/@imagen" alt="Imagen del producto" class="imagen-pedido" />
+                                <img src="~/images/productosMain/@imagen" alt="Imagen del producto" class="mispedidos-img" />
                             }
-    
                         </div>
                     </a>
                 </li>
             }
+        </ul>
 
-        </ul>        
+        @if (paginacion != null)
+        {
+            @await Html.PartialAsync("_Paginacion", (
+                paginacion.PaginaActual,
+                paginacion.TotalPaginas,
+                "MisPedidos",
+                "Pedidos",
+                (object)(new { })
+            ))
+        }
     }
-    else{
-        <h1>No tienes ningún pedido</h1>
+    else
+    {
+        <div class="mispedidos-vacio">
+            <i class="bi bi-bag-x"></i>
+            <h2>No tienes ningún pedido</h2>
+        </div>
     }
 </div>

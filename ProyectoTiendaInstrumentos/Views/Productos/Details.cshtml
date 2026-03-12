@@ -7,6 +7,7 @@
     bool usuarioHaValorado = ViewBag.UsuarioHaValorado ?? false;
     bool usuarioHaComprado = ViewBag.UsuarioHaComprado ?? false;
     bool estaAutenticado = Context.Session.GetObject<Usuario>("Usuario") != null;
+    PagedResult<VwValoracionesProducto> paginacionResenas = ViewBag.PaginacionResenas as PagedResult<VwValoracionesProducto>;
 }
 <p><a asp-controller="Productos" asp-action="Index" asp-route-idSubtipo="@Model.IdSubtipo">Volver</a></p>
 <div>
@@ -211,12 +212,24 @@
                         </div>
                     </div>       
                 }
+
+                @if (paginacionResenas != null)
+                {
+                    @await Html.PartialAsync("_Paginacion", (
+                        paginacionResenas.PaginaActual,
+                        paginacionResenas.TotalPaginas,
+                        "Details",
+                        "Productos",
+                        (object)(new { idProducto = Model.IdProducto })
+                    ))
+                }
             }
             else
             {
                 <p class="sin-resenas">No hay reseñas de este producto todavía. ¡Sé el primero en opinar!</p>
             }
         </div>
+
     </div>
 </div>
 

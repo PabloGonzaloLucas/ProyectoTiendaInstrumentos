@@ -12,7 +12,7 @@ namespace ProyectoTiendaInstrumentos.Controllers
         {
             this.repo = repositoryCarrito;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pagina = 1)
         {
             if(HttpContext.Session.GetObject<Usuario>("Usuario") == null)
             {
@@ -20,7 +20,10 @@ namespace ProyectoTiendaInstrumentos.Controllers
             }
             int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;
             List<VwCatalogoProducto> productosCarrito = await this.repo.GetProductosCarritoByUsuarioAsync(idUsuario);
-            return View(productosCarrito);
+
+            var paginado = PagedResult<VwCatalogoProducto>.Create(productosCarrito, pagina, 5);
+            ViewBag.PaginacionCarrito = paginado;
+            return View(paginado.Items);
         }
         public async Task<IActionResult> ConfirmarCompra()
         {

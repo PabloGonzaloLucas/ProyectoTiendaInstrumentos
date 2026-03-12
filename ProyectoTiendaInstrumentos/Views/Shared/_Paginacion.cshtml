@@ -1,0 +1,84 @@
+@model (int PaginaActual, int TotalPaginas, string Accion, string Controlador, object RoutePorDefecto)
+@{
+    int pagina = Model.PaginaActual;
+    int total = Model.TotalPaginas;
+    if (total <= 1) { return; }
+
+    int radio = 2;
+    int inicio = Math.Max(1, pagina - radio);
+    int fin = Math.Min(total, pagina + radio);
+}
+
+<nav class="paginacion-nav" aria-label="Paginación">
+    <ul class="paginacion">
+
+        @* Anterior *@
+        <li class="paginacion-item @(pagina == 1 ? "disabled" : "")">
+            @if (pagina > 1)
+            {
+                var routeAnterior = new RouteValueDictionary(Model.RoutePorDefecto) { ["pagina"] = pagina - 1 };
+                <a class="paginacion-link" asp-controller="@Model.Controlador" asp-action="@Model.Accion" asp-all-route-data="@(routeAnterior.ToDictionary(k => k.Key, k => k.Value?.ToString()))" aria-label="Anterior">&#8249;</a>
+            }
+            else
+            {
+                <span class="paginacion-link" aria-disabled="true">&#8249;</span>
+            }
+        </li>
+
+        @* Primera página si está lejos *@
+        @if (inicio > 1)
+        {
+            var route1 = new RouteValueDictionary(Model.RoutePorDefecto) { ["pagina"] = 1 };
+            <li class="paginacion-item">
+                <a class="paginacion-link" asp-controller="@Model.Controlador" asp-action="@Model.Accion" asp-all-route-data="@(route1.ToDictionary(k => k.Key, k => k.Value?.ToString()))">1</a>
+            </li>
+            if (inicio > 2)
+            {
+                <li class="paginacion-item disabled"><span class="paginacion-link">…</span></li>
+            }
+        }
+
+        @* Páginas del rango *@
+        @for (int p = inicio; p <= fin; p++)
+        {
+            var routeP = new RouteValueDictionary(Model.RoutePorDefecto) { ["pagina"] = p };
+            <li class="paginacion-item @(p == pagina ? "active" : "")">
+                @if (p == pagina)
+                {
+                    <span class="paginacion-link">@p</span>
+                }
+                else
+                {
+                    <a class="paginacion-link" asp-controller="@Model.Controlador" asp-action="@Model.Accion" asp-all-route-data="@(routeP.ToDictionary(k => k.Key, k => k.Value?.ToString()))">@p</a>
+                }
+            </li>
+        }
+
+        @* Última página si está lejos *@
+        @if (fin < total)
+        {
+            if (fin < total - 1)
+            {
+                <li class="paginacion-item disabled"><span class="paginacion-link">…</span></li>
+            }
+            var routeLast = new RouteValueDictionary(Model.RoutePorDefecto) { ["pagina"] = total };
+            <li class="paginacion-item">
+                <a class="paginacion-link" asp-controller="@Model.Controlador" asp-action="@Model.Accion" asp-all-route-data="@(routeLast.ToDictionary(k => k.Key, k => k.Value?.ToString()))">@total</a>
+            </li>
+        }
+
+        @* Siguiente *@
+        <li class="paginacion-item @(pagina == total ? "disabled" : "")">
+            @if (pagina < total)
+            {
+                var routeSiguiente = new RouteValueDictionary(Model.RoutePorDefecto) { ["pagina"] = pagina + 1 };
+                <a class="paginacion-link" asp-controller="@Model.Controlador" asp-action="@Model.Accion" asp-all-route-data="@(routeSiguiente.ToDictionary(k => k.Key, k => k.Value?.ToString()))" aria-label="Siguiente">&#8250;</a>
+            }
+            else
+            {
+                <span class="paginacion-link" aria-disabled="true">&#8250;</span>
+            }
+        </li>
+
+    </ul>
+</nav>

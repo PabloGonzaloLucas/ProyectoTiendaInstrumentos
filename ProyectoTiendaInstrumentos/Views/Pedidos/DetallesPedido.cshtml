@@ -1,48 +1,53 @@
 ﻿@model Pedido
+@using ProyectoTiendaInstrumentos.Models
+@{
+    PagedResult<VwProductosPedido> paginacionProductos = ViewBag.PaginacionProductos as PagedResult<VwProductosPedido>;
+}
 
-<p>
-    <a asp-controller="Pedidos" asp-action="MisPedidos">Volver a mis pedidos</a>
-</p>
+<a asp-controller="Pedidos" asp-action="MisPedidos" class="detpedido-volver">
+    <i class="bi bi-arrow-left"></i> Volver a mis pedidos
+</a>
 
-<h1>Detalles del pedido @Model.IdPedido</h1>
+<h1 class="detpedido-titulo">Pedido #@Model.IdPedido</h1>
 
-<div>
-    <h2>@Model.PrecioTotal</h2>
-    <span>@Model.Estado</span>
-    <p>Se entregará el @Model.FechaEntrega.ToString()<p/>
-    
-    <ul>
-        @foreach (VwProductosPedido producto in Model.ProductosPedido)
-        {
-            <li>
-                <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto">
-                    <img src="~/images/productosMain/@producto.Imagen" alt="@producto.Modelo" />
-                    <p>
-                        <span style="font-weight:400">
-                            @(producto.Marca + " ")
-                        </span>
-                        <span>
-                            @producto.Modelo
-                        </span>
-                    </p>
-                    <span>
-                        @producto.PrecioUnitario €
-                    </span>
-                    <span>
-                        Cantidad: @producto.Cantidad
-                    </span>
-                    <span>
-                        Subtotal: @(producto.SubtotalLinea) €
-                    </span>
-                </a>
-            </li>
+<div class="detpedido-resumen">
+    <span class="detpedido-total">@Model.PrecioTotal.ToString("C")</span>
+    <span class="detpedido-estado">@Model.Estado</span>
+    <span class="detpedido-fecha-entrega"><i class="bi bi-truck"></i> Entrega: @Model.FechaEntrega?.ToString("dd/MM/yyyy")</span>
+</div>
 
-        }
+<ul class="detpedido-lista">
+    @foreach (VwProductosPedido producto in Model.ProductosPedido)
+    {
+        <li>
+            <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto" class="detpedido-producto-link">
+                <img src="~/images/productosMain/@producto.Imagen" alt="@producto.Modelo" class="detpedido-producto-img" />
+                <div class="detpedido-producto-info">
+                    <span class="detpedido-producto-marca">@producto.Marca</span>
+                    <span class="detpedido-producto-nombre">@producto.Modelo</span>
+                    <div class="detpedido-producto-meta">
+                        <span class="detpedido-producto-precio">@producto.PrecioUnitario.ToString("C")</span>
+                        <span>x @producto.Cantidad</span>
+                    </div>
+                </div>
+                <span class="detpedido-producto-subtotal">@producto.SubtotalLinea?.ToString("C")</span>
+            </a>
+        </li>
+    }
+</ul>
 
-    </ul>
-    <div>
-        <span>
-            Pedido el @Model.FechaCreacion.ToString()
-        </span>
-    </div>
+@if (paginacionProductos != null)
+{
+    @await Html.PartialAsync("_Paginacion", (
+        paginacionProductos.PaginaActual,
+        paginacionProductos.TotalPaginas,
+        "DetallesPedido",
+        "Pedidos",
+        (object)(new { idPedido = Model.IdPedido })
+    ))
+}
+
+<div class="detpedido-footer">
+    <i class="bi bi-calendar-check"></i>
+    Pedido realizado el @Model.FechaCreacion?.ToString("dd/MM/yyyy HH:mm")
 </div>

@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Hosting.Server;
+﻿using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 
 namespace ProyectoTiendaInstrumentos.Helpers
@@ -72,10 +71,8 @@ namespace ProyectoTiendaInstrumentos.Helpers
             //http:localhost:999/images/productos/1.png
             //Quiero buscar la forma de recuperar la URL de nuestro Server 
             //en MVC Net Core.
-            var addresses =
-                this.server.Features.Get<IServerAddressesFeature>
-                ().Addresses;
-            string serverUrl = addresses.FirstOrDefault();
+            var addresses = this.server.Features.Get<IServerAddressesFeature>()?.Addresses;
+            string serverUrl = addresses?.FirstOrDefault() ?? string.Empty;
             //DEVOLVEMOS LA RUTA URL
             string urlPath = serverUrl + "/" + carpeta + "/" + fileName;
             return urlPath;
