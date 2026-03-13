@@ -6,7 +6,7 @@
     List<ProductoImagen> imagenesProducto = ViewBag.ImagenesProductos as List<ProductoImagen>;
     bool usuarioHaValorado = ViewBag.UsuarioHaValorado ?? false;
     bool usuarioHaComprado = ViewBag.UsuarioHaComprado ?? false;
-    bool estaAutenticado = Context.Session.GetObject<Usuario>("Usuario") != null;
+    bool estaAutenticado = Context.User.Identity.IsAuthenticated;
     PagedResult<VwValoracionesProducto> paginacionResenas = ViewBag.PaginacionResenas as PagedResult<VwValoracionesProducto>;
 }
 <p><a asp-controller="Productos" asp-action="Index" asp-route-idSubtipo="@Model.IdSubtipo">Volver</a></p>
@@ -235,11 +235,8 @@
 
 @section Scripts {
     <script>
-        // jQuery script for image gallery and review form
         $(function () {
-
             // ── Galería de imágenes ───────────────────────────────────────────────
-
             var $mainImg = $('#main-product-image');
 
             $(document).on('click', '.gallery-image-container', function () {
@@ -253,26 +250,16 @@
                 $(this).addClass('thumb-active');
             });
 
-            // ── Formulario de reseña ──────────────────────────────────────────────
-            document.addEventListener('DOMContentLoaded', function() {
-                const btnMostrar = document.getElementById('btnMostrarFormulario');
-                const btnCancelar = document.getElementById('btnCancelar');
-                const cajaComentario = document.getElementById('cajaComentario');
+            // ── Formulario de reseña ─────────────────────────────────────────────
+            $(document).on('click', '#btnMostrarFormulario', function () {
+                $('#cajaComentario').show();
+                $('#btnMostrarFormulario').hide();
+            });
 
-                if (btnMostrar) {
-                    btnMostrar.addEventListener('click', function() {
-                        cajaComentario.style.display = 'block';
-                        btnMostrar.style.display = 'none';
-                    });
-                }
-
-                if (btnCancelar) {
-                    btnCancelar.addEventListener('click', function() {
-                        cajaComentario.style.display = 'none';
-                        btnMostrar.style.display = 'inline-block';
-                        cajaComentario.querySelector('form').reset();
-                    });
-                }
+            $(document).on('click', '#btnCancelar', function () {
+                $('#cajaComentario').hide();
+                $('#btnMostrarFormulario').show();
+                $('#cajaComentario form')[0]?.reset();
             });
         });
     </script>

@@ -23,58 +23,72 @@
                 }
             </div>
 
+            <form asp-controller="Cuenta" asp-action="CambiarFotoPerfil" method="post" enctype="multipart/form-data" class="mx-auto" style="max-width: 420px;">
+                <div class="form-group">
+                    <input type="file" name="imagen" class="form-control" accept="image/*" />
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Actualizar foto</button>
+                </div>
+            </form>
+
             <div class="mb-4" style="font-weight: 700; font-size: 1.3rem; color: var(--text-dark);">
                 @Model?.Nombre
             </div>
         </div>
 
         <div class="mx-auto" style="max-width: 700px;">
-            <div class="form-group">
-                <label class="control-label">Nombre</label>
-                <input type="text" class="form-control" value="@Model.Nombre" disabled />
-            </div>
-
-            <div class="form-group">
-                <label class="control-label">Email</label>
-                <input type="email" class="form-control" value="@Model.Email" disabled />
-            </div>
-
-            <div class="form-group">
-                <label class="control-label">Dirección</label>
-                <input type="text" class="form-control" value="@Model.Direccion" disabled />
-            </div>
-
-            <div class="form-group">
-                <label class="control-label">Teléfono</label>
-                <input type="text" class="form-control" value="@(Model.Telefono ?? string.Empty)" disabled />
-            </div>
-
-            <div class="form-group">
-                <label class="control-label">Contraseña</label>
-                <div class="d-flex gap-2 align-items-stretch">
-                    <input type="password" class="form-control" value="********" disabled style="flex: 1;" />
-                    <a class="btn btn-secondary" asp-controller="Cuenta" asp-action="CambiarPassword" style="white-space: nowrap;">
-                        Cambiar
-                    </a>
+            <form asp-controller="Cuenta" asp-action="ActualizarPerfil" method="post">
+                <div class="form-group">
+                    <label class="control-label">Nombre</label>
+                    <input type="text" name="nombre" class="form-control" value="@Model.Nombre" required />
                 </div>
-            </div>
 
-            <div class="d-flex justify-content-between align-items-center gap-2 mt-4 pt-3" style="border-top: 2px solid var(--light-gray);">
-                <a class="btn btn-secondary" asp-controller="Home" asp-action="Index">Volver</a>
-                <a class="btn btn-primary" asp-controller="Pedidos" asp-action="MisPedidos">Ver mis pedidos</a>
-            </div>
-
-            @if (Model?.FechaRegistro != null)
-            {
-                <div class="mt-4 text-center text-muted" style="font-size: 0.9rem;">
-                    Registrado el: @Model.FechaRegistro.Value.ToString("dd/MM/yyyy")
+                <div class="form-group">
+                    <label class="control-label">Email</label>
+                    <input type="email" class="form-control" value="@Model.Email" disabled />
                 </div>
-            }
 
-            @if (TempData["Mensaje"] != null)
-            {
-                <div class="error-message">@TempData["Mensaje"]</div>
-            }
+                <div class="form-group">
+                    <label class="control-label">Dirección</label>
+                    <input type="text" name="direccion" class="form-control" value="@Model.Direccion" />
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Teléfono</label>
+                    <input type="text" name="telefono" class="form-control" value="@(Model.Telefono ?? string.Empty)" />
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Contraseña</label>
+                    <div class="d-flex gap-2 align-items-stretch">
+                        <input type="password" class="form-control" value="********" disabled style="flex: 1;" />
+                        <a class="btn btn-secondary" asp-controller="Cuenta" asp-action="CambiarPassword" style="white-space: nowrap;">
+                            Cambiar
+                        </a>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center gap-2 mt-4 pt-3" style="border-top: 2px solid var(--light-gray);">
+                    <a class="btn btn-secondary" asp-controller="Home" asp-action="Index">Volver</a>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                        <a class="btn btn-primary" asp-controller="Pedidos" asp-action="MisPedidos">Ver mis pedidos</a>
+                    </div>
+                </div>
+
+                @if (Model?.FechaRegistro != null)
+                {
+                    <div class="mt-4 text-center text-muted" style="font-size: 0.9rem;">
+                        Registrado el: @Model.FechaRegistro.Value.ToString("dd/MM/yyyy")
+                    </div>
+                }
+
+                @if (TempData["Mensaje"] != null)
+                {
+                    <div class="error-message">@TempData["Mensaje"]</div>
+                }
+            </form>
         </div>
     </div>
 </div>

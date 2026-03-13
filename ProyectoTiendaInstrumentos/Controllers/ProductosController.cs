@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProyectoTiendaInstrumentos.Extensions;
+using ProyectoTiendaInstrumentos.Filters;
 using ProyectoTiendaInstrumentos.Models;
 using ProyectoTiendaInstrumentos.Repositories;
 using ProyectoTiendaInstrumentos.Repositories.Interfaces;
+using System.Security.Claims;
 
 namespace ProyectoTiendaInstrumentos.Controllers
 {
@@ -74,9 +76,9 @@ namespace ProyectoTiendaInstrumentos.Controllers
             ViewBag.Valoraciones = paginadoResenas.Items;
             ViewBag.PaginacionResenas = paginadoResenas;
 
-            if (HttpContext.Session.GetObject<Usuario>("Usuario") != null)
+            if (HttpContext.User.Identity.IsAuthenticated)
             {
-                int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;
+                int idUsuario = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
                 ViewBag.UsuarioHaValorado = await this.repoValoraciones.UsuarioHaValoradoProductoAsync(idUsuario, idProducto);
                 ViewBag.UsuarioHaComprado = await this.repoValoraciones.UsuarioHaCompradoProductoAsync(idUsuario, idProducto);
             }
@@ -91,30 +93,24 @@ namespace ProyectoTiendaInstrumentos.Controllers
         }
 
         [HttpPost]
+        [AuthorizeUsuarios]
         public async Task<IActionResult> AddToCart(int idProducto, int cantidad = 1)
         {
-            if(HttpContext.Session.GetObject<Usuario>("Usuario") != null)
-            {
-                int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;
-                await this.repoCarrito.AddProductoToCartAsync(idProducto, idUsuario,cantidad);
-                return RedirectToAction("Details", new { idProducto = idProducto });
-            }
-            else
-            {
-                return RedirectToAction("Login", "Cuenta");
-            }
+            
+            int idUsuario = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            await this.repoCarrito.AddProductoToCartAsync(idProducto, idUsuario,cantidad);
+            return RedirectToAction("Details", new { idProducto = idProducto });
+            
+            
         }
 
         [HttpPost]
+        [AuthorizeUsuarios]
+
         public async Task<IActionResult> AddValoracion(int idProducto, int puntuacion, string comentario)
         {
-            if (HttpContext.Session.GetObject<Usuario>("Usuario") == null)
-            {
-                TempData["ErrorValoracion"] = "Debes iniciar sesión para dejar una reseña.";
-                return RedirectToAction("Details", new { idProducto = idProducto });
-            }
+            int idUsuario = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;
 
             if (puntuacion < 1 || puntuacion > 5)
             {

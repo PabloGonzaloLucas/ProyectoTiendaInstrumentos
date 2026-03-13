@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProyectoTiendaInstrumentos.Extensions;
+using ProyectoTiendaInstrumentos.Filters;
 using ProyectoTiendaInstrumentos.Models;
 using ProyectoTiendaInstrumentos.Repositories.Interfaces;
+using System.Security.Claims;
 
 namespace ProyectoTiendaInstrumentos.Controllers
 {
@@ -12,37 +14,34 @@ namespace ProyectoTiendaInstrumentos.Controllers
         {
             this.repo = repositoryCarrito;
         }
+
+        [AuthorizeUsuarios]
         public async Task<IActionResult> Index(int pagina = 1)
         {
-            if(HttpContext.Session.GetObject<Usuario>("Usuario") == null)
-            {
-                return RedirectToAction("Login", "Cuenta");
-            }
-            int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;
-            List<VwCatalogoProducto> productosCarrito = await this.repo.GetProductosCarritoByUsuarioAsync(idUsuario);
+            int id = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            List<VwCatalogoProducto> productosCarrito = await this.repo.GetProductosCarritoByUsuarioAsync(id);
 
             var paginado = PagedResult<VwCatalogoProducto>.Create(productosCarrito, pagina, 5);
             ViewBag.PaginacionCarrito = paginado;
             return View(paginado.Items);
         }
+        [AuthorizeUsuarios]
+
         public async Task<IActionResult> ConfirmarCompra()
         {
-            if(HttpContext.Session.GetObject<Usuario>("Usuario") == null)
-            {
-                return RedirectToAction("Login", "Cuenta");
-            }
-            int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;
-            List<VwCatalogoProducto> productosCarrito = await this.repo.GetProductosCarritoByUsuarioAsync(idUsuario);
+            int id = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            List<VwCatalogoProducto> productosCarrito = await this.repo.GetProductosCarritoByUsuarioAsync(id);
             return View(productosCarrito);
         }
+
+        [AuthorizeUsuarios]
         [HttpPost]
         public async Task<IActionResult> ConfirmarCompra(string accion, List<ProductoCarritoCantidad> productos)
         {
-            if(HttpContext.Session.GetObject<Usuario>("Usuario") == null)
-            {
-                return RedirectToAction("Login", "Cuenta");
-            }
-            int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;
+            int id = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
 
             if (accion == "cancelar")
             {
@@ -56,13 +55,13 @@ namespace ProyectoTiendaInstrumentos.Controllers
                     return RedirectToAction("Index");
                 }
 
-                int idPedido = await this.repo.ComprarProductosAsync(productos, idUsuario);
+                int idPedido = await this.repo.ComprarProductosAsync(productos, id);
                 if(idPedido == 0)
                 {
                     TempData["Error"] = "No se pudo procesar la compra. Por favor, inténtalo de nuevo.";
                     return RedirectToAction("Index");
                 }
-                await this.repo.ClearCartAsync(idUsuario);
+                await this.repo.ClearCartAsync(id);
                 //REDIRIJIR AL PEDIDO
                 return RedirectToAction("DetallesPedido", "Pedidos", new { idPedido = idPedido });
             }
@@ -72,14 +71,11 @@ namespace ProyectoTiendaInstrumentos.Controllers
             }
         }
 
+        [AuthorizeUsuarios]
         [HttpPost]
         public async Task<IActionResult> ProcesarCompra(List<ProductoCarritoCantidad> productos)
         {
-            if (HttpContext.Session.GetObject<Usuario>("Usuario") == null)
-            {
-                return RedirectToAction("Login", "Cuenta");
-            }
-            int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;
+            int id = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             if (productos == null || productos.Count == 0)
             {
@@ -94,43 +90,34 @@ namespace ProyectoTiendaInstrumentos.Controllers
             
             foreach (ProductoCarritoCantidad item in productos)
             {
-                await this.repo.ActualizarCantidadAsync(item.IdProducto, item.Cantidad, idUsuario);
+                await this.repo.ActualizarCantidadAsync(item.IdProducto, item.Cantidad, id);
             }
 
             return RedirectToAction("ConfirmarCompra");
         
         }
 
+        [AuthorizeUsuarios]
         [HttpPost]
         public async Task<IActionResult> VaciarCarrito()
         {
-            if (HttpContext.Session.GetObject<Usuario>("Usuario") == null)
-            {
-                return RedirectToAction("Login", "Cuenta");
-            }
-            else
-            {
-                int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;
-                await this.repo.ClearCartAsync(idUsuario);
-                TempData["Mensaje"] = "Carrito vaciado";
-                return RedirectToAction("Index");
-            }
+            int id = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            await this.repo.ClearCartAsync(id);
+            TempData["Mensaje"] = "Carrito vaciado";
+            return RedirectToAction("Index");
+            
         }
+
+        [AuthorizeUsuarios]
 
         [HttpPost]
         public async Task<IActionResult> EliminarProducto(int idProducto)
         {
-            if (HttpContext.Session.GetObject<Usuario>("Usuario") == null)
-            {
-                return RedirectToAction("Login", "Cuenta");
-            }
-            else
-            {
-                int idUsuario = HttpContext.Session.GetObject<Usuario>("Usuario").IdUsuario;
-                await this.repo.RemoveProductoFromCartAsync(idProducto, idUsuario);
-                TempData["Mensaje"] = "Producto eliminado del carrito";
-                return RedirectToAction("Index");
-            }
+            int id = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            await this.repo.RemoveProductoFromCartAsync(idProducto, id);
+            TempData["Mensaje"] = "Producto eliminado del carrito";
+            return RedirectToAction("Index");
+            
 
         }
 

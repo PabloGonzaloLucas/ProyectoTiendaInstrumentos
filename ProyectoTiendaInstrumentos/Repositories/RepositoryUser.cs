@@ -25,7 +25,7 @@ namespace ProyectoTiendaInstrumentos.Repositories
                 return await this.context.Usuarios.MaxAsync(x => x.IdUsuario) + 1;
             }
         }
-        private async Task<Usuario> GetUserByIdAsync(int idUsuario)
+        public async Task<Usuario> GetUserByIdAsync(int idUsuario)
         {
             var consulta = from datos in this.context.Usuarios
                            where datos.IdUsuario == idUsuario 
@@ -99,7 +99,7 @@ namespace ProyectoTiendaInstrumentos.Repositories
             usuarioSeguridad.IdUsuario = user.IdUsuario;
             usuarioSeguridad.Salt = HelperTools.GenerateSalt();
             usuarioSeguridad.Password = HelperCryptography.EncryptPassword(password, usuarioSeguridad.Salt);
-            await this.context.Usuarios.AddAsync(user);
+            await this.context. Usuarios.AddAsync(user);
             await this.context.SaveChangesAsync();
             await this.context.SeguridadUsuarios.AddAsync(usuarioSeguridad);
             await this.context.SaveChangesAsync();
@@ -179,6 +179,53 @@ namespace ProyectoTiendaInstrumentos.Repositories
             this.context.SeguridadUsuarios.Update(seguridad);
             await this.context.SaveChangesAsync();
 
+            return true;
+        }
+
+        public async Task<bool> UpdateUserImageAsync(int idUsuario, IFormFile imagen)
+        {
+            if (imagen == null || imagen.Length == 0)
+            {
+                return false;
+            }
+
+            Usuario user = await this.context.Usuarios.FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
+            if (user == null)
+            {
+                return false;
+            }
+
+            string fileName = Path.GetFileName(imagen.FileName);
+            string path = this.helper.MapPath(fileName, Folders.Users);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+
+            await using (Stream stream = new FileStream(path, FileMode.Create))
+            {
+                await imagen.CopyToAsync(stream);
+            }
+
+            user.Imagen = fileName;
+            this.context.Usuarios.Update(user);
+            await this.context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UpdateUserProfileAsync(int idUsuario, string nombre, string direccion, string telefono)
+        {
+            Usuario user = await this.context.Usuarios.FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
+            if (user == null)
+            {
+                return false;
+            }
+
+            user.Nombre = nombre;
+            user.Direccion = direccion;
+            user.Telefono = telefono;
+
+            this.context.Usuarios.Update(user);
+            await this.context.SaveChangesAsync();
             return true;
         }
     }
