@@ -1,14 +1,46 @@
 ﻿@model IEnumerable<ProyectoTiendaInstrumentos.Models.Familia>
 
 <div class="familias-menu-wrapper">
-    <ul class="familias-menu">
-        @foreach (var familia in Model)
-        {
-            <li>
-                <a asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@familia.IdFamilia">
-                    @familia.Nombre
-                </a>
-            </li>
-        }
-    </ul>
-</div></nav>
+   
+    @if (Context.User.FindFirst("Admin") != null)
+    {
+
+        <ul class="familias-menu">
+            @foreach (var familia in Model)
+            {
+                <li>
+                    <a asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@familia.IdFamilia">
+                        @familia.Nombre
+                    </a>
+                    <a asp-controller="Familias" asp-action="Eliminar" asp-route-idFamilia="@familia.IdFamilia">
+                        Eliminar
+                    </a>
+                </li>
+            }
+        </ul>
+
+        <button type="button">Añadir Familia</button>
+
+        <form method="post" asp-controller="Familias" asp-action="Create" enctype="multipart/form-data">
+            <label>Nombre</label>
+            <input type="text" name="nombre" />
+            <label>Imagen</label>
+            <input type="file" name="imagenBanner" />
+            <button type="submit">Añadir Familia</button>
+        </form>
+    }
+    else
+    {
+        <ul class="familias-menu">
+            @foreach (var familia in Model)
+            {
+                <li>
+                    <a asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@familia.IdFamilia">
+                        @familia.Nombre
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+
+</div>

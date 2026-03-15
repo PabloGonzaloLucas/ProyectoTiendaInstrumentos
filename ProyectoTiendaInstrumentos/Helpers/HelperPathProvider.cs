@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 namespace ProyectoTiendaInstrumentos.Helpers
 {
     //Enumeracion con las carpetas que deseemos subir ficheros
-    public enum Folders { Marcas, Productos, ProductosMain, Users}
+    public enum Folders { Marcas, Productos, ProductosMain, Users, Familias}
     public class HelperPathProvider
     {
         private IWebHostEnvironment hostEnvironment;
@@ -34,7 +34,10 @@ namespace ProyectoTiendaInstrumentos.Helpers
             else if (folder == Folders.Users)
             {
                 carpeta = Path.Combine("images", "users");
-
+            }
+            else if (folder == Folders.Familias)
+            {
+                carpeta = Path.Combine("images", "familias");
             }
             else if (folder == Folders.ProductosMain)
             {
@@ -59,6 +62,10 @@ namespace ProyectoTiendaInstrumentos.Helpers
             else if (folder == Folders.Users)
             {
                 carpeta = "images/users";
+            }
+            else if (folder == Folders.Familias)
+            {
+                carpeta = "images/familias";
             }
             else if (folder == Folders.ProductosMain)
             {

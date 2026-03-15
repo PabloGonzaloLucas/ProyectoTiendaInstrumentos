@@ -40,5 +40,25 @@ namespace ProyectoTiendaInstrumentos.Repositories
                            select datos.Nombre;
             return await consulta.FirstOrDefaultAsync();
         }
+
+        public async Task InsertSubtipoAsync(string nombre, int idTipo)
+        {
+            Subtipo subtipo = new Subtipo();
+            subtipo.Nombre = nombre;
+            subtipo.IdSubtipo = await this.context.Subtipos.MaxAsync(f => f.IdSubtipo) + 1;
+            subtipo.IdTipo = idTipo;
+            await this.context.Subtipos.AddAsync(subtipo);
+            await this.context.SaveChangesAsync();
+        }
+
+        public async Task DeleteSubtipoAsync(int idSubtipo)
+        {
+            Subtipo subtipo = await this.context.Subtipos.FirstOrDefaultAsync(f => f.IdSubtipo == idSubtipo);
+            if (subtipo != null)
+            {
+                this.context.Subtipos.Remove(subtipo);
+                await this.context.SaveChangesAsync();
+            }
+        }
     }
 }

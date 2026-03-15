@@ -94,18 +94,21 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         [HttpPost]
         [AuthorizeUsuarios]
+        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> AddToCart(int idProducto, int cantidad = 1)
         {
-            
+
             int idUsuario = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
-            await this.repoCarrito.AddProductoToCartAsync(idProducto, idUsuario,cantidad);
+            await this.repoCarrito.AddProductoToCartAsync(idProducto, idUsuario, cantidad);
             return RedirectToAction("Details", new { idProducto = idProducto });
-            
-            
+
+
         }
 
         [HttpPost]
         [AuthorizeUsuarios]
+        [ValidateAntiForgeryToken]
 
         public async Task<IActionResult> AddValoracion(int idProducto, int puntuacion, string comentario)
         {
@@ -205,6 +208,60 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
             List<VwCatalogoProducto> productos = await this.repo.GetVistaCatalogoBySubtipoAndFiltroAsync(idSubtipo, idEspecificacion, valor);
             return PartialView("_ProductosGrid", productos);
+        }
+
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+
+        public async Task<IActionResult> Eliminar(int idProducto, int? idSubtipo)
+        {
+            await this.repo.DeleteProductoAsync(idProducto);
+
+            if (idSubtipo.HasValue)
+            {
+                return RedirectToAction("Index", "Productos", new { idSubtipo = idSubtipo.Value });
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+        public async Task<IActionResult> Create(int? idSubtipo)
+        {
+            if (idSubtipo != null)
+            {
+                SelectSubtiposProducto selectSubtiposProducto = await this.repo.GetArbolTiposAsync(idSubtipo.Value);
+                ViewBag.ArbolTipos = selectSubtiposProducto;
+            }
+            ViewBag.Marcas = await this.repo.GetMarcasAsync();
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        public async Task<IActionResult> Create(
+            string modelo,
+            int idMarca,
+            decimal precio,
+            int stock,
+            int idSubtipo,
+            string descripcion,
+            IFormFile imagen,
+            List<IFormFile> imagenes,
+            List<int>? specIds,
+            List<string>? specValores)
+        {
+            int idProductoNuevo = await this.repo.InsertProductoAsync(
+                modelo: modelo,
+                idMarca: idMarca,
+                precio: precio,
+                stock: stock,
+                idSubtipo: idSubtipo,
+                descripcion: descripcion,
+                imagenPrincipal: imagen,
+                imagenesSecundarias: imagenes,
+                specIds: specIds,
+                specValores: specValores);
+
+            return RedirectToAction("Details", "Productos", new { idProducto = idProductoNuevo });
         }
     }
 }

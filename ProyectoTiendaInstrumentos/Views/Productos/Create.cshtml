@@ -1,0 +1,436 @@
+﻿@using ProyectoTiendaInstrumentos.Models
+@using ProyectoTiendaInstrumentos.Repositories
+@inject RepositorySubtipos repositorySubtipos
+<form method="post" enctype="multipart/form-data">
+    @{ 
+        SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
+        bool hasArbol = arbolTipos != null;
+    }
+
+    <select name="idFamilia" id="selectFamilia">
+        @if (hasArbol)
+        {
+            <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
+        }
+        else
+        {
+            <option value="">Selecciona familia...</option>
+        }
+    </select>
+
+    <select name="idTipo" id="selectTipo">
+        @if (hasArbol)
+        {
+            <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
+        }
+        else
+        {
+            <option value="">Selecciona tipo...</option>
+        }
+    </select>
+
+    <select name="idSubtipo" id="selectSubtipo">
+        @if (hasArbol)
+        {
+            <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
+        }
+        else
+        {
+            <option value="">Selecciona subtipo...</option>
+        }
+    </select>
+
+    <label>Modelo</label>
+    <input type="text" name="modelo" />
+
+    <label>Precio</label>
+    <input type="number" step="0.01" name="precio" />
+
+    <label>Stock</label>
+    <input type="number" name="stock" />
+
+    <label>Marca</label>
+    <select name="idMarca">
+        @foreach (var marca in ViewBag.Marcas as List<Marca>)
+        {
+            <option value="@marca.IdMarca">@marca.Nombre</option>
+        }
+    </select>
+
+    <label>Imagen principal</label>
+    <input type="file" name="imagen" />
+
+    <button type="button" id="botonMostrarFormImagenes">
+        Imagenes del producto
+    </button>
+
+    <div id="zonaImagenes" style="display:none; margin-top: 12px;">
+        <div style="display:flex; gap: 16px; align-items:flex-start;">
+            <div id="contenedorImagenes" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+
+            <div>
+                <label>Agregar imágenes</label>
+                <input type="file" id="inputImagenesProducto" name="imagenes" multiple accept="image/*" />
+                <small>Se pueden seleccionar varias veces; se acumulan.</small>
+            </div>
+        </div>
+    </div>
+
+    <textarea name="descripcion" placeholder="Descripción del producto"></textarea>
+
+    <button type="button" id="botonMostrarFormSpecs">
+        Especificaciones del producto
+    </button>
+
+    <div id="zonaSpecs" style="display:none; margin-top: 12px;">
+        <div style="display:flex; gap: 16px; align-items:flex-start;">
+            <div style="min-width: 260px;">
+                <label>Agregar especificación</label>
+
+                <select id="selectEspecificacionesSubtipo">
+                    <option value="">Selecciona especificación...</option>
+                </select>
+
+                <input type="text" id="inputSpecValor" placeholder="Valor" style="display:block; margin-top:8px;" />
+
+                <button type="button" id="botonAgregarSpec" style="margin-top:8px;">Agregar especificación</button>
+
+                <small id="hintUnidad" style="display:block; margin-top:6px; color:#666;"></small>
+            </div>
+
+            <div style="flex: 1;">
+                <label>Especificaciones añadidas</label>
+                <div id="contenedorSpecs" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit">Crear producto</button>
+</form>
+
+@section Scripts {
+    <script>
+        $(function () {
+            // --- Helpers ---
+            function fillSelect($select, items, placeholder, selectedValue) {
+                var current = selectedValue ?? $select.val();
+                $select.empty();
+
+                if (placeholder) {
+                    $select.append($('<option/>', { value: '', text: placeholder }));
+                }
+
+                for (var i = 0; i < items.length; i++) {
+                    $select.append($('<option/>', {
+                        value: items[i].id,
+                        text: items[i].nombre
+                    }).attr('data-unidad', items[i].unidadMedida ?? ''));
+                }
+
+                if (current) {
+                    $select.val(current);
+                }
+            }
+
+            function hasValue(v) {
+                return v !== undefined && v !== null && String(v).trim() !== '';
+            }
+
+            function setSpecValorInputTypeByUnidad(unidad) {
+                var $input = $('#inputSpecValor');
+
+                if (unidad === 'ud') {
+                    // Cambia a number para unidades "ud"
+                    $input.attr('type', 'number');
+                    $input.attr('step', '1');
+                    $input.attr('inputmode', 'numeric');
+                } else {
+                    // Vuelve a text para el resto
+                    $input.attr('type', 'text');
+                    $input.removeAttr('step');
+                    $input.removeAttr('inputmode');
+                }
+            }
+
+            function clearSpecsUI() {
+                $('#selectEspecificacionesSubtipo').empty().append($('<option/>', { value: '', text: 'Selecciona especificación...' }));
+                $('#inputSpecValor').val('');
+                setSpecValorInputTypeByUnidad('');
+                $('#hintUnidad').text('');
+                $('#contenedorSpecs').empty();
+            }
+
+            function buildHiddenInputs(specId, valor) {
+                // arrays para el model binder
+                return (
+                    '<input type="hidden" name="specIds" value="' + specId + '" />' +
+                    '<input type="hidden" name="specValores" value="' + $('<div/>').text(valor).html() + '" />'
+                );
+            }
+
+            // --- Carga perezosa familias/tipos/subtipos ---
+            var familiasLoaded = false;
+            var tiposLoadedForFamilia = null;
+            var subtiposLoadedForTipo = null;
+
+            var preFamilia = $('#selectFamilia').val();
+            var preTipo = $('#selectTipo').val();
+            var preSubtipo = $('#selectSubtipo').val();
+
+            $('#selectFamilia').on('focus mousedown', function () {
+                if (familiasLoaded) return;
+
+                $.get('@Url.Action("Familias", "Catalogo")')
+                    .done(function (data) {
+                        familiasLoaded = true;
+                        fillSelect($('#selectFamilia'), data, 'Selecciona familia...', preFamilia);
+                        preFamilia = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar las familias.');
+                    });
+            });
+
+            $('#selectTipo').on('focus mousedown', function () {
+                var idFamilia = $('#selectFamilia').val();
+                if (!hasValue(idFamilia)) return;
+                if (tiposLoadedForFamilia === idFamilia) return;
+
+                $.get('@Url.Action("Tipos", "Catalogo")', { idFamilia: idFamilia })
+                    .done(function (data) {
+                        tiposLoadedForFamilia = idFamilia;
+                        fillSelect($('#selectTipo'), data, 'Selecciona tipo...', preTipo);
+                        preTipo = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los tipos.');
+                    });
+            });
+
+            $('#selectSubtipo').on('focus mousedown', function () {
+                var idTipo = $('#selectTipo').val();
+                if (!hasValue(idTipo)) return;
+                if (subtiposLoadedForTipo === idTipo) return;
+
+                $.get('@Url.Action("Subtipos", "Catalogo")', { idTipo: idTipo })
+                    .done(function (data) {
+                        subtiposLoadedForTipo = idTipo;
+                        fillSelect($('#selectSubtipo'), data, 'Selecciona subtipo...', preSubtipo);
+                        preSubtipo = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los subtipos.');
+                    });
+            });
+
+            $('#selectFamilia').on('change', function () {
+                var idFamilia = $(this).val();
+
+                tiposLoadedForFamilia = null;
+                subtiposLoadedForTipo = null;
+
+                fillSelect($('#selectTipo'), [], 'Selecciona tipo...');
+                fillSelect($('#selectSubtipo'), [], 'Selecciona subtipo...');
+
+                clearSpecsUI();
+
+                if (!idFamilia) return;
+
+                $.get('@Url.Action("Tipos", "Catalogo")', { idFamilia: idFamilia })
+                    .done(function (data) {
+                        tiposLoadedForFamilia = idFamilia;
+                        fillSelect($('#selectTipo'), data, 'Selecciona tipo...');
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los tipos.');
+                    });
+            });
+
+            $('#selectTipo').on('change', function () {
+                var idTipo = $(this).val();
+
+                subtiposLoadedForTipo = null;
+
+                fillSelect($('#selectSubtipo'), [], 'Selecciona subtipo...');
+
+                clearSpecsUI();
+
+                if (!idTipo) return;
+
+                $.get('@Url.Action("Subtipos", "Catalogo")', { idTipo: idTipo })
+                    .done(function (data) {
+                        subtiposLoadedForTipo = idTipo;
+                        fillSelect($('#selectSubtipo'), data, 'Selecciona subtipo...');
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los subtipos.');
+                    });
+            });
+
+            // --- Specs: mostrar/ocultar ---
+            $('#botonMostrarFormSpecs').on('click', function () {
+                $('#zonaSpecs').toggle();
+            });
+
+            // --- Cargar especificaciones por subtipo ---
+            function loadSpecsForSubtipo(idSubtipo) {
+                if (!hasValue(idSubtipo)) {
+                    clearSpecsUI();
+                    return;
+                }
+
+                $.get('@Url.Action("Especificaciones", "Catalogo")', { idSubtipo: idSubtipo })
+                    .done(function (data) {
+                        // data: [{id, nombre, unidadMedida}]
+                        fillSelect($('#selectEspecificacionesSubtipo'), data, 'Selecciona especificación...');
+                        $('#hintUnidad').text('');
+                        setSpecValorInputTypeByUnidad('');
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar las especificaciones del subtipo.');
+                    });
+            }
+
+            // cuando cambia subtipo, cargamos specs y limpiamos lista
+            $('#selectSubtipo').on('change', function () {
+                clearSpecsUI();
+                loadSpecsForSubtipo($(this).val());
+            });
+
+            // si viene preseleccionado (ViewBag.ArbolTipos), carga specs al arrancar
+            if (hasValue($('#selectSubtipo').val())) {
+                loadSpecsForSubtipo($('#selectSubtipo').val());
+            }
+
+            // Grupo de specs añadidas para evitar duplicados
+            var specsAdded = {}; // { specId: true }
+
+            // hint unidad + tipo de input
+            $('#selectEspecificacionesSubtipo').on('change', function () {
+                var unidad = $(this).find('option:selected').data('unidad');
+
+                if (hasValue(unidad)) {
+                    $('#hintUnidad').text('Unidad: ' + unidad);
+                } else {
+                    $('#hintUnidad').text('');
+                }
+
+                setSpecValorInputTypeByUnidad(unidad);
+                $('#inputSpecValor').val('');
+            });
+
+            // Añadir spec
+            $('#botonAgregarSpec').on('click', function () {
+                var specId = $('#selectEspecificacionesSubtipo').val();
+                var specNombre = $('#selectEspecificacionesSubtipo option:selected').text();
+                var unidad = $('#selectEspecificacionesSubtipo option:selected').data('unidad');
+                var valor = $('#inputSpecValor').val();
+
+                if (!hasValue(specId)) {
+                    alert('Selecciona una especificación.');
+                    return;
+                }
+                if (!hasValue(valor)) {
+                    alert('Introduce un valor para la especificación.');
+                    return;
+                }
+                if (specsAdded[specId]) {
+                    alert('Esa especificación ya está añadida.');
+                    return;
+                }
+
+                specsAdded[specId] = true;
+
+                var $row = $('<div/>', {
+                    'class': 'spec-row',
+                    'css': {
+                        'display': 'flex',
+                        'alignItems': 'center',
+                        'justifyContent': 'space-between',
+                        'gap': '12px',
+                        'border': '1px solid #ddd',
+                        'borderRadius': '8px',
+                        'padding': '8px 10px'
+                    }
+                });
+
+                var texto = specNombre + ': ' + valor + (hasValue(unidad) ? (' ' + unidad) : '');
+                var $text = $('<div/>', { text: texto });
+
+                var $remove = $('<button/>', {
+                    type: 'button',
+                    text: 'Quitar'
+                }).on('click', function () {
+                    delete specsAdded[specId];
+                    $row.remove();
+                });
+
+                // hidden inputs para el POST
+                var $hidden = $('<div/>').html(buildHiddenInputs(specId, valor));
+
+                $row.append($text, $hidden, $remove);
+                $('#contenedorSpecs').append($row);
+
+                // reset inputs
+                $('#selectEspecificacionesSubtipo').val('');
+                $('#inputSpecValor').val('');
+                $('#hintUnidad').text('');
+                setSpecValorInputTypeByUnidad('');
+            });
+
+        });
+    </script>
+
+    <script>
+        // Tu script existente de imágenes (déjalo tal cual)
+        $(function () {
+            var acumuladorArchivos = new DataTransfer();
+
+            $('#botonMostrarFormImagenes').on('click', function () {
+                $('#zonaImagenes').toggle();
+            });
+
+            $('#inputImagenesProducto').on('change', function (e) {
+                var files = e.target.files;
+                if (!files || files.length === 0) {
+                    return;
+                }
+
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    acumuladorArchivos.items.add(file);
+
+                    (function (f) {
+                        var reader = new FileReader();
+                        reader.onload = function (ev) {
+                            var $item = $('<div/>', {
+                                'class': 'preview-item',
+                                'css': {
+                                    'position': 'relative',
+                                    'width': '90px',
+                                    'height': '90px',
+                                    'border': '1px solid #ddd',
+                                    'border-radius': '8px',
+                                    'overflow': 'hidden'
+                                }
+                            });
+
+                            var $img = $('<img/>', {
+                                src: ev.target.result,
+                                alt: f.name,
+                                css: { width: '100%', height: '100%', objectFit: 'cover' }
+                            });
+
+                            $item.append($img);
+                            $('#contenedorImagenes').append($item);
+                        };
+                        reader.readAsDataURL(f);
+                    })(file);
+                }
+
+                this.files = acumuladorArchivos.files;
+                $(this).val('');
+            });
+        });
+    </script>
+}

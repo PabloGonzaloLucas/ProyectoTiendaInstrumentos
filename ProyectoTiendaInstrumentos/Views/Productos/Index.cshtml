@@ -36,6 +36,23 @@ else
     </p>
 }
 
+@if (Context.User.FindFirst("Admin") != null)
+{
+    @if (subtipo != null)
+    {
+        <a asp-action="Create" asp-controller="Productos" asp-route-idSubtipo="@subtipo.IdSubtipo">
+            Crear Producto
+        </a>
+    }
+    else
+    {
+        <a asp-action="Create" asp-controller="Productos">
+            Crear Producto
+        </a>
+    }
+
+}
+
 @if (Model != null && Model.Count > 0)
 {
     if (esBusqueda)

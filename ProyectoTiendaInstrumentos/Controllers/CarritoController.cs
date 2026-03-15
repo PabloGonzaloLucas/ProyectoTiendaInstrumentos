@@ -38,6 +38,7 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         [AuthorizeUsuarios]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmarCompra(string accion, List<ProductoCarritoCantidad> productos)
         {
             int id = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -73,6 +74,8 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         [AuthorizeUsuarios]
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> ProcesarCompra(List<ProductoCarritoCantidad> productos)
         {
             int id = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -99,6 +102,8 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         [AuthorizeUsuarios]
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> VaciarCarrito()
         {
             int id = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));

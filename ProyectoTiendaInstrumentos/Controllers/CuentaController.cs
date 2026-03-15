@@ -51,6 +51,8 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         [AuthorizeUsuarios]
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> CambiarPassword(string passwordActual, string passwordNueva, string passwordConfirmar)
         {
             //if (HttpContext.Session.GetObject<Usuario>("Usuario") == null)
@@ -108,6 +110,8 @@ namespace ProyectoTiendaInstrumentos.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Register(string nombre, string email, IFormFile imagen, string password, string telefono, string direccion)
         {
             await this.repo.RegisterUserFakePassAsync(nombre, email, imagen, password, telefono, direccion);
@@ -121,6 +125,8 @@ namespace ProyectoTiendaInstrumentos.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Login(string email, string password)
         {
             Usuario user = await this.repo.LogInUserFakePassAsync(email, password);
@@ -134,7 +140,7 @@ namespace ProyectoTiendaInstrumentos.Controllers
                 ClaimsIdentity identity = new ClaimsIdentity(
                    CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role
                 );
-                if (user.RolId == 2)
+                if (user.RolId == 1)
                 {
                     Claim claimAdmin = new Claim("Admin", "Soy admin");
                     identity.AddClaim(claimAdmin);
@@ -198,6 +204,8 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         [AuthorizeUsuarios]
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> CambiarFotoPerfil(IFormFile imagen)
         {
             int id = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -222,6 +230,8 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         [AuthorizeUsuarios]
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> ActualizarPerfil(string nombre, string direccion, string telefono)
         {
             int id = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));

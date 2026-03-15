@@ -12,6 +12,7 @@ namespace ProyectoTiendaInstrumentos.Data
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Especificacion> Especificaciones { get; set; }
         public DbSet<Familia> Familias { get; set; }
+        public DbSet<Marca> Marcas { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<DetallePedido> DetallePedidos { get; set; }
         public DbSet<CategoriaFiltro> CategoriaFiltros { get; set; }
