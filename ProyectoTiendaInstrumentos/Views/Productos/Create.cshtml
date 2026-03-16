@@ -382,54 +382,86 @@
     </script>
 
     <script>
-        // Tu script existente de imágenes (déjalo tal cual)
+        // Imágenes secundarias
         $(function () {
-            var acumuladorArchivos = new DataTransfer();
+            var dt = new DataTransfer();
 
             $('#botonMostrarFormImagenes').on('click', function () {
                 $('#zonaImagenes').toggle();
             });
 
+            function renderPreview(file, index) {
+                var $item = $('<div/>', {
+                    'class': 'preview-item preview-new',
+                    'attr': { 'data-index': index },
+                    'css': {
+                        'position': 'relative',
+                        'width': '90px',
+                        'height': '90px',
+                        'border': '1px solid #ddd',
+                        'border-radius': '8px',
+                        'overflow': 'hidden'
+                    }
+                });
+
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    var $img = $('<img/>', {
+                        src: ev.target.result,
+                        alt: file.name,
+                        css: { width: '100%', height: '100%', objectFit: 'cover' }
+                    });
+                    $item.prepend($img);
+                };
+                reader.readAsDataURL(file);
+
+                var $remove = $('<button/>', {
+                    type: 'button',
+                    text: 'X',
+                    css: { position: 'absolute', top: '4px', right: '4px' }
+                }).on('click', function () {
+                    // reconstruimos DataTransfer sin el índice quitado
+                    var removeIndex = parseInt($item.attr('data-index'));
+                    var newDt = new DataTransfer();
+
+                    // quitar preview
+                    $item.remove();
+
+                    // reindexar y reconstruir
+                    var newIndex = 0;
+                    $('.preview-item.preview-new').each(function () {
+                        var oldIndex = parseInt($(this).attr('data-index'));
+                        if (oldIndex === removeIndex) return;
+
+                        var f = dt.files[oldIndex];
+                        if (f) {
+                            newDt.items.add(f);
+                            $(this).attr('data-index', newIndex++);
+                        }
+                    });
+
+                    dt = newDt;
+                    $('#inputImagenesProducto')[0].files = dt.files;
+                });
+
+                $item.append($remove);
+                $('#contenedorImagenes').append($item);
+            }
+
             $('#inputImagenesProducto').on('change', function (e) {
                 var files = e.target.files;
-                if (!files || files.length === 0) {
-                    return;
-                }
+                if (!files || files.length === 0) return;
 
                 for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
-                    acumuladorArchivos.items.add(file);
-
-                    (function (f) {
-                        var reader = new FileReader();
-                        reader.onload = function (ev) {
-                            var $item = $('<div/>', {
-                                'class': 'preview-item',
-                                'css': {
-                                    'position': 'relative',
-                                    'width': '90px',
-                                    'height': '90px',
-                                    'border': '1px solid #ddd',
-                                    'border-radius': '8px',
-                                    'overflow': 'hidden'
-                                }
-                            });
-
-                            var $img = $('<img/>', {
-                                src: ev.target.result,
-                                alt: f.name,
-                                css: { width: '100%', height: '100%', objectFit: 'cover' }
-                            });
-
-                            $item.append($img);
-                            $('#contenedorImagenes').append($item);
-                        };
-                        reader.readAsDataURL(f);
-                    })(file);
+                    dt.items.add(files[i]);
+                    renderPreview(files[i], dt.files.length - 1);
                 }
 
-                this.files = acumuladorArchivos.files;
-                $(this).val('');
+                // IMPORTANT: conservar acumulado en el input real
+                this.files = dt.files;
+
+                // No vaciar el input, porque perderíamos la selección.
+                // Si quieres permitir volver a seleccionar el mismo archivo, se puede usar un input "proxy".
             });
         });
     </script>

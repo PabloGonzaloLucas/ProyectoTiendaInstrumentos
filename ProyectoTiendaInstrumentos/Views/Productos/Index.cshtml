@@ -43,11 +43,20 @@ else
         <a asp-action="Create" asp-controller="Productos" asp-route-idSubtipo="@subtipo.IdSubtipo">
             Crear Producto
         </a>
+        <a asp-action="CreateSpecs" asp-controller="Productos" asp-route-idSubtipo="@subtipo.IdSubtipo">
+            Añadir especificaciones
+        </a>
+        <a asp-action="EditSpec" asp-controller="Productos" asp-route-idSubtipo="@subtipo.IdSubtipo">
+            Editar especificaciones
+        </a>
     }
     else
     {
         <a asp-action="Create" asp-controller="Productos">
             Crear Producto
+        </a>
+        <a asp-action="CreateSpecs" asp-controller="Productos">
+            Añadir especificaciones
         </a>
     }
 

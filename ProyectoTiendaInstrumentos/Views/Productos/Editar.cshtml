@@ -1,0 +1,539 @@
+﻿@using ProyectoTiendaInstrumentos.Models
+@using ProyectoTiendaInstrumentos.Repositories
+@inject RepositorySubtipos repositorySubtipos
+@{
+    Producto producto = ViewBag.Producto as Producto;
+    List<ProductoImagen> imagenesSecundariasExistentes = ViewBag.ImagenesProducto as List<ProductoImagen>;
+    List<VwEspecificacionesProducto> specsExistentes = ViewBag.Especificaciones as List<VwEspecificacionesProducto>;
+}
+<form method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="idProducto" value="@producto?.IdProducto" />
+
+    @{ 
+        SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
+        bool hasArbol = arbolTipos != null;
+    }
+
+    <select name="idFamilia" id="selectFamilia">
+        @if (hasArbol)
+        {
+            <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
+        }
+        else
+        {
+            <option value="">Selecciona familia...</option>
+        }
+    </select>
+
+    <select name="idTipo" id="selectTipo">
+        @if (hasArbol)
+        {
+            <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
+        }
+        else
+        {
+            <option value="">Selecciona tipo...</option>
+        }
+    </select>
+
+    <select name="idSubtipo" id="selectSubtipo">
+        @if (hasArbol)
+        {
+            <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
+        }
+        else
+        {
+            <option value="">Selecciona subtipo...</option>
+        }
+    </select>
+
+    <label>Modelo</label>
+    <input type="text" name="modelo" value="@producto?.Modelo" />
+
+    <label>Precio</label>
+    <input type="number" step="0.01" name="precio"
+       value="@(producto?.Precio.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "")" />
+
+    <label>Stock</label>
+    <input type="number" name="stock" value="@producto?.Stock" />
+
+    <label>Marca</label>
+    <select name="idMarca">
+        @foreach (var marca in ViewBag.Marcas as List<Marca>)
+        {
+            if (producto != null && producto.IdMarca == marca.IdMarca)
+            {
+                <option value="@marca.IdMarca" selected>@marca.Nombre</option>
+            }
+            else
+            {
+                <option value="@marca.IdMarca">@marca.Nombre</option>
+            }
+        }
+    </select>
+
+    <label>Imagen principal (actual)</label>
+    @if (!string.IsNullOrEmpty(producto?.Imagen))
+    {
+        <img id="previewImagenPrincipal"
+             src="~/images/productosMain/@producto.Imagen"
+             style="width:140px; height:140px; object-fit:cover; display:block; margin-bottom:8px;" />
+    }
+    else
+    {
+        <img id="previewImagenPrincipal"
+             src="~/images/productosMain/default.png"
+             style="width:140px; height:140px; object-fit:cover; display:block; margin-bottom:8px;" />
+    }
+
+    <label>Cambiar imagen principal</label>
+    <input type="file" name="imagen" id="inputImagenPrincipal" accept="image/*" />
+
+    <button type="button" id="botonMostrarFormImagenes">
+        Imagenes del producto
+    </button>
+
+    <div id="zonaImagenes" style="display:none; margin-top: 12px;">
+        <div style="display:flex; gap: 16px; align-items:flex-start;">
+            <div id="contenedorImagenes" style="display:flex; flex-wrap:wrap; gap:10px;">
+                @if (imagenesSecundariasExistentes != null)
+                {
+                    foreach (var img in imagenesSecundariasExistentes)
+                    {
+                        <div class="preview-item" data-id="@img.IdProductoImagen" style="position:relative; width:90px; height:90px; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
+                            <img src="~/images/productos/@img.Imagen" alt="Imagen secundaria" style="width:100%; height:100%; object-fit:cover;" />
+                            <input type="hidden" name="imagenesExistentesIds" value="@img.IdProductoImagen" />
+                            <button type="button" class="btnEliminarImagenExistente" style="position:absolute; top:4px; right:4px;">X</button>
+                        </div>
+                    }
+                }
+            </div>
+
+            <div>
+                <label>Agregar imágenes</label>
+                <input type="file" id="inputImagenesProducto" name="imagenes" multiple accept="image/*" />
+                <small>Se pueden seleccionar varias veces; se acumulan.</small>
+            </div>
+        </div>
+    </div>
+
+    <textarea name="descripcion" placeholder="Descripción del producto">@producto?.Descripcion</textarea>
+
+    <button type="button" id="botonMostrarFormSpecs">
+        Especificaciones del producto
+    </button>
+
+    <div id="zonaSpecs" style="display:none; margin-top: 12px;">
+        <div style="display:flex; gap: 16px; align-items:flex-start;">
+            <div style="min-width: 260px;">
+                <label>Agregar especificación</label>
+
+                <select id="selectEspecificacionesSubtipo">
+                    <option value="">Selecciona especificación...</option>
+                </select>
+
+                <input type="text" id="inputSpecValor" placeholder="Valor" style="display:block; margin-top:8px;" />
+
+                <button type="button" id="botonAgregarSpec" style="margin-top:8px;">Agregar especificación</button>
+
+                <small id="hintUnidad" style="display:block; margin-top:6px; color:#666;"></small>
+            </div>
+
+            <div style="flex: 1;">
+                <label>Especificaciones añadidas</label>
+                <div id="contenedorSpecs" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+                    @if (specsExistentes != null)
+                    {
+                        foreach (var spec in specsExistentes)
+                        {
+                            <div class="spec-row" data-specid="@spec.IdEspecificacion" style="display:flex; align-items:center; justify-content:space-between; gap:12px; border:1px solid #ddd; border-radius:8px; padding:8px 10px;">
+                                <div>@spec.Especificacion: @spec.Valor</div>
+                                <div>
+                                    <input type="hidden" name="specIds" value="@spec.IdEspecificacion" />
+                                    <input type="hidden" name="specValores" value="@spec.Valor" />
+                                </div>
+                                <button type="button" class="btnQuitarSpec">Quitar</button>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit">Guardar cambios</button>
+</form>
+
+@section Scripts {
+    <script>
+        $(function () {
+            // --- Helpers ---
+            function fillSelect($select, items, placeholder, selectedValue) {
+                var current = selectedValue ?? $select.val();
+                $select.empty();
+
+                if (placeholder) {
+                    $select.append($('<option/>', { value: '', text: placeholder }));
+                }
+
+                for (var i = 0; i < items.length; i++) {
+                    $select.append($('<option/>', {
+                        value: items[i].id,
+                        text: items[i].nombre
+                    }).attr('data-unidad', items[i].unidadMedida ?? ''));
+                }
+
+                if (current) {
+                    $select.val(current);
+                }
+            }
+
+            function hasValue(v) {
+                return v !== undefined && v !== null && String(v).trim() !== '';
+            }
+
+            function setSpecValorInputTypeByUnidad(unidad) {
+                var $input = $('#inputSpecValor');
+
+                if (unidad === 'ud') {
+                    // Cambia a number para unidades "ud"
+                    $input.attr('type', 'number');
+                    $input.attr('step', '1');
+                    $input.attr('inputmode', 'numeric');
+                } else {
+                    // Vuelve a text para el resto
+                    $input.attr('type', 'text');
+                    $input.removeAttr('step');
+                    $input.removeAttr('inputmode');
+                }
+            }
+
+            function clearSpecsSelectUI() {
+                $('#selectEspecificacionesSubtipo').empty().append($('<option/>', { value: '', text: 'Selecciona especificación...' }));
+                $('#inputSpecValor').val('');
+                setSpecValorInputTypeByUnidad('');
+                $('#hintUnidad').text('');
+            }
+
+            function buildHiddenInputs(specId, valor) {
+                // arrays para el model binder
+                return (
+                    '<input type="hidden" name="specIds" value="' + specId + '" />' +
+                    '<input type="hidden" name="specValores" value="' + $('<div/>').text(valor).html() + '" />'
+                );
+            }
+
+            // --- Carga perezosa familias/tipos/subtipos ---
+            var familiasLoaded = false;
+            var tiposLoadedForFamilia = null;
+            var subtiposLoadedForTipo = null;
+
+            var preFamilia = $('#selectFamilia').val();
+            var preTipo = $('#selectTipo').val();
+            var preSubtipo = $('#selectSubtipo').val();
+
+            $('#selectFamilia').on('focus mousedown', function () {
+                if (familiasLoaded) return;
+
+                $.get('@Url.Action("Familias", "Catalogo")')
+                    .done(function (data) {
+                        familiasLoaded = true;
+                        fillSelect($('#selectFamilia'), data, 'Selecciona familia...', preFamilia);
+                        preFamilia = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar las familias.');
+                    });
+            });
+
+            $('#selectTipo').on('focus mousedown', function () {
+                var idFamilia = $('#selectFamilia').val();
+                if (!hasValue(idFamilia)) return;
+                if (tiposLoadedForFamilia === idFamilia) return;
+
+                $.get('@Url.Action("Tipos", "Catalogo")', { idFamilia: idFamilia })
+                    .done(function (data) {
+                        tiposLoadedForFamilia = idFamilia;
+                        fillSelect($('#selectTipo'), data, 'Selecciona tipo...', preTipo);
+                        preTipo = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los tipos.');
+                    });
+            });
+
+            $('#selectSubtipo').on('focus mousedown', function () {
+                var idTipo = $('#selectTipo').val();
+                if (!hasValue(idTipo)) return;
+                if (subtiposLoadedForTipo === idTipo) return;
+
+                $.get('@Url.Action("Subtipos", "Catalogo")', { idTipo: idTipo })
+                    .done(function (data) {
+                        subtiposLoadedForTipo = idTipo;
+                        fillSelect($('#selectSubtipo'), data, 'Selecciona subtipo...', preSubtipo);
+                        preSubtipo = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los subtipos.');
+                    });
+            });
+
+            $('#selectFamilia').on('change', function () {
+                var idFamilia = $(this).val();
+
+                tiposLoadedForFamilia = null;
+                subtiposLoadedForTipo = null;
+
+                fillSelect($('#selectTipo'), [], 'Selecciona tipo...');
+                fillSelect($('#selectSubtipo'), [], 'Selecciona subtipo...');
+
+                clearSpecsSelectUI();
+
+                if (!idFamilia) return;
+
+                $.get('@Url.Action("Tipos", "Catalogo")', { idFamilia: idFamilia })
+                    .done(function (data) {
+                        tiposLoadedForFamilia = idFamilia;
+                        fillSelect($('#selectTipo'), data, 'Selecciona tipo...');
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los tipos.');
+                    });
+            });
+
+            $('#selectTipo').on('change', function () {
+                var idTipo = $(this).val();
+
+                subtiposLoadedForTipo = null;
+
+                fillSelect($('#selectSubtipo'), [], 'Selecciona subtipo...');
+
+                clearSpecsSelectUI();
+
+                if (!idTipo) return;
+
+                $.get('@Url.Action("Subtipos", "Catalogo")', { idTipo: idTipo })
+                    .done(function (data) {
+                        subtiposLoadedForTipo = idTipo;
+                        fillSelect($('#selectSubtipo'), data, 'Selecciona subtipo...');
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los subtipos.');
+                    });
+            });
+
+            // --- Specs: mostrar/ocultar ---
+            $('#botonMostrarFormSpecs').on('click', function () {
+                $('#zonaSpecs').toggle();
+            });
+
+            // --- Cargar especificaciones por subtipo ---
+            function loadSpecsForSubtipo(idSubtipo) {
+                if (!hasValue(idSubtipo)) {
+                    clearSpecsSelectUI();
+                    return;
+                }
+
+                $.get('@Url.Action("Especificaciones", "Catalogo")', { idSubtipo: idSubtipo })
+                    .done(function (data) {
+                        // data: [{id, nombre, unidadMedida}]
+                        fillSelect($('#selectEspecificacionesSubtipo'), data, 'Selecciona especificación...');
+                        $('#hintUnidad').text('');
+                        setSpecValorInputTypeByUnidad('');
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar las especificaciones del subtipo.');
+                    });
+            }
+
+            // cuando cambia subtipo, cargamos specs (pero NO borramos las ya añadidas)
+            $('#selectSubtipo').on('change', function () {
+                clearSpecsSelectUI();
+                loadSpecsForSubtipo($(this).val());
+            });
+
+            // si viene preseleccionado (ViewBag.ArbolTipos), carga specs al arrancar
+            if (hasValue($('#selectSubtipo').val())) {
+                loadSpecsForSubtipo($('#selectSubtipo').val());
+            }
+
+            // Grupo de specs añadidas para evitar duplicados (precargado con las existentes renderizadas)
+            var specsAdded = {}; // { specId: true }
+            $('#contenedorSpecs .spec-row').each(function () {
+                var id = $(this).attr('data-specid');
+                if (hasValue(id)) specsAdded[id] = true;
+            });
+
+            // quitar spec existente o nueva (delegado)
+            $('#contenedorSpecs').on('click', '.btnQuitarSpec', function () {
+                var $row = $(this).closest('.spec-row');
+                var specId = $row.attr('data-specid');
+                if (hasValue(specId)) {
+                    delete specsAdded[specId];
+                }
+                $row.remove();
+            });
+
+            // hint unidad + tipo de input
+            $('#selectEspecificacionesSubtipo').on('change', function () {
+                var unidad = $(this).find('option:selected').data('unidad');
+
+                if (hasValue(unidad)) {
+                    $('#hintUnidad').text('Unidad: ' + unidad);
+                } else {
+                    $('#hintUnidad').text('');
+                }
+
+                setSpecValorInputTypeByUnidad(unidad);
+                $('#inputSpecValor').val('');
+            });
+
+            // Añadir spec
+            $('#botonAgregarSpec').on('click', function () {
+                var specId = $('#selectEspecificacionesSubtipo').val();
+                var specNombre = $('#selectEspecificacionesSubtipo option:selected').text();
+                var unidad = $('#selectEspecificacionesSubtipo option:selected').data('unidad');
+                var valor = $('#inputSpecValor').val();
+
+                if (!hasValue(specId)) {
+                    alert('Selecciona una especificación.');
+                    return;
+                }
+                if (!hasValue(valor)) {
+                    alert('Introduce un valor para la especificación.');
+                    return;
+                }
+                if (specsAdded[specId]) {
+                    alert('Esa especificación ya está añadida.');
+                    return;
+                }
+
+                specsAdded[specId] = true;
+
+                var $row = $('<div/>', {
+                    'class': 'spec-row',
+                    'attr': { 'data-specid': specId },
+                    'css': {
+                        'display': 'flex',
+                        'alignItems': 'center',
+                        'justifyContent': 'space-between',
+                        'gap': '12px',
+                        'border': '1px solid #ddd',
+                        'borderRadius': '8px',
+                        'padding': '8px 10px'
+                    }
+                });
+
+                var texto = specNombre + ': ' + valor + (hasValue(unidad) ? (' ' + unidad) : '');
+                var $text = $('<div/>', { text: texto });
+
+                var $remove = $('<button/>', {
+                    type: 'button',
+                    text: 'Quitar',
+                    'class': 'btnQuitarSpec'
+                });
+
+                var $hidden = $('<div/>').html(buildHiddenInputs(specId, valor));
+
+                $row.append($text, $hidden, $remove);
+                $('#contenedorSpecs').append($row);
+
+                $('#selectEspecificacionesSubtipo').val('');
+                $('#inputSpecValor').val('');
+                $('#hintUnidad').text('');
+                setSpecValorInputTypeByUnidad('');
+            });
+        });
+    </script>
+
+    <script>
+        $(function () {
+            var dt = new DataTransfer();
+
+            $('#botonMostrarFormImagenes').on('click', function () {
+                $('#zonaImagenes').toggle();
+            });
+
+            // Eliminar imagen secundaria existente: quitamos el bloque y su hidden input
+            $('#contenedorImagenes').on('click', '.btnEliminarImagenExistente', function () {
+                $(this).closest('.preview-item').remove();
+            });
+
+            function renderPreview(file, index) {
+                var $item = $('<div/>', {
+                    'class': 'preview-item preview-new',
+                    'attr': { 'data-index': index },
+                    'css': {
+                        'position': 'relative',
+                        'width': '90px',
+                        'height': '90px',
+                        'border': '1px solid #ddd',
+                        'border-radius': '8px',
+                        'overflow': 'hidden'
+                    }
+                });
+
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    var $img = $('<img/>', {
+                        src: ev.target.result,
+                        alt: file.name,
+                        css: { width: '100%', height: '100%', objectFit: 'cover' }
+                    });
+                    $item.prepend($img);
+                };
+                reader.readAsDataURL(file);
+
+                var $remove = $('<button/>', {
+                    type: 'button',
+                    text: 'X',
+                    css: { position: 'absolute', top: '4px', right: '4px' }
+                }).on('click', function () {
+                    var removeIndex = parseInt($item.attr('data-index'));
+                    var newDt = new DataTransfer();
+
+                    $item.remove();
+
+                    var newIndex = 0;
+                    $('.preview-item.preview-new').each(function () {
+                        var oldIndex = parseInt($(this).attr('data-index'));
+                        if (oldIndex === removeIndex) return;
+
+                        var f = dt.files[oldIndex];
+                        if (f) {
+                            newDt.items.add(f);
+                            $(this).attr('data-index', newIndex++);
+                        }
+                    });
+
+                    dt = newDt;
+                    $('#inputImagenesProducto')[0].files = dt.files;
+                });
+
+                $item.append($remove);
+                $('#contenedorImagenes').append($item);
+            }
+
+            $('#inputImagenesProducto').on('change', function (e) {
+                var files = e.target.files;
+                if (!files || files.length === 0) return;
+
+                for (var i = 0; i < files.length; i++) {
+                    dt.items.add(files[i]);
+                    renderPreview(files[i], dt.files.length - 1);
+                }
+
+                this.files = dt.files;
+            });
+
+            $('#inputImagenPrincipal').on('change', function (e) {
+                var file = e.target.files && e.target.files[0];
+                if (!file) return;
+
+                var url = URL.createObjectURL(file);
+                $('#previewImagenPrincipal').attr('src', url);
+            });
+        });
+    </script>
+}

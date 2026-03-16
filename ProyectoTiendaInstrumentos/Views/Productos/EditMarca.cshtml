@@ -1,0 +1,13 @@
+﻿@model Marca
+
+<div>
+    <h1 class="page-title">Editar Marca</h1>
+    <form method="post" asp-controller="Productos" asp-action="EditMarca" enctype="multipart/form-data">
+        <input type="hidden" name="IdMarca" value="@Model.IdMarca" />
+        <label>Nombre</label>
+        <input type="text" name="Nombre" value="@Model.Nombre" />
+        <label>Logo</label>
+        <input type="file" name="Logo" />
+        <button type="submit">Guardar Cambios</button>
+    </form>
+</div>

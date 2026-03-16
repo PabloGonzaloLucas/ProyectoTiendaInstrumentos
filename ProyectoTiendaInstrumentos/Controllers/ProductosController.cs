@@ -19,9 +19,43 @@ namespace ProyectoTiendaInstrumentos.Controllers
             this.repoCarrito = repositoryCarrito;
             this.repoValoraciones = repoValoraciones;
         }
-        public async Task<IActionResult> Index(int idSubtipo, string q = null, int pagina = 1)
+        public async Task<IActionResult> Index(int idSubtipo, int? idMarca = null, string q = null, int pagina = 1)
         {
             const int tamañoPagina = 12;
+
+            // --- filtro por marca ---
+            if (idMarca.HasValue)
+            {
+                // Resolvemos el nombre de la marca desde BD (vw_CatalogoProductos expone "Marca", no "IdMarca").
+                var marcas = await this.repo.GetMarcasAsync();
+                var marca = marcas.FirstOrDefault(m => m.IdMarca == idMarca.Value);
+                if (marca == null)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+
+                List<VwCatalogoProducto> baseCatalogo;
+                if (idSubtipo > 0)
+                {
+                    ViewBag.Subtipo = await this.repo.GetSubtipoByIdAsync(idSubtipo);
+                    ViewBag.Specs = await this.repo.GetEspecificacionesBySubtipoAsync(idSubtipo);
+                    baseCatalogo = await this.repo.GetVistaCatalogoBySubtipoAsync(idSubtipo);
+                }
+                else
+                {
+                    baseCatalogo = await this.repo.GetVistaCatalogoAsync();
+                }
+
+                var filtrados = baseCatalogo
+                    .Where(p => string.Equals(p.Marca, marca.Nombre, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                var paginadoMarca = PagedResult<VwCatalogoProducto>.Create(filtrados, pagina, tamañoPagina);
+                ViewBag.TerminoBusqueda = marca.Nombre;
+                ViewBag.NumeroResultados = filtrados.Count;
+                ViewBag.Paginacion = paginadoMarca;
+                return View(paginadoMarca.Items);
+            }
 
             if (!string.IsNullOrWhiteSpace(q))
             {
@@ -214,7 +248,14 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         public async Task<IActionResult> Eliminar(int idProducto, int? idSubtipo)
         {
-            await this.repo.DeleteProductoAsync(idProducto);
+            if (!await this.repo.TieneComprasAsync(idProducto))
+            {
+                await this.repo.DeleteProductoAsync(idProducto);
+            }
+            else
+            {
+                return RedirectToAction("Details", "Productos", new { idProducto = idProducto });
+            }
 
             if (idSubtipo.HasValue)
             {
@@ -223,6 +264,7 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
         public async Task<IActionResult> Create(int? idSubtipo)
         {
             if (idSubtipo != null)
@@ -262,6 +304,185 @@ namespace ProyectoTiendaInstrumentos.Controllers
                 specValores: specValores);
 
             return RedirectToAction("Details", "Productos", new { idProducto = idProductoNuevo });
+        }
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        [HttpGet]
+        public async Task<IActionResult> Editar(int idProducto)
+        {
+            Producto producto = await this.repo.GetProductoAsync(idProducto);
+            if (producto == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (producto.IdSubtipo.HasValue)
+            {
+                ViewBag.ArbolTipos = await this.repo.GetArbolTiposAsync(producto.IdSubtipo.Value);
+            }
+
+            ViewBag.Marcas = await this.repo.GetMarcasAsync();
+            ViewBag.ImagenesProducto = await this.repo.GetImagenesProductoByIdAsync(idProducto);
+            ViewBag.Producto = producto;
+            ViewBag.Especificaciones = await this.repo.GetEspecificacionesAsync(idProducto);
+            return View();
+        }
+
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Editar(
+            int idProducto,
+            string modelo,
+            int idMarca,
+            decimal precio,
+            int stock,
+            int idSubtipo,
+            string descripcion,
+            IFormFile? imagen,
+            List<IFormFile>? imagenes,
+            List<int>? imagenesExistentesIds,
+            List<int>? specIds,
+            List<string>? specValores)
+        {
+            await this.repo.UpdateProductoAsync(
+                idProducto: idProducto,
+                modelo: modelo,
+                idMarca: idMarca,
+                precio: precio,
+                stock: stock,
+                idSubtipo: idSubtipo,
+                descripcion: descripcion,
+                imagenPrincipal: imagen,
+                imagenesSecundarias: imagenes,
+                imagenesExistentesIds: imagenesExistentesIds,
+                specIds: specIds,
+                specValores: specValores);
+
+            return RedirectToAction("Details", "Productos", new { idProducto });
+        }
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        public async Task<IActionResult> CreateSpecs(int? idSubtipo)
+        {
+            if (idSubtipo != null)
+            {
+                SelectSubtiposProducto selectSubtiposProducto = await this.repo.GetArbolTiposAsync(idSubtipo.Value);
+                ViewBag.ArbolTipos = selectSubtiposProducto;
+            }
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        public async Task<IActionResult> CreateSpecs(string nombre, string unidadMedida, int idSubtipo)
+        {
+            await this.repo.InsertEspecificacionAsync(
+                nombre: nombre,
+                unidadMedida: unidadMedida,
+                idSubtipo: idSubtipo);
+
+            return RedirectToAction("Index", "Productos", new { idSubtipo });
+        }
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        [HttpGet]
+        public async Task<IActionResult> EditSpec(int? idSubtipo = null)
+        {
+            if (idSubtipo != null)
+            {
+                ViewBag.ArbolTipos = await this.repo.GetArbolTiposAsync(idSubtipo.Value);
+            }
+
+            // Pantalla dinámica: no cargamos ninguna especificación por defecto.
+            // La UI cargará las especificaciones por subtipo y, al seleccionar una,
+            // pedirá sus datos vía JSON.
+            return View();
+        }
+
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        [HttpGet]
+        public async Task<IActionResult> GetEspecificacionJson(int idEspecificacion)
+        {
+            Especificacion? espec = await this.repo.GetEspecificacionByIdAsync(idEspecificacion);
+            if (espec == null)
+            {
+                return NotFound();
+            }
+
+            return Json(new
+            {
+                idEspecificacion = espec.IdEspecificacion,
+                nombre = espec.Nombre,
+                unidadMedida = espec.UnidadMedida
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        public async Task<IActionResult> EditSpec(int idEspecificacion, string nombre, string unidadMedida, int idSubtipo)
+        {
+            await this.repo.UpdateEspecificacionAsync(
+                idEspecificacion: idEspecificacion,
+                nombre: nombre,
+                unidadMedida: unidadMedida,
+                idSubtipo: idSubtipo);
+
+            return RedirectToAction("Index", "Productos", new { idSubtipo });
+        }
+
+        public async Task<IActionResult> Marcas()
+        {
+            List<Marca> marcas = await this.repo.GetMarcasAsync();
+            return View(marcas);
+        }
+
+
+        [HttpPost]
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> CreateMarca(string nombre, IFormFile logo)
+        {
+            await this.repo.InsertMarcaAsync(nombre, logo);
+
+            return RedirectToAction("Marcas", "Productos");
+        }
+
+
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        [HttpGet]
+        public async Task<IActionResult> EditMarca(int idMarca)
+        {
+
+            Marca marca = await this.repo.GetMarcaAsync(idMarca);
+            // Pantalla dinámica: no cargamos ninguna especificación por defecto.
+            // La UI cargará las especificaciones por subtipo y, al seleccionar una,
+            // pedirá sus datos vía JSON.
+            return View(marca);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        public async Task<IActionResult> EditMarca(int idMarca, string nombre, IFormFile? logo)
+        {
+            await this.repo.UpdateMarcaAsync(idMarca, nombre, logo);
+            return RedirectToAction("Marcas", "Productos");
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        public async Task<IActionResult> DeleteMarca(int idMarca)
+        {
+            if (!await this.repo.TieneProductosAsync(idMarca))
+            {
+                await this.repo.DeleteMarcaAsync(idMarca);
+            }
+            else
+            {
+                TempData["ErrorMarca"] = "No se puede eliminar esta marca porque tiene productos asociados.";
+            }
+            return RedirectToAction("Marcas", "Productos");
         }
     }
 }

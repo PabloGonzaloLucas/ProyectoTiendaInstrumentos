@@ -1,0 +1,179 @@
+﻿@using ProyectoTiendaInstrumentos.Models
+@using ProyectoTiendaInstrumentos.Repositories
+@inject RepositorySubtipos repositorySubtipos
+
+<form method="post">
+    @{
+        SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
+        bool hasArbol = arbolTipos != null;
+    }
+
+    <select name="idFamilia" id="selectFamilia">
+        @if (hasArbol)
+        {
+            <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
+        }
+        else
+        {
+            <option value="">Selecciona familia...</option>
+        }
+    </select>
+
+    <select name="idTipo" id="selectTipo">
+        @if (hasArbol)
+        {
+            <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
+        }
+        else
+        {
+            <option value="">Selecciona tipo...</option>
+        }
+    </select>
+
+    <select name="idSubtipo" id="selectSubtipo">
+        @if (hasArbol)
+        {
+            <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
+        }
+        else
+        {
+            <option value="">Selecciona subtipo...</option>
+        }
+    </select>
+
+    <label>Nombre</label>
+    <input type="text" name="nombre" />
+
+    <label>Unidad de medida</label>
+    <select name="unidadMedida">
+        <option value="texto">Texto</option>
+        <option value="unidades">unidades</option>
+    </select>
+
+    <button type="submit">Crear especificación</button>
+</form>
+
+@section Scripts {
+    <script>
+        $(function () {
+            function fillSelect($select, items, placeholder, selectedValue) {
+                var current = selectedValue ?? $select.val();
+                $select.empty();
+
+                if (placeholder) {
+                    $select.append($('<option/>', { value: '', text: placeholder }));
+                }
+
+                for (var i = 0; i < items.length; i++) {
+                    $select.append($('<option/>', {
+                        value: items[i].id,
+                        text: items[i].nombre
+                    }));
+                }
+
+                if (current) {
+                    $select.val(current);
+                }
+            }
+
+            function hasValue(v) {
+                return v !== undefined && v !== null && String(v).trim() !== '';
+            }
+
+            // --- Carga perezosa familias/tipos/subtipos ---
+            var familiasLoaded = false;
+            var tiposLoadedForFamilia = null;
+            var subtiposLoadedForTipo = null;
+
+            var preFamilia = $('#selectFamilia').val();
+            var preTipo = $('#selectTipo').val();
+            var preSubtipo = $('#selectSubtipo').val();
+
+            $('#selectFamilia').on('focus mousedown', function () {
+                if (familiasLoaded) return;
+
+                $.get('@Url.Action("Familias", "Catalogo")')
+                    .done(function (data) {
+                        familiasLoaded = true;
+                        fillSelect($('#selectFamilia'), data, 'Selecciona familia...', preFamilia);
+                        preFamilia = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar las familias.');
+                    });
+            });
+
+            $('#selectTipo').on('focus mousedown', function () {
+                var idFamilia = $('#selectFamilia').val();
+                if (!hasValue(idFamilia)) return;
+                if (tiposLoadedForFamilia === idFamilia) return;
+
+                $.get('@Url.Action("Tipos", "Catalogo")', { idFamilia: idFamilia })
+                    .done(function (data) {
+                        tiposLoadedForFamilia = idFamilia;
+                        fillSelect($('#selectTipo'), data, 'Selecciona tipo...', preTipo);
+                        preTipo = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los tipos.');
+                    });
+            });
+
+            $('#selectSubtipo').on('focus mousedown', function () {
+                var idTipo = $('#selectTipo').val();
+                if (!hasValue(idTipo)) return;
+                if (subtiposLoadedForTipo === idTipo) return;
+
+                $.get('@Url.Action("Subtipos", "Catalogo")', { idTipo: idTipo })
+                    .done(function (data) {
+                        subtiposLoadedForTipo = idTipo;
+                        fillSelect($('#selectSubtipo'), data, 'Selecciona subtipo...', preSubtipo);
+                        preSubtipo = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los subtipos.');
+                    });
+            });
+
+            $('#selectFamilia').on('change', function () {
+                var idFamilia = $(this).val();
+
+                tiposLoadedForFamilia = null;
+                subtiposLoadedForTipo = null;
+
+                fillSelect($('#selectTipo'), [], 'Selecciona tipo...');
+                fillSelect($('#selectSubtipo'), [], 'Selecciona subtipo...');
+
+                if (!idFamilia) return;
+
+                $.get('@Url.Action("Tipos", "Catalogo")', { idFamilia: idFamilia })
+                    .done(function (data) {
+                        tiposLoadedForFamilia = idFamilia;
+                        fillSelect($('#selectTipo'), data, 'Selecciona tipo...');
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los tipos.');
+                    });
+            });
+
+            $('#selectTipo').on('change', function () {
+                var idTipo = $(this).val();
+
+                subtiposLoadedForTipo = null;
+
+                fillSelect($('#selectSubtipo'), [], 'Selecciona subtipo...');
+
+                if (!idTipo) return;
+
+                $.get('@Url.Action("Subtipos", "Catalogo")', { idTipo: idTipo })
+                    .done(function (data) {
+                        subtiposLoadedForTipo = idTipo;
+                        fillSelect($('#selectSubtipo'), data, 'Selecciona subtipo...');
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los subtipos.');
+                    });
+            });
+        });
+    </script>
+}

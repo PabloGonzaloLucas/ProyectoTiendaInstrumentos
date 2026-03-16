@@ -1,0 +1,260 @@
+﻿@using ProyectoTiendaInstrumentos.Models
+@using ProyectoTiendaInstrumentos.Repositories
+@inject RepositorySubtipos repositorySubtipos
+
+<form method="post">
+    @{
+        SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
+        bool hasArbol = arbolTipos != null;
+    }
+
+    <div style="display:flex; flex-direction:column; gap:10px; max-width:520px;">
+
+        <label>Familia</label>
+        <select name="idFamilia" id="selectFamilia">
+            @if (hasArbol)
+            {
+                <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
+            }
+            else
+            {
+                <option value="">Selecciona familia...</option>
+            }
+        </select>
+
+        <label>Tipo</label>
+        <select name="idTipo" id="selectTipo">
+            @if (hasArbol)
+            {
+                <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
+            }
+            else
+            {
+                <option value="">Selecciona tipo...</option>
+            }
+        </select>
+
+        <label>Subtipo</label>
+        <select name="idSubtipo" id="selectSubtipo">
+            @if (hasArbol)
+            {
+                <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
+            }
+            else
+            {
+                <option value="">Selecciona subtipo...</option>
+            }
+        </select>
+
+        <hr />
+
+        <label>Especificación</label>
+        <select id="selectEspecificacionesSubtipo">
+            <option value="">Selecciona especificación...</option>
+        </select>
+
+        <div id="zonaEditar" style="display:none; margin-top:10px;">
+            <input type="hidden" name="idEspecificacion" id="hiddenIdEspecificacion" />
+
+            <label>Nombre</label>
+            <input type="text" name="nombre" id="inputNombre" />
+
+            <label>Unidad de medida</label>
+            <select name="unidadMedida" id="selectUnidadMedida">
+                <option value="">Texto</option>
+                <option value="ud">Unidades (ud)</option>
+            </select>
+
+            <button type="submit" style="margin-top:10px;">Guardar cambios</button>
+        </div>
+
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        $(function () {
+            // --- Helpers ---
+            function fillSelect($select, items, placeholder, selectedValue, mapFn) {
+                var current = selectedValue ?? $select.val();
+                $select.empty();
+
+                if (placeholder) {
+                    $select.append($('<option/>', { value: '', text: placeholder }));
+                }
+
+                for (var i = 0; i < items.length; i++) {
+                    var it = mapFn ? mapFn(items[i]) : items[i];
+                    $select.append($('<option/>', {
+                        value: it.id,
+                        text: it.nombre
+                    }).attr('data-unidad', (it.unidadMedida ?? '')));
+                }
+
+                if (current) {
+                    $select.val(current);
+                }
+            }
+
+            function hasValue(v) {
+                return v !== undefined && v !== null && String(v).trim() !== '';
+            }
+
+            function clearEditarUI() {
+                $('#selectEspecificacionesSubtipo')
+                    .empty()
+                    .append($('<option/>', { value: '', text: 'Selecciona especificación...' }));
+
+                $('#hiddenIdEspecificacion').val('');
+                $('#inputNombre').val('');
+                $('#selectUnidadMedida').val('');
+                $('#zonaEditar').hide();
+            }
+
+            // --- Carga perezosa familias/tipos/subtipos (igual que Create) ---
+            var familiasLoaded = false;
+            var tiposLoadedForFamilia = null;
+            var subtiposLoadedForTipo = null;
+
+            var preFamilia = $('#selectFamilia').val();
+            var preTipo = $('#selectTipo').val();
+            var preSubtipo = $('#selectSubtipo').val();
+
+            $('#selectFamilia').on('focus mousedown', function () {
+                if (familiasLoaded) return;
+
+                $.get('@Url.Action("Familias", "Catalogo")')
+                    .done(function (data) {
+                        familiasLoaded = true;
+                        fillSelect($('#selectFamilia'), data, 'Selecciona familia...', preFamilia);
+                        preFamilia = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar las familias.');
+                    });
+            });
+
+            $('#selectTipo').on('focus mousedown', function () {
+                var idFamilia = $('#selectFamilia').val();
+                if (!hasValue(idFamilia)) return;
+                if (tiposLoadedForFamilia === idFamilia) return;
+
+                $.get('@Url.Action("Tipos", "Catalogo")', { idFamilia: idFamilia })
+                    .done(function (data) {
+                        tiposLoadedForFamilia = idFamilia;
+                        fillSelect($('#selectTipo'), data, 'Selecciona tipo...', preTipo);
+                        preTipo = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los tipos.');
+                    });
+            });
+
+            $('#selectSubtipo').on('focus mousedown', function () {
+                var idTipo = $('#selectTipo').val();
+                if (!hasValue(idTipo)) return;
+                if (subtiposLoadedForTipo === idTipo) return;
+
+                $.get('@Url.Action("Subtipos", "Catalogo")', { idTipo: idTipo })
+                    .done(function (data) {
+                        subtiposLoadedForTipo = idTipo;
+                        fillSelect($('#selectSubtipo'), data, 'Selecciona subtipo...', preSubtipo);
+                        preSubtipo = null;
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los subtipos.');
+                    });
+            });
+
+            $('#selectFamilia').on('change', function () {
+                var idFamilia = $(this).val();
+
+                tiposLoadedForFamilia = null;
+                subtiposLoadedForTipo = null;
+
+                fillSelect($('#selectTipo'), [], 'Selecciona tipo...');
+                fillSelect($('#selectSubtipo'), [], 'Selecciona subtipo...');
+                clearEditarUI();
+
+                if (!idFamilia) return;
+
+                $.get('@Url.Action("Tipos", "Catalogo")', { idFamilia: idFamilia })
+                    .done(function (data) {
+                        tiposLoadedForFamilia = idFamilia;
+                        fillSelect($('#selectTipo'), data, 'Selecciona tipo...');
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los tipos.');
+                    });
+            });
+
+            $('#selectTipo').on('change', function () {
+                var idTipo = $(this).val();
+
+                subtiposLoadedForTipo = null;
+
+                fillSelect($('#selectSubtipo'), [], 'Selecciona subtipo...');
+                clearEditarUI();
+
+                if (!idTipo) return;
+
+                $.get('@Url.Action("Subtipos", "Catalogo")', { idTipo: idTipo })
+                    .done(function (data) {
+                        subtiposLoadedForTipo = idTipo;
+                        fillSelect($('#selectSubtipo'), data, 'Selecciona subtipo...');
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar los subtipos.');
+                    });
+            });
+
+            // --- Especificaciones por subtipo ---
+            function loadSpecsForSubtipo(idSubtipo) {
+                if (!hasValue(idSubtipo)) {
+                    clearEditarUI();
+                    return;
+                }
+
+                $.get('@Url.Action("Especificaciones", "Catalogo")', { idSubtipo: idSubtipo })
+                    .done(function (data) {
+                        clearEditarUI();
+                        // data: [{id, nombre, unidadMedida}]
+                        fillSelect($('#selectEspecificacionesSubtipo'), data, 'Selecciona especificación...');
+                    })
+                    .fail(function () {
+                        alert('No se pudieron cargar las especificaciones del subtipo.');
+                    });
+            }
+
+            $('#selectSubtipo').on('change', function () {
+                loadSpecsForSubtipo($(this).val());
+            });
+
+            // si viene preseleccionado, cargamos specs al arrancar
+            if (hasValue($('#selectSubtipo').val())) {
+                loadSpecsForSubtipo($('#selectSubtipo').val());
+            }
+
+            // --- Al seleccionar especificación: traer datos y mostrar editor ---
+            $('#selectEspecificacionesSubtipo').on('change', function () {
+                var idEspecificacion = $(this).val();
+                if (!hasValue(idEspecificacion)) {
+                    clearEditarUI();
+                    return;
+                }
+
+                $.get('@Url.Action("GetEspecificacionJson", "Productos")', { idEspecificacion: idEspecificacion })
+                    .done(function (data) {
+                        $('#hiddenIdEspecificacion').val(data.idEspecificacion);
+                        $('#inputNombre').val(data.nombre ?? '');
+                        $('#selectUnidadMedida').val(data.unidadMedida ?? '');
+                        $('#zonaEditar').show();
+                    })
+                    .fail(function () {
+                        alert('No se pudo cargar la especificación seleccionada.');
+                        clearEditarUI();
+                    });
+            });
+        });
+    </script>
+}
