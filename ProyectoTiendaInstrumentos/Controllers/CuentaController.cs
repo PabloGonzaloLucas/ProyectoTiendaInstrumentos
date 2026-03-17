@@ -16,7 +16,7 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         public CuentaController(RepositoryUser repo)
         {
-            this.repo = repo;           
+            this.repo = repo;
         }
         public IActionResult Index()
         {
@@ -158,7 +158,7 @@ namespace ProyectoTiendaInstrumentos.Controllers
                 {
                     string controller = TempData["controller"].ToString();
                     string action = TempData["action"].ToString();
-                    if(action == "Logout")
+                    if (action == "Logout")
                     {
                         return RedirectToAction("Index", "Home");
                     }
@@ -180,7 +180,7 @@ namespace ProyectoTiendaInstrumentos.Controllers
                 }
                 ///////////
                 //HttpContext.Session.SetObject("Usuario", user);
-               // return RedirectToAction("Index", "Home");
+                // return RedirectToAction("Index", "Home");
             }
         }
 
@@ -260,5 +260,15 @@ namespace ProyectoTiendaInstrumentos.Controllers
             return RedirectToAction("Perfil");
         }
 
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        public async Task<IActionResult> PanelUsuarios()
+        {
+            List<Usuario> usuarios = await this.repo.GetAllUsersAsync();
+            foreach(Usuario user in usuarios)
+            {
+                user.NumPedidos = await this.repo.GetNumComprasUsuario(user.IdUsuario);
+            }
+            return View(usuarios);
+        }
     }
 }

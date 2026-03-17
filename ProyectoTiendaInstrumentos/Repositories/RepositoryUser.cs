@@ -228,5 +228,16 @@ namespace ProyectoTiendaInstrumentos.Repositories
             await this.context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<Usuario>> GetAllUsersAsync()
+        {
+            return await this.context.Usuarios.ToListAsync();
+        }
+
+        public async Task<int> GetNumComprasUsuario(int idUsuario)
+        {
+            return await this.context.Pedidos.CountAsync(p => p.IdUsuario == idUsuario);
+
+        }
     }
 }

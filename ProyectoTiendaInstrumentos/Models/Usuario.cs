@@ -34,5 +34,7 @@ public partial class Usuario
 
     public DateTime? FechaRegistro { get; set; }
 
+    [NotMapped]
+    public int? NumPedidos { get; set; }
 
 }

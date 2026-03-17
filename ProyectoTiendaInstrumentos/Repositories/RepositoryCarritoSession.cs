@@ -27,7 +27,7 @@ namespace ProyectoTiendaInstrumentos.Repositories
             {
                 idsProductos = new List<ProductoCarritoCantidad>();
             }
-            idsProductos.Add(new ProductoCarritoCantidad { IdProducto = idProducto, Cantidad = cantidad});
+            idsProductos.Add(new ProductoCarritoCantidad { IdProducto = idProducto, Cantidad = cantidad });
             this.contextAccessor.HttpContext.Session.SetObject("idsCarrito", idsProductos);
         }
 
@@ -38,7 +38,7 @@ namespace ProyectoTiendaInstrumentos.Repositories
 
         public async Task<List<VwCatalogoProducto>> GetProductosCarritoByUsuarioAsync(int idUsuario)
         {
-            if(this.contextAccessor.HttpContext.Session.GetObject<List<ProductoCarritoCantidad>>("idsCarrito") == null)
+            if (this.contextAccessor.HttpContext.Session.GetObject<List<ProductoCarritoCantidad>>("idsCarrito") == null)
             {
                 return new List<VwCatalogoProducto>();
             }
@@ -49,8 +49,8 @@ namespace ProyectoTiendaInstrumentos.Repositories
                 var consulta = from datos in this.context.CatalogoProductos
                                where productosIds.Contains(datos.IdProducto)
                                select datos;
-                List<VwCatalogoProducto> productos =  await consulta.ToListAsync();
-                foreach(VwCatalogoProducto producto in productos)
+                List<VwCatalogoProducto> productos = await consulta.ToListAsync();
+                foreach (VwCatalogoProducto producto in productos)
                 {
                     producto.Cantidad = idsProductos.Where(p => p.IdProducto == producto.IdProducto).FirstOrDefault().Cantidad;
                 }
@@ -61,7 +61,7 @@ namespace ProyectoTiendaInstrumentos.Repositories
 
         public async Task RemoveProductoFromCartAsync(int idProducto, int idUsuario)
         {
-            if(this.contextAccessor.HttpContext.Session.GetObject<List<ProductoCarritoCantidad>>("idsCarrito") != null)
+            if (this.contextAccessor.HttpContext.Session.GetObject<List<ProductoCarritoCantidad>>("idsCarrito") != null)
             {
                 List<ProductoCarritoCantidad> idsProductos = this.contextAccessor.HttpContext.Session.GetObject<List<ProductoCarritoCantidad>>("idsCarrito");
                 ProductoCarritoCantidad producto = idsProductos.Where(p => p.IdProducto == idProducto).FirstOrDefault();
@@ -72,7 +72,7 @@ namespace ProyectoTiendaInstrumentos.Repositories
 
         public async Task<int> GetNumProductosCarritoAsync(int idUsuario)
         {
-            if(this.contextAccessor.HttpContext.Session.GetObject<List<ProductoCarritoCantidad>>("idsCarrito") == null)
+            if (this.contextAccessor.HttpContext.Session.GetObject<List<ProductoCarritoCantidad>>("idsCarrito") == null)
             {
                 return 0;
             }
@@ -82,11 +82,11 @@ namespace ProyectoTiendaInstrumentos.Repositories
 
         public async Task ActualizarCantidadAsync(int idProducto, int cantidad, int idUsuario)
         {
-            if(this.contextAccessor.HttpContext.Session.GetObject<List<ProductoCarritoCantidad>>("idsCarrito") != null)
+            if (this.contextAccessor.HttpContext.Session.GetObject<List<ProductoCarritoCantidad>>("idsCarrito") != null)
             {
                 List<ProductoCarritoCantidad> idsProductos = this.contextAccessor.HttpContext.Session.GetObject<List<ProductoCarritoCantidad>>("idsCarrito");
                 ProductoCarritoCantidad producto = idsProductos.Where(p => p.IdProducto == idProducto).FirstOrDefault();
-                if(producto != null)
+                if (producto != null)
                 {
                     producto.Cantidad = cantidad;
                     this.contextAccessor.HttpContext.Session.SetObject("idsCarrito", idsProductos);
@@ -141,6 +141,15 @@ namespace ProyectoTiendaInstrumentos.Repositories
             pedido.IdUsuario = idUsuario;
             pedido.Estado = "Procesando";
 
+            // FechaEntrega aleatoria entre mañana y +14 días
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            DateOnly minEntrega = today.AddDays(1);
+            DateOnly maxEntrega = today.AddDays(14);
+            int daysRange = (maxEntrega.DayNumber - minEntrega.DayNumber) + 1;
+            int randomOffsetDays = Random.Shared.Next(daysRange);
+            DateOnly entregaDateOnly = minEntrega.AddDays(randomOffsetDays);
+            pedido.FechaEntrega = entregaDateOnly.ToDateTime(TimeOnly.MinValue);
+
             this.context.Pedidos.Add(pedido);
             await this.context.SaveChangesAsync();
 
@@ -185,12 +194,12 @@ namespace ProyectoTiendaInstrumentos.Repositories
             return pedido.IdPedido;
         }
 
-        private async Task<int>FindMaxIdPedidoAsync()
+        private async Task<int> FindMaxIdPedidoAsync()
         {
             int maxId = this.context.Pedidos.Max(p => p.IdPedido);
             return maxId;
         }
-        private async Task<int>FindMaxIdDetallePedidoAsync()
+        private async Task<int> FindMaxIdDetallePedidoAsync()
         {
             int maxId = this.context.DetallePedidos.Max(p => p.IdDetallePedido);
             return maxId;

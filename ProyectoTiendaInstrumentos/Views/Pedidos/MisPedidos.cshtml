@@ -12,6 +12,9 @@
         <ul class="mispedidos-lista">
             @foreach(Pedido pedido in Model)
             {
+                @* bool entregado = pedido.FechaEntrega.HasValue && pedido.FechaEntrega.Value < DateTime.Now;
+                string estadoMostrar = entregado ? "Entregado" : pedido.Estado; *@
+
                 <li class="mispedidos-item">
                     <a asp-controller="Pedidos" asp-action="DetallesPedido" asp-route-idPedido="@pedido.IdPedido" class="mispedidos-card">
                         <div class="mispedidos-info">

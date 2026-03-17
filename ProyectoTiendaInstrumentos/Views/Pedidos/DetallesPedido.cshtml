@@ -2,6 +2,8 @@
 @using ProyectoTiendaInstrumentos.Models
 @{
     PagedResult<VwProductosPedido> paginacionProductos = ViewBag.PaginacionProductos as PagedResult<VwProductosPedido>;
+    // bool entregado = Model.FechaEntrega.HasValue && Model.FechaEntrega.Value < DateTime.Now;
+    // string estadoMostrar = entregado ? "Entregado" : Model.Estado;
 }
 
 <a asp-controller="Pedidos" asp-action="MisPedidos" class="detpedido-volver">

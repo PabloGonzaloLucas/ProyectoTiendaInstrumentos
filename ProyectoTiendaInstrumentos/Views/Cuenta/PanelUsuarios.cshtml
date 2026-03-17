@@ -1,0 +1,49 @@
+﻿@model List<Usuario>
+
+<div>
+    <h1>Panel de Usuarios</h1>
+   
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Teléfono</th>
+                    <th>Direccion</th>
+                    <th>Fecha de Registro</th>
+                    <th>Número de Compras</th>
+                </tr>
+            </thead>
+            <tbody>
+                 @foreach(Usuario usuario in Model)
+                 {
+                    <tr>
+                        <td>
+                            <img src="~/images/users/@usuario.Imagen" alt="imagen @usuario.Nombre"/>
+                        </td>
+                        <td>@usuario.IdUsuario</td>
+                        <td>@usuario.Nombre</td>
+                        <td>@usuario.Email</td>
+                        <td>
+                            @if(usuario.RolId == 1)
+                            {
+                                <span class="badge badge-primary">Admin</span>
+                            }
+                            else if(usuario.RolId == 2)
+                            {
+                                <span class="badge badge-secondary">Usuario</span>
+                            }
+                        </td>
+                        <td>@usuario.Telefono</td>
+                        <td>@usuario.Direccion</td>
+                        <td>@usuario.FechaRegistro</td>
+                        <td>@usuario.NumPedidos</td>
+                    </tr>
+                 }
+        </table>
+    
+
+</div>

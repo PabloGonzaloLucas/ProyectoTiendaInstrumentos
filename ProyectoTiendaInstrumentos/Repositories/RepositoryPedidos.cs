@@ -22,16 +22,22 @@ namespace ProyectoTiendaInstrumentos.Repositories
             // Materializar la lista ANTES del foreach para cerrar el DataReader
             List<Pedido> pedidos = await consulta.ToListAsync();
 
+            // Actualizar estado a 'Entregado' si la fecha de entrega ya ha pasado
+            DateTime now = DateTime.Now;
+            bool anyChanged = false;
             foreach (Pedido pedido in pedidos)
             {
-                var idsProductos = from datos in this.context.DetallePedidos
-                                           where datos.IdPedido == pedido.IdPedido
-                                           select datos.IdProducto;
+                if (pedido.FechaEntrega.HasValue
+                    && pedido.FechaEntrega.Value < now
+                    && !string.Equals(pedido.Estado, "Entregado", StringComparison.OrdinalIgnoreCase))
+                {
+                    pedido.Estado = "Entregado";
+                    anyChanged = true;
+                }
 
-                //List<int> idsProductos = (await idsProductosConsulta.ToListAsync())
-                //    .Where(x => x.HasValue)
-                //    .Select(x => x.Value)
-                //    .ToList();
+                var idsProductos = from datos in this.context.DetallePedidos
+                                   where datos.IdPedido == pedido.IdPedido
+                                   select datos.IdProducto;
 
                 var imagenes = from datos in this.context.Productos
                                where idsProductos.Contains(datos.IdProducto)
@@ -40,7 +46,12 @@ namespace ProyectoTiendaInstrumentos.Repositories
                 pedido.ImagenesProductos = await imagenes.ToListAsync();
             }
 
-            return pedidos; // Ya está materializado, no re-ejecutar la consulta
+            if (anyChanged)
+            {
+                await this.context.SaveChangesAsync();
+            }
+
+            return pedidos;
         }
 
         public async Task<Pedido> GetPedidoByIdAsync(int idPedido)
@@ -51,15 +62,29 @@ namespace ProyectoTiendaInstrumentos.Repositories
 
             Pedido pedido = await consulta.FirstOrDefaultAsync();
 
+            if (pedido == null)
+            {
+                return null;
+            }
+
+            // Actualizar estado a 'Entregado' si la fecha de entrega ya ha pasado
+            if (pedido.FechaEntrega.HasValue
+                && pedido.FechaEntrega.Value < DateTime.Now
+                && !string.Equals(pedido.Estado, "Entregado", StringComparison.OrdinalIgnoreCase))
+            {
+                pedido.Estado = "Entregado";
+                await this.context.SaveChangesAsync();
+            }
+
             var productosPedido = from datos in this.context.ProductosPedidos
-                            where datos.IdPedido == idPedido
-                            select datos;
+                                  where datos.IdPedido == idPedido
+                                  select datos;
 
             List<VwProductosPedido> productos = await productosPedido.ToListAsync();
             pedido.ProductosPedido = productos;
 
-            return pedido; // Ya está materializado, no re-ejecutar la consulta
+            return pedido;
         }
-    
+
     }
 }
