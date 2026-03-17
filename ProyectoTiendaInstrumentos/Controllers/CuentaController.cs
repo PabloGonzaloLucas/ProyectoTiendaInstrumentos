@@ -129,7 +129,7 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         public async Task<IActionResult> Login(string email, string password)
         {
-            Usuario user = await this.repo.LogInUserFakePassAsync(email, password);
+            Usuario user = await this.repo.LogInUserAsync(email, password);
             if (user == null)
             {
                 ViewData["MENSAJE"] = "Credenciales incorrectas";

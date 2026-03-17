@@ -196,12 +196,18 @@ namespace ProyectoTiendaInstrumentos.Repositories
 
         private async Task<int> FindMaxIdPedidoAsync()
         {
-            int maxId = this.context.Pedidos.Max(p => p.IdPedido);
+            int maxId = this.context.Pedidos
+             .Select(p => (int?)p.IdPedido)
+             .Max() ?? 1;
             return maxId;
         }
         private async Task<int> FindMaxIdDetallePedidoAsync()
         {
-            int maxId = this.context.DetallePedidos.Max(p => p.IdDetallePedido);
+          
+            int maxId = this.context.DetallePedidos
+            .Select(d => (int?)d.IdDetallePedido)
+            .Max() ?? 1;
+
             return maxId;
         }
     }
