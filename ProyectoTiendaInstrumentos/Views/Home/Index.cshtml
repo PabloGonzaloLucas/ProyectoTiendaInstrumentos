@@ -1,8 +1,230 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="home-hero">
+    <div class="row align-items-center g-4">
+        <div class="col-12 col-lg-6">
+            <div class="home-hero-badge">
+                <i class="bi bi-shield-check"></i>
+                <span>Compra segura · Envíos rápidos · Soporte experto</span>
+            </div>
+
+            <h1 class="home-hero-title">
+                Instrumentos y accesorios
+                <span class="home-hero-title-accent">para músicos exigentes</span>
+            </h1>
+
+            <p class="home-hero-subtitle">
+                Descubre primeras marcas, ofertas y novedades. Encuentra el sonido que buscas y equípate con confianza.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <a class="btn btn-primary btn-lg" asp-controller="Productos" asp-action="Index" asp-route-todos="true">
+                    <i class="bi bi-bag"></i>
+                    Ver catálogo
+                </a>
+                <a class="btn btn-secondary btn-lg" asp-controller="Productos" asp-action="Marcas">
+                    <i class="bi bi-award"></i>
+                    Explorar marcas
+                </a>
+            </div>
+
+            <div class="home-hero-stats mt-4">
+                <div class="home-stat">
+                    <div class="home-stat-value">+1.500</div>
+                    <div class="home-stat-label">Productos</div>
+                </div>
+                <div class="home-stat">
+                    <div class="home-stat-value">24/7</div>
+                    <div class="home-stat-label">Asistencia</div>
+                </div>
+                <div class="home-stat">
+                    <div class="home-stat-value">48h</div>
+                    <div class="home-stat-label">Envío en península</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="home-hero-card">
+                <div class="home-hero-card-top">
+                    <div class="home-hero-card-icon"><i class="bi bi-music-note-beamed"></i></div>
+                    <div>
+                        <div class="home-hero-card-title">Recomendado para ti</div>
+                        <div class="home-hero-card-subtitle">Lo más buscado esta semana</div>
+                    </div>
+                </div>
+
+                <div class="home-hero-card-grid">
+                    <a class="home-mini" asp-controller="Productos" asp-action="Index" asp-route-q="Guitarra">
+                        <div class="home-mini-icon"><i class="bi bi-guitar"></i></div>
+                        <div class="home-mini-text">
+                            <div class="home-mini-title">Guitarras</div>
+                            <div class="home-mini-sub">Eléctricas, acústicas y clásicas</div>
+                        </div>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                    <a class="home-mini" asp-controller="Productos" asp-action="Index" asp-route-q="Batería">
+                        <div class="home-mini-icon"><i class="bi bi-disc"></i></div>
+                        <div class="home-mini-text">
+                            <div class="home-mini-title">Baterías</div>
+                            <div class="home-mini-sub">Acústicas y electrónicas</div>
+                        </div>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                    <a class="home-mini" asp-controller="Productos" asp-action="Index" asp-route-q="Teclado">
+                        <div class="home-mini-icon"><i class="bi bi-music-note-list"></i></div>
+                        <div class="home-mini-text">
+                            <div class="home-mini-title">Teclados</div>
+                            <div class="home-mini-sub">Controladores y pianos digitales</div>
+                        </div>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                    <a class="home-mini" asp-controller="Productos" asp-action="Index" asp-route-q="Micrófono">
+                        <div class="home-mini-icon"><i class="bi bi-mic"></i></div>
+                        <div class="home-mini-text">
+                            <div class="home-mini-title">Audio</div>
+                            <div class="home-mini-sub">Micros, interfaces y monitores</div>
+                        </div>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="home-hero-card-cta">
+                    <div class="home-hero-card-cta-text">
+                        <strong>¿Buscas algo concreto?</strong>
+                        <span>Usa la barra de búsqueda superior o entra al catálogo.</span>
+                    </div>
+                    <a class="btn btn-primary" asp-controller="Productos" asp-action="Index" asp-route-todos="true">
+                        <i class="bi bi-search"></i>
+                        Buscar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="home-section mt-4">
+    <div class="home-section-header">
+        <h2 class="home-section-title">Compra con confianza</h2>
+        <p class="home-section-subtitle">Todo lo que esperas de una tienda profesional, sin complicaciones.</p>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="home-feature">
+                <div class="home-feature-icon"><i class="bi bi-truck"></i></div>
+                <div class="home-feature-title">Envío rápido</div>
+                <div class="home-feature-text">Entrega en 24/48h en península para la mayoría de productos.</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="home-feature">
+                <div class="home-feature-icon"><i class="bi bi-arrow-repeat"></i></div>
+                <div class="home-feature-title">Devoluciones</div>
+                <div class="home-feature-text">Proceso sencillo y transparente. Compra sin miedo.</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="home-feature">
+                <div class="home-feature-icon"><i class="bi bi-credit-card"></i></div>
+                <div class="home-feature-title">Pago seguro</div>
+                <div class="home-feature-text">Métodos de pago protegidos y verificación antifraude.</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="home-feature">
+                <div class="home-feature-icon"><i class="bi bi-headset"></i></div>
+                <div class="home-feature-title">Soporte experto</div>
+                <div class="home-feature-text">Te ayudamos a elegir el equipo ideal para tu estilo.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="home-section mt-4">
+    <div class="home-section-header">
+        <h2 class="home-section-title">Accesos rápidos</h2>
+        <p class="home-section-subtitle">Empieza por categorías populares o vete directo a lo más vendido.</p>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-4">
+            <a class="home-quick" asp-controller="Productos" asp-action="Index" asp-route-todos="true">
+                <div class="home-quick-left">
+                    <div class="home-quick-icon"><i class="bi bi-grid-3x3-gap"></i></div>
+                    <div>
+                        <div class="home-quick-title">Catálogo completo</div>
+                        <div class="home-quick-text">Explora todas las familias y subtipos.</div>
+                    </div>
+                </div>
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <a class="home-quick" asp-controller="Productos" asp-action="Index" asp-route-orden="ventas">
+                <div class="home-quick-left">
+                    <div class="home-quick-icon"><i class="bi bi-fire"></i></div>
+                    <div>
+                        <div class="home-quick-title">Lo más vendido</div>
+                        <div class="home-quick-text">Tendencias y top ventas del momento.</div>
+                    </div>
+                </div>
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <a class="home-quick" asp-controller="Productos" asp-action="Marcas">
+                <div class="home-quick-left">
+                    <div class="home-quick-icon"><i class="bi bi-award"></i></div>
+                    <div>
+                        <div class="home-quick-title">Marcas</div>
+                        <div class="home-quick-text">Trabajamos con fabricantes reconocidos.</div>
+                    </div>
+                </div>
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="home-newsletter mt-4" aria-label="Newsletter">
+    <div class="row g-3 align-items-center">
+        <div class="col-12 col-lg-7">
+            <div class="home-newsletter-title">Recibe ofertas y novedades</div>
+            <div class="home-newsletter-text">Sin spam. Solo promociones reales y lanzamientos interesantes.</div>
+        </div>
+        <div class="col-12 col-lg-5">
+            <form class="home-newsletter-form" method="get" asp-controller="Productos" asp-action="Index">
+                <input class="form-control" type="search" name="q" placeholder="Busca un producto (ej. Fender, teclado, micro...)" aria-label="Buscar" />
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-search"></i>
+                    Buscar
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // UX: enfoca el primer input de búsqueda al pulsar "/" en la home
+        (function () {
+            document.addEventListener('keydown', function (e) {
+                if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                    var active = document.activeElement;
+                    var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA');
+                    if (isTyping) return;
+
+                    var input = document.querySelector('.home-newsletter-form input[name="q"]');
+                    if (!input) return;
+
+                    e.preventDefault();
+                    input.focus();
+                }
+            });
+        })();
+    </script>
+}

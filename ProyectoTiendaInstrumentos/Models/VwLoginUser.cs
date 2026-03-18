@@ -17,5 +17,6 @@ namespace ProyectoTiendaInstrumentos.Models
         [Column("Salt")]
         public string Salt { get; set; } = null!;
 
+
     }
 }

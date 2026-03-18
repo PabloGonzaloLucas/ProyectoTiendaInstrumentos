@@ -21,6 +21,9 @@ public partial class VwCatalogoProducto
     [Column("Stock")]
 
     public int? Stock { get; set; }
+    [Column("Ventas")]
+
+    public int? Ventas { get; set; }
     [Column("Estrellas")]
 
     public int Estrellas { get; set; }

@@ -19,9 +19,66 @@ namespace ProyectoTiendaInstrumentos.Controllers
             this.repoCarrito = repositoryCarrito;
             this.repoValoraciones = repoValoraciones;
         }
-        public async Task<IActionResult> Index(int idSubtipo, int? idMarca = null, string q = null, int pagina = 1)
+        public async Task<IActionResult> Index(int idSubtipo, int? idMarca = null, string q = null, int pagina = 1, string? todos = "false", string? orden = "")
         {
+
             const int tamañoPagina = 12;
+
+            // --- ordenar por ventas (Top 100) ---
+            if (string.Equals(orden, "ventas", StringComparison.OrdinalIgnoreCase))
+            {
+                if (idSubtipo > 0)
+                {
+                    ViewBag.Subtipo = await this.repo.GetSubtipoByIdAsync(idSubtipo);
+                    ViewBag.Specs = await this.repo.GetEspecificacionesBySubtipoAsync(idSubtipo);
+                }
+
+                List<VwCatalogoProducto> top = await this.repo.GetVistaCatalogoAsync();
+
+                if (idSubtipo > 0)
+                {
+                    top = top.Where(p => p.IdSubtipo == idSubtipo).ToList();
+                }
+
+                top = top
+                    .OrderByDescending(p => p.Ventas ?? 0)
+                    .ThenBy(p => p.Modelo)
+                    .Take(100)
+                    .ToList();
+
+                var paginadoTop = PagedResult<VwCatalogoProducto>.Create(top, pagina, tamañoPagina);
+                ViewBag.TerminoBusqueda = "Top ventas";
+                ViewBag.NumeroResultados = top.Count;
+                ViewBag.Paginacion = paginadoTop;
+                return View(paginadoTop.Items);
+            }
+
+            // --- ver todos (catálogo completo) ---
+            // Mantiene la barra de filtros (familia/tipo/subtipo) y el panel de especificaciones.
+            // Si idSubtipo > 0, seguimos cargando el subtipo y sus specs para que el panel funcione.
+            if (string.Equals(todos, "true", StringComparison.OrdinalIgnoreCase))
+            {
+                if (idSubtipo > 0)
+                {
+                    ViewBag.Subtipo = await this.repo.GetSubtipoByIdAsync(idSubtipo);
+                    ViewBag.Specs = await this.repo.GetEspecificacionesBySubtipoAsync(idSubtipo);
+                }
+
+                List<VwCatalogoProducto> productosTodos = await this.repo.GetVistaCatalogoAsync();
+
+                // Si venimos con idSubtipo, opcionalmente filtramos el grid al subtipo.
+                // La UI puede seguir mostrando el panel de specs de ese subtipo.
+                if (idSubtipo > 0)
+                {
+                    productosTodos = productosTodos.Where(p => p.IdSubtipo == idSubtipo).ToList();
+                }
+
+                var paginadoTodos = PagedResult<VwCatalogoProducto>.Create(productosTodos, pagina, tamañoPagina);
+                ViewBag.TerminoBusqueda = "Todos";
+                ViewBag.NumeroResultados = productosTodos.Count;
+                ViewBag.Paginacion = paginadoTodos;
+                return View(paginadoTodos.Items);
+            }
 
             // --- filtro por marca ---
             if (idMarca.HasValue)

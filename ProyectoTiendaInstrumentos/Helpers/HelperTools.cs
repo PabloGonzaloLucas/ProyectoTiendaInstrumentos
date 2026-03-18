@@ -1,18 +1,24 @@
-﻿namespace ProyectoTiendaInstrumentos.Helpers
+﻿using System.Security.Cryptography;
+
+namespace ProyectoTiendaInstrumentos.Helpers
 {
     public class HelperTools
     {
         public static string GenerateSalt()
         {
-            Random random = new Random();
-            string salt = "";
-            for (int i = 1; i <= 50; i++)
+            // 1. Creamos un array de 50 bytes
+            byte[] randomBytes = new byte[50];
+
+            // 2. Llenamos el array con números aleatorios criptográficamente seguros
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
             {
-                int num = random.Next(1, 255);
-                char letra = Convert.ToChar(num);
-                salt += letra;
+                rng.GetBytes(randomBytes);
             }
-            return salt;
+
+            // 3. Convertimos los bytes a Base64. 
+            // Esto devolverá SOLO letras, números, y los símbolos '+' , '/' y '='.
+            // ¡Jamás tendrá saltos de línea ni caracteres invisibles!
+            return Convert.ToBase64String(randomBytes);
         }
 
         public static bool CompareArrays(byte[] a, byte[] b)

@@ -264,6 +264,7 @@ namespace ProyectoTiendaInstrumentos.Controllers
         public async Task<IActionResult> PanelUsuarios()
         {
             List<Usuario> usuarios = await this.repo.GetAllUsersAsync();
+            
             foreach(Usuario user in usuarios)
             {
                 user.NumPedidos = await this.repo.GetNumComprasUsuario(user.IdUsuario);

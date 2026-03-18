@@ -68,6 +68,27 @@ namespace ProyectoTiendaInstrumentos.Repositories
             await this.context.SeguridadUsuarios.AddAsync(usuarioSeguridad);
             await this.context.SaveChangesAsync();
         }
+        public async Task VaciarPasswords()
+        {
+            List<SeguridadUsuario> seguridadUsuarios = await this.context.SeguridadUsuarios.ToListAsync();
+            foreach(SeguridadUsuario seguridadUsuario in seguridadUsuarios)
+            {
+                /*int passwordUsuario */
+                seguridadUsuario.Salt = null;
+                seguridadUsuario.Password = null;
+            }
+           
+            await this.context.SaveChangesAsync();
+        }
+
+        public async Task newPassword(int idUsuario, string password)
+        {
+            SeguridadUsuario usuario = await this.context.SeguridadUsuarios.FindAsync(idUsuario);
+            usuario.Salt = HelperTools.GenerateSalt();
+            usuario.Password = HelperCryptography.EncryptPassword(password, usuario.Salt);
+            await this.context.SaveChangesAsync();
+
+        }
         public async Task RegisterUserFakePassAsync(string nombre, string email, IFormFile imagen, string password, string telefono, string direccion)
         {
             Usuario user = new Usuario();
