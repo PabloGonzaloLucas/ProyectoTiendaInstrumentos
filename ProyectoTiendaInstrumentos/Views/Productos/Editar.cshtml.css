@@ -1,0 +1,182 @@
+/* ================================================
+   PRODUCTOS / EDITAR
+   Misma UI que Productos/Create
+   ================================================ */
+
+.product-edit {
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 0;
+}
+
+.product-edit__card {
+  width: 100%;
+  max-width: 900px;
+  background: var(--color-surface);
+  border-radius: 20px;
+  padding: 2.25rem;
+  box-shadow: 0 10px 40px var(--shadow-md);
+  border-top: 5px solid var(--color-primary);
+}
+
+.product-edit__title {
+  margin: 0 0 1.25rem 0;
+  text-align: center;
+  font-weight: 900;
+  color: var(--color-bg-dark);
+  letter-spacing: 0.2px;
+  position: relative;
+  padding-bottom: 0.9rem;
+}
+
+.product-edit__title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 3px;
+  background: var(--grad-primary-h90);
+  border-radius: 2px;
+}
+
+.product-edit__form {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+}
+
+.product-edit__group {
+  grid-column: span 12;
+}
+
+.product-edit__group--6 {
+  grid-column: span 6;
+}
+
+.product-edit__group--4 {
+  grid-column: span 4;
+}
+
+.product-edit__label {
+  color: var(--color-bg-dark);
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  display: block;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.product-edit__control {
+  width: 100%;
+}
+
+.product-edit select,
+.product-edit input[type="text"],
+.product-edit input[type="number"],
+.product-edit input[type="file"],
+.product-edit textarea {
+  width: 100%;
+}
+
+.product-edit .form-control,
+.product-edit .form-select {
+  text-align: center;
+}
+
+.product-edit textarea {
+  min-height: 140px;
+  resize: vertical;
+  text-align: center;
+}
+
+.product-edit__section-btn {
+  justify-content: space-between;
+  width: 100%;
+  border-color: var(--primary-a45);
+  color: var(--color-bg-dark);
+  background: linear-gradient(135deg, var(--primary-a12) 0%, var(--primary-a06) 100%);
+}
+
+.product-edit__section-btn:hover {
+  border-color: var(--color-primary);
+  background: linear-gradient(135deg, var(--primary-a18) 0%, var(--primary-a08) 100%);
+}
+
+.product-edit__panel {
+  grid-column: span 12;
+  padding: 1rem;
+  background: var(--color-bg-light);
+  border: 2px solid var(--primary-a22);
+  border-radius: var(--radius-xl);
+}
+
+.product-edit__hint {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--color-bg-dark-2);
+  font-weight: 600;
+}
+
+.product-edit__actions {
+  grid-column: span 12;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.product-edit__submit {
+  padding: 0.95rem 1.25rem;
+  border-radius: var(--radius-xl);
+}
+
+.product-edit__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(220, 53, 69, 0.35);
+  background: rgba(220, 53, 69, 0.08);
+  color: var(--color-danger);
+  font-weight: 800;
+  font-size: 0.85rem;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.product-edit__remove:hover {
+  background: rgba(220, 53, 69, 0.16);
+  border-color: rgba(220, 53, 69, 0.6);
+}
+
+.product-edit__remove:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.22rem rgba(220, 53, 69, 0.18);
+}
+
+.product-edit__preview {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+  margin: 0.25rem auto 0.75rem;
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--primary-a22);
+  box-shadow: 0 8px 22px var(--shadow-sm);
+}
+
+@media (max-width: 768px) {
+  .product-edit__card {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .product-edit__group--6,
+  .product-edit__group--4 {
+    grid-column: span 12;
+  }
+}

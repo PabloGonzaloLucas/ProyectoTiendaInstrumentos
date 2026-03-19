@@ -10,14 +10,19 @@
             @for (int index = 0; index < Model.Count; index++)
             {
                 VwCatalogoProducto producto = Model[index];
-                <li>
+                <li class="confirmar-item">
                     <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto" class="confirmar-item-link">
-                        <img src="~/images/productosMain/@producto.ImagenPrincipal" alt="@producto.Modelo" class="confirmar-item-img" />
-                        <div class="confirmar-item-info">
-                            <span class="confirmar-item-marca">@producto.Marca</span>
-                            <span class="confirmar-item-nombre">@producto.Modelo</span>
-                            <span class="confirmar-item-precio">@producto.Precio €</span>
-                            <span class="confirmar-item-cantidad">x @(producto.Cantidad ?? 0)</span>
+                        <div class="confirmar-item-main">
+                            <div class="confirmar-item-info">
+                                <span class="confirmar-item-marca">@producto.Marca</span>
+                                <span class="confirmar-item-nombre">@producto.Modelo</span>
+                                <span class="confirmar-item-precio">@producto.Precio €</span>
+                                <span class="confirmar-item-cantidad">x @(producto.Cantidad ?? 0)</span>
+                            </div>
+
+                            <div class="confirmar-item-imgwrap">
+                                <img src="~/images/productosMain/@producto.ImagenPrincipal" alt="@producto.Modelo" class="confirmar-item-img" />
+                            </div>
                         </div>
                     </a>
                 </li>

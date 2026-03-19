@@ -1,56 +1,66 @@
-﻿@model List<Subtipo>
+@model List<Subtipo>
+@using ProyectoTiendaInstrumentos.Models
 @{
-    Tipo tipo = ViewBag.Tipo as Tipo;
+    Tipo? tipo = ViewBag.Tipo as Tipo;
     ViewData["Title"] = tipo?.Nombre ?? "Subtipos";
 }
 
-<div class="breadcrumb-nav">
-    <a asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@tipo.IdFamilia">
-        <i class="bi bi-arrow-left"></i> @tipo.Nombre
-    </a>
-</div>
-
-<h1 class="page-title">@tipo.Nombre</h1>
-
-@if (Context.User.FindFirst("Admin") != null)
+@if (tipo != null)
 {
-    <button type="button">Añadir Subtipo</button>
-    <form method="post" asp-controller="Subtipos" asp-action="Index" enctype="multipart/form-data">
-        <label>Nombre</label>
-        <input type="text" name="Nombre" />
-        <input type="hidden" name="IdTipo" value="@tipo.IdTipo" />
-        <button type="submit" name="accion" value="add">Añadir</button>
-        <button type="submit" name="accion" value="cancelar">Cancelar</button>
-    </form>
+    <div class="breadcrumb-nav">
+        <a asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@tipo.IdFamilia">
+            <i class="bi bi-arrow-left"></i> @tipo.Nombre
+        </a>
+    </div>
 
-    <ul class="subtipos-grid">
-        @foreach (Subtipo subtipo in Model)
-        {
-            <li>
-                <a asp-controller="Productos" asp-action="Index" asp-route-idSubtipo="@subtipo.IdSubtipo" class="subtipo-card">
-                    <span>@subtipo.Nombre</span>
-                </a>
-                <a asp-controller="Subtipos" asp-action="Eliminar" asp-route-idSubtipo="@subtipo.IdSubtipo" 
-                asp-route-idTipo="@subtipo.IdTipo">
-                    Eliminar
-                </a>
-            </li>
-        }
-    </ul>
-
+    <h1 class="page-title">@tipo.Nombre</h1>
 }
 else
 {
-    <ul class="subtipos-grid">
-        @foreach(Subtipo subtipo in Model)
-        {
-            <li>
-                <a asp-controller="Productos" asp-action="Index" asp-route-idSubtipo="@subtipo.IdSubtipo" class="subtipo-card">
-                    <span>@subtipo.Nombre</span>
-                </a>
-            </li>
-        }
-    </ul>
-    
+    <h1 class="page-title">Subtipos</h1>
 }
 
+@if (Context.User.FindFirst("Admin") != null)
+{
+    <div class="admin-toolbar">
+        <button type="button" class="admin-btn" onclick="document.getElementById('form-add-subtipo').classList.toggle('admin-form--visible')">
+            <i class="bi bi-plus-circle"></i> Añadir Subtipo
+        </button>
+        <form id="form-add-subtipo" method="post" asp-controller="Subtipos" asp-action="Index"
+              enctype="multipart/form-data" class="admin-form">
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label>Nombre del subtipo</label>
+                    <input type="text" name="Nombre" class="admin-input" required placeholder="Ej: Guitarra eléctrica..." />
+                    <input type="hidden" name="IdTipo" value="@(tipo?.IdTipo ?? 0)" />
+                </div>
+                <div class="admin-form-actions">
+                    <button type="submit" name="accion" value="add" class="admin-btn admin-btn--primary">Añadir</button>
+                    <button type="submit" name="accion" value="cancelar" class="admin-btn admin-btn--secondary">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+}
+
+<ul class="subtipos-grid">
+    @foreach (Subtipo subtipo in Model)
+    {
+        <li>
+            <a asp-controller="Productos" asp-action="Index" asp-route-idSubtipo="@subtipo.IdSubtipo" class="subtipo-card">
+                <span>@subtipo.Nombre</span>
+                <i class="bi bi-arrow-right-short"></i>
+            </a>
+            @if (Context.User.FindFirst("Admin") != null)
+            {
+                <a asp-controller="Subtipos" asp-action="Eliminar"
+                   asp-route-idSubtipo="@subtipo.IdSubtipo"
+                   asp-route-idTipo="@subtipo.IdTipo"
+                   class="admin-btn admin-btn--sm admin-btn--delete"
+                   onclick="return confirm('¿Eliminar este subtipo?')">
+                    <i class="bi bi-trash"></i>
+                </a>
+            }
+        </li>
+    }
+</ul>

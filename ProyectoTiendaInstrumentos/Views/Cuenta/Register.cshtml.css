@@ -1,4 +1,6 @@
-/* Register Styles */
+/* ================================================
+   REGISTER
+   ================================================ */
 
 .register-container {
     display: flex;
@@ -9,17 +11,17 @@
 }
 
 .register-card {
-    background: var(--white);
+    background: var(--color-surface);
     border-radius: 20px;
     padding: 3rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 40px var(--shadow-md);
     width: 100%;
     max-width: 550px;
-    border-top: 5px solid var(--primary-green);
+    border-top: 5px solid var(--color-primary);
 }
 
 .register-card h1 {
-    color: var(--dark-bg);
+    color: var(--color-bg-dark);
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
@@ -36,12 +38,12 @@
     transform: translateX(-50%);
     width: 80px;
     height: 3px;
-    background: linear-gradient(90deg, var(--primary-green), var(--accent-green));
+    background: var(--grad-primary-h90);
     border-radius: 2px;
 }
 
 .register-card h4 {
-    color: var(--dark-gray);
+    color: var(--color-bg-dark-2);
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 2rem;
@@ -55,7 +57,7 @@
 }
 
 .form-group label {
-    color: var(--dark-bg);
+    color: var(--color-bg-dark);
     font-weight: 600;
     margin-bottom: 0.5rem;
     display: block;
@@ -64,66 +66,52 @@
     letter-spacing: 0.5px;
 }
 
-/* Asegurar que todos los inputs tengan los estilos correctos */
 .register-card .form-group input.form-control,
 .register-card .form-group input[type="email"],
 .register-card .form-group input[type="password"],
 .register-card .form-group input[type="text"],
 .register-card .form-group input[type="tel"],
-.register-card input.form-control,
-.register-card input[type="password"] {
-    width: 100% !important;
-    height: auto !important;
-    padding: 0.85rem 1rem !important;
-    border: 2px solid #dfdfdf !important;
-    border-radius: 10px !important;
-    font-size: 1rem !important;
-    line-height: 1.5 !important;
-    transition: all 0.3s ease !important;
-    background-color: var(--light-gray) !important;
-    box-sizing: border-box !important;
+.register-card input.form-control {
+    width: 100%;
+    height: auto;
+    padding: 0.85rem 1rem;
+    border: 2px solid #dfdfdf;
+    border-radius: var(--radius-xl);
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: var(--transition-base);
+    background-color: var(--color-bg-light);
+    box-sizing: border-box;
 }
 
 .register-card .form-group input:focus,
 .register-card .form-group input.form-control:focus {
-    outline: none !important;
-    border-color: var(--primary-green) !important;
-    background-color: #dfdfdf !important;
-    box-shadow: 0 0 0 3px rgba(127, 227, 170, 0.1) !important;
+    outline: none;
+    border-color: var(--color-primary);
+    background-color: #dfdfdf;
+    box-shadow: 0 0 0 3px var(--primary-a10);
 }
 
-.btn-primary {
+.register-card .btn-primary {
     width: 100%;
     padding: 1rem;
-    background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
-    border: none;
-    border-radius: 10px;
-    color: var(--dark-bg);
-    font-weight: 700;
+    border-radius: var(--radius-xl);
     font-size: 1.1rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(127, 227, 170, 0.3);
     margin-top: 1rem;
+    box-shadow: 0 4px 15px var(--primary-a30);
 }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(127, 227, 170, 0.4);
-    background: linear-gradient(135deg, var(--accent-green) 0%, var(--primary-green) 100%);
-}
-
-.btn-primary:active {
-    transform: translateY(0);
+.register-card .btn-primary:hover {
+    box-shadow: 0 6px 20px var(--primary-a40);
 }
 
 .error-message {
     background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
-    color: var(--white);
+    color: var(--color-surface);
     padding: 1rem;
-    border-radius: 10px;
+    border-radius: var(--radius-xl);
     text-align: center;
     margin-top: 1.5rem;
     font-weight: 600;
@@ -132,14 +120,14 @@
 }
 
 .success-message {
-    background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
-    color: var(--dark-bg);
+    background: var(--grad-primary);
+    color: var(--color-bg-dark);
     padding: 1rem;
-    border-radius: 10px;
+    border-radius: var(--radius-xl);
     text-align: center;
     margin-top: 1.5rem;
     font-weight: 600;
-    box-shadow: 0 4px 15px rgba(127, 227, 170, 0.3);
+    box-shadow: var(--shadow-btn);
     animation: slideIn 0.3s ease;
 }
 
@@ -156,7 +144,7 @@
 }
 
 .text-danger {
-    color: #dc3545;
+    color: var(--color-danger);
     font-size: 0.85rem;
     margin-top: 0.3rem;
     display: block;
@@ -166,26 +154,27 @@
     text-align: center;
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 2px solid var(--light-gray);
+    border-top: 2px solid var(--color-bg-light);
 }
 
 .login-link p {
-    color: var(--dark-gray);
+    color: var(--color-bg-dark-2);
     font-size: 0.95rem;
     margin: 0;
 }
 
 .login-link a {
-    color: var(--primary-green);
+    color: var(--color-primary);
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: var(--transition-base);
     border-bottom: 2px solid transparent;
+    background-color: rgba(182, 182, 182, 0.63);
 }
 
 .login-link a:hover {
-    color: var(--accent-green);
-    border-bottom-color: var(--accent-green);
+    color: var(--color-primary-dk);
+    border-bottom-color: var(--color-primary-dk);
 }
 
 @media (max-width: 576px) {

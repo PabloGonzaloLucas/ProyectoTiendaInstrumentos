@@ -2,79 +2,96 @@
 @using ProyectoTiendaInstrumentos.Repositories
 @inject RepositorySubtipos repositorySubtipos
 
-<form method="post">
-    @{
-        SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
-        bool hasArbol = arbolTipos != null;
-    }
+@{
+    ViewData["Title"] = "Editar especificación";
+}
 
-    <div style="display:flex; flex-direction:column; gap:10px; max-width:520px;">
+<div class="product-edit">
+    <div class="product-edit__card">
+        <h1 class="product-edit__title">Editar especificación</h1>
 
-        <label>Familia</label>
-        <select name="idFamilia" id="selectFamilia">
-            @if (hasArbol)
-            {
-                <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
+        <form method="post" class="product-edit__form">
+            @{
+                SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
+                bool hasArbol = arbolTipos != null;
             }
-            else
-            {
-                <option value="">Selecciona familia...</option>
-            }
-        </select>
 
-        <label>Tipo</label>
-        <select name="idTipo" id="selectTipo">
-            @if (hasArbol)
-            {
-                <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
-            }
-            else
-            {
-                <option value="">Selecciona tipo...</option>
-            }
-        </select>
+            <div class="product-edit__group product-edit__group--4">
+                <label class="product-edit__label" for="selectFamilia">Familia</label>
+                <select name="idFamilia" id="selectFamilia" class="form-select product-edit__control">
+                    @if (hasArbol)
+                    {
+                        <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
+                    }
+                    else
+                    {
+                        <option value="">Selecciona familia...</option>
+                    }
+                </select>
+            </div>
 
-        <label>Subtipo</label>
-        <select name="idSubtipo" id="selectSubtipo">
-            @if (hasArbol)
-            {
-                <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
-            }
-            else
-            {
-                <option value="">Selecciona subtipo...</option>
-            }
-        </select>
+            <div class="product-edit__group product-edit__group--4">
+                <label class="product-edit__label" for="selectTipo">Tipo</label>
+                <select name="idTipo" id="selectTipo" class="form-select product-edit__control">
+                    @if (hasArbol)
+                    {
+                        <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
+                    }
+                    else
+                    {
+                        <option value="">Selecciona tipo...</option>
+                    }
+                </select>
+            </div>
 
-        <hr />
+            <div class="product-edit__group product-edit__group--4">
+                <label class="product-edit__label" for="selectSubtipo">Subtipo</label>
+                <select name="idSubtipo" id="selectSubtipo" class="form-select product-edit__control">
+                    @if (hasArbol)
+                    {
+                        <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
+                    }
+                    else
+                    {
+                        <option value="">Selecciona subtipo...</option>
+                    }
+                </select>
+            </div>
 
-        <label>Especificación</label>
-        <select id="selectEspecificacionesSubtipo">
-            <option value="">Selecciona especificación...</option>
-        </select>
+            <div class="product-edit__group">
+                <label class="product-edit__label" for="selectEspecificacionesSubtipo">Especificación</label>
+                <select id="selectEspecificacionesSubtipo" class="form-select product-edit__control">
+                    <option value="">Selecciona especificación...</option>
+                </select>
+            </div>
 
-        <div id="zonaEditar" style="display:none; margin-top:10px;">
-            <input type="hidden" name="idEspecificacion" id="hiddenIdEspecificacion" />
+            <div id="zonaEditar" class="product-edit__panel" style="display:none;">
+                <input type="hidden" name="idEspecificacion" id="hiddenIdEspecificacion" />
 
-            <label>Nombre</label>
-            <input type="text" name="nombre" id="inputNombre" />
+                <div class="product-edit__group product-edit__group--6">
+                    <label class="product-edit__label" for="inputNombre">Nombre</label>
+                    <input type="text" name="nombre" id="inputNombre" class="form-control product-edit__control" />
+                </div>
 
-            <label>Unidad de medida</label>
-            <select name="unidadMedida" id="selectUnidadMedida">
-                <option value="">Texto</option>
-                <option value="ud">Unidades (ud)</option>
-            </select>
+                <div class="product-edit__group product-edit__group--6">
+                    <label class="product-edit__label" for="selectUnidadMedida">Unidad de medida</label>
+                    <select name="unidadMedida" id="selectUnidadMedida" class="form-select product-edit__control">
+                        <option value="">Texto</option>
+                        <option value="ud">Unidades (ud)</option>
+                    </select>
+                </div>
 
-            <button type="submit" style="margin-top:10px;">Guardar cambios</button>
-        </div>
-
+                <div class="product-edit__actions">
+                    <button type="submit" class="btn btn-primary product-edit__submit">Guardar cambios</button>
+                </div>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
 @section Scripts {
     <script>
         $(function () {
-            // --- Helpers ---
             function fillSelect($select, items, placeholder, selectedValue, mapFn) {
                 var current = selectedValue ?? $select.val();
                 $select.empty();

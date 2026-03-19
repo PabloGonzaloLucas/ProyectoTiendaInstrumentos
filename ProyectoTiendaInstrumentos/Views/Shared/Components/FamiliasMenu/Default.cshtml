@@ -1,33 +1,52 @@
 ﻿@model IEnumerable<ProyectoTiendaInstrumentos.Models.Familia>
 
 <div class="familias-menu-wrapper">
-   
+
     @if (Context.User.FindFirst("Admin") != null)
     {
+        <div class="familias-admin">
+            <div class="familias-admin__top">
+                <ul class="familias-menu">
+                    @foreach (var familia in Model)
+                    {
+                        <li class="familias-item familias-item--admin">
+                            <a class="familias-link" asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@familia.IdFamilia">
+                                @familia.Nombre
+                            </a>
+                            <a class="familias-delete familias-delete--danger" asp-controller="Familias" asp-action="Eliminar" asp-route-idFamilia="@familia.IdFamilia"
+                               onclick="return confirm('¿Eliminar esta familia?')" aria-label="Eliminar familia @familia.Nombre">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </li>
+                    }
+                </ul>
 
-        <ul class="familias-menu">
-            @foreach (var familia in Model)
-            {
-                <li>
-                    <a asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@familia.IdFamilia">
-                        @familia.Nombre
-                    </a>
-                    <a asp-controller="Familias" asp-action="Eliminar" asp-route-idFamilia="@familia.IdFamilia">
-                        Eliminar
-                    </a>
-                </li>
-            }
-        </ul>
+                <button type="button" class="btn btn-primary familias-admin__show" onclick="document.getElementById('form-add-familia').classList.toggle('familias-admin__form--visible')">
+                    <i class="bi bi-plus-circle"></i> Añadir Familia
+                </button>
+            </div>
 
-        <button type="button">Añadir Familia</button>
-
-        <form method="post" asp-controller="Familias" asp-action="Create" enctype="multipart/form-data">
-            <label>Nombre</label>
-            <input type="text" name="nombre" />
-            <label>Imagen</label>
-            <input type="file" name="imagenBanner" />
-            <button type="submit">Añadir Familia</button>
-        </form>
+            <form id="form-add-familia" method="post" asp-controller="Familias" asp-action="Create" enctype="multipart/form-data" class="familias-admin__form">
+                <div class="familias-admin__row">
+                    <div class="familias-admin__group">
+                        <label class="familias-admin__label">Nombre</label>
+                        <input type="text" name="nombre" class="familias-admin__input form-control" required />
+                    </div>
+                    <div class="familias-admin__group">
+                        <label class="familias-admin__label">Imagen</label>
+                        <input type="file" name="imagenBanner" class="familias-admin__input form-control" accept="image/*" />
+                    </div>
+                    <div class="familias-admin__actions">
+                        <button type="submit" class="btn btn-primary familias-admin__submit">
+                            <i class="bi bi-check2"></i> Guardar
+                        </button>
+                        <button type="button" class="btn btn-secondary familias-admin__cancel" onclick="document.getElementById('form-add-familia').classList.remove('familias-admin__form--visible')">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     }
     else
     {
@@ -44,3 +63,4 @@
     }
 
 </div>
+

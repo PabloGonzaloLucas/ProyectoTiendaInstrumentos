@@ -62,10 +62,10 @@
             @if (Context.User.FindFirst("Admin") != null)
             {
            
-                <a asp-controller="Productos" asp-action="Editar" asp-route-idProducto="@producto.IdProducto">
-                    Editar
+                <a asp-controller="Productos" asp-action="Editar" asp-route-idProducto="@producto.IdProducto"
+                   class="admin-btn admin-btn--lg admin-btn--edit producto-card__admin-edit">
+                    <i class="bi bi-pencil"></i> Editar
                 </a>
-
             }
     </div>
 }

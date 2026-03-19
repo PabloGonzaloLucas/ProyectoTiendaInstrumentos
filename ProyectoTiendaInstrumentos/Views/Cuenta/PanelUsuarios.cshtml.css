@@ -1,0 +1,112 @@
+/* ================================================
+   PANEL USUARIOS
+   ================================================ */
+
+.usuarios-panel__title {
+  text-align: center;
+  color: var(--color-bg-dark);
+  font-size: 2.25rem;
+  font-weight: 900;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid var(--color-primary);
+}
+
+.usuarios-panel__tablewrap {
+  border: 2px solid var(--primary-a25);
+  border-radius: var(--radius-2xl);
+  overflow: auto;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.usuarios-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 980px;
+}
+
+.usuarios-table thead th {
+  background: var(--grad-dark);
+  color: var(--color-surface);
+  padding: 0.9rem 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-size: 0.78rem;
+  border-bottom: 2px solid var(--color-primary);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.usuarios-table__th--avatar {
+  width: 72px;
+}
+
+.usuarios-table tbody td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--primary-a15);
+  background: var(--color-surface);
+  vertical-align: middle;
+  font-weight: 700;
+  color: var(--color-bg-dark);
+}
+
+.usuarios-table tbody tr:hover td {
+  background: var(--primary-a06);
+}
+
+.usuarios-table__td--avatar {
+  text-align: center;
+}
+
+.usuarios-table__td--name {
+  font-weight: 900;
+}
+
+.usuarios-table__td--email {
+  color: var(--color-bg-dark-2);
+  font-weight: 700;
+}
+
+.usuarios-table__td--num {
+  text-align: center;
+  font-weight: 900;
+}
+
+.usuarios-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.78rem;
+  letter-spacing: 0.3px;
+  border: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.usuarios-badge--admin {
+  background: rgba(220, 53, 69, 0.12);
+  border-color: rgba(220, 53, 69, 0.35);
+  color: #b02a37;
+}
+
+.usuarios-badge--user {
+  background: var(--primary-a18);
+  border-color: var(--primary-a35);
+  color: var(--color-bg-dark);
+}
+
+@media (max-width: 992px) {
+  .usuarios-panel__tablewrap {
+    border-radius: var(--radius-xl);
+  }
+
+  .usuarios-panel__title {
+    font-size: 2rem;
+  }
+}

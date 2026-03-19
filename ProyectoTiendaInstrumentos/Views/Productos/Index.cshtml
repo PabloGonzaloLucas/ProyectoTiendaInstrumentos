@@ -1,4 +1,4 @@
-﻿@using ProyectoTiendaInstrumentos.Models
+@using ProyectoTiendaInstrumentos.Models
 @model List<VwCatalogoProducto>
 @{
     ViewData["Title"] = "Catálogo";
@@ -38,28 +38,29 @@ else
 
 @if (Context.User.FindFirst("Admin") != null)
 {
-    @if (subtipo != null)
-    {
-        <a asp-action="Create" asp-controller="Productos" asp-route-idSubtipo="@subtipo.IdSubtipo">
-            Crear Producto
-        </a>
-        <a asp-action="CreateSpecs" asp-controller="Productos" asp-route-idSubtipo="@subtipo.IdSubtipo">
-            Añadir especificaciones
-        </a>
-        <a asp-action="EditSpec" asp-controller="Productos" asp-route-idSubtipo="@subtipo.IdSubtipo">
-            Editar especificaciones
-        </a>
-    }
-    else
-    {
-        <a asp-action="Create" asp-controller="Productos">
-            Crear Producto
-        </a>
-        <a asp-action="CreateSpecs" asp-controller="Productos">
-            Añadir especificaciones
-        </a>
-    }
-
+    <div class="admin-toolbar">
+        @if (subtipo != null)
+        {
+            <a asp-action="Create" asp-controller="Productos" asp-route-idSubtipo="@subtipo.IdSubtipo" class="admin-btn">
+                <i class="bi bi-plus-circle"></i> Crear Producto
+            </a>
+            <a asp-action="CreateSpecs" asp-controller="Productos" asp-route-idSubtipo="@subtipo.IdSubtipo" class="admin-btn">
+                <i class="bi bi-list-check"></i> Añadir especificaciones
+            </a>
+            <a asp-action="EditSpec" asp-controller="Productos" asp-route-idSubtipo="@subtipo.IdSubtipo" class="admin-btn">
+                <i class="bi bi-pencil-square"></i> Editar especificaciones
+            </a>
+        }
+        else
+        {
+            <a asp-action="Create" asp-controller="Productos" class="admin-btn">
+                <i class="bi bi-plus-circle"></i> Crear Producto
+            </a>
+            <a asp-action="CreateSpecs" asp-controller="Productos" class="admin-btn">
+                <i class="bi bi-list-check"></i> Añadir especificaciones
+            </a>
+        }
+    </div>
 }
 
 @if (Model != null && Model.Count > 0)

@@ -1,13 +1,29 @@
 ﻿@model Marca
 
-<div>
-    <h1 class="page-title">Editar Marca</h1>
-    <form method="post" asp-controller="Productos" asp-action="EditMarca" enctype="multipart/form-data">
-        <input type="hidden" name="IdMarca" value="@Model.IdMarca" />
-        <label>Nombre</label>
-        <input type="text" name="Nombre" value="@Model.Nombre" />
-        <label>Logo</label>
-        <input type="file" name="Logo" />
-        <button type="submit">Guardar Cambios</button>
-    </form>
+@{
+    ViewData["Title"] = "Editar marca";
+}
+
+<div class="product-edit">
+    <div class="product-edit__card">
+        <h1 class="product-edit__title">Editar marca</h1>
+
+        <form method="post" asp-controller="Productos" asp-action="EditMarca" enctype="multipart/form-data" class="product-edit__form">
+            <input type="hidden" name="IdMarca" value="@Model.IdMarca" />
+
+            <div class="product-edit__group product-edit__group--6">
+                <label class="product-edit__label" for="Nombre">Nombre</label>
+                <input id="Nombre" type="text" name="Nombre" value="@Model.Nombre" class="form-control product-edit__control" />
+            </div>
+
+            <div class="product-edit__group product-edit__group--6">
+                <label class="product-edit__label" for="Logo">Logo</label>
+                <input id="Logo" type="file" name="Logo" class="form-control product-edit__control" />
+            </div>
+
+            <div class="product-edit__actions">
+                <button type="submit" class="btn btn-primary product-edit__submit">Guardar cambios</button>
+            </div>
+        </form>
+    </div>
 </div>

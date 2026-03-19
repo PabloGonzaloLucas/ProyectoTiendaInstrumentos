@@ -1,49 +1,59 @@
-﻿@model List<Tipo>
+@model List<Tipo>
+@using ProyectoTiendaInstrumentos.Models
 @{
     ViewData["Title"] = "Tipos de Instrumentos";
-}
-@{
-    //int idFamilia = ViewBag.idFamilia;
+    int idFamilia = Context.User.FindFirst("Admin") != null ? (int)(ViewBag.idFamilia ?? 0) : 0;
 }
 
 <h1 class="page-title">Tipos de Instrumentos</h1>
 
 @if (Context.User.FindFirst("Admin") != null)
 {
-     int idFamilia = ViewBag.idFamilia;
-
-        <button type="button">Añadir Tipo</button>
-        <form method="post" asp-controller="Tipos" asp-action="Index" enctype="multipart/form-data">
-            <label>Nombre</label>
-            <input type="text" name="Nombre" />
-            <input type="hidden" name="IdFamilia" value="@idFamilia" />
-            <button type="submit" name="accion" value="add">Añadir</button>
-            <button type="submit" name="accion" value="cancelar">Cancelar</button>
+    <div class="admin-toolbar">
+        <button type="button" class="admin-btn" onclick="document.getElementById('form-add-tipo').classList.toggle('admin-form--visible')">
+            <i class="bi bi-plus-circle"></i> Añadir Tipo
+        </button>
+        <form id="form-add-tipo" method="post" asp-controller="Tipos" asp-action="Index"
+              enctype="multipart/form-data" class="admin-form">
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label>Nombre del tipo</label>
+                    <input type="text" name="Nombre" class="admin-input" required placeholder="Ej: Cuerdas, Viento..." />
+                    <input type="hidden" name="IdFamilia" value="@idFamilia" />
+                </div>
+                <div class="admin-form-actions">
+                    <button type="submit" name="accion" value="add" class="admin-btn admin-btn--primary">Añadir</button>
+                    <button type="submit" name="accion" value="cancelar" class="admin-btn admin-btn--secondary">Cancelar</button>
+                </div>
+            </div>
         </form>
+    </div>
 }
-@if(Model.Count > 0)
-{
 
-        <ul class="tipos-grid">
-            @foreach (Tipo tipo in Model)
-            {
-                <li>
-                    <a asp-controller="Subtipos" asp-action="Index" asp-route-idTipo="@tipo.IdTipo" class="tipo-card">
-                        <span>@tipo.Nombre</span>
-                    </a>
+@if (Model.Count > 0)
+{
+    <ul class="tipos-grid">
+        @foreach (Tipo tipo in Model)
+        {
+            <li>
+                <a asp-controller="Subtipos" asp-action="Index" asp-route-idTipo="@tipo.IdTipo" class="tipo-card">
+                    <span>@tipo.Nombre</span>
+                    <i class="bi bi-arrow-right-short"></i>
+                </a>
                 @if (Context.User.FindFirst("Admin") != null)
                 {
-                    <a asp-controller="Tipos" asp-action="Eliminar" asp-route-idTipo="@tipo.IdTipo"
-                       asp-route-idFamilia="@tipo.IdFamilia">
-                        Eliminar
+                    <a asp-controller="Tipos" asp-action="Eliminar"
+                       asp-route-idTipo="@tipo.IdTipo"
+                       asp-route-idFamilia="@tipo.IdFamilia"
+                       class="admin-btn admin-btn--lg admin-btn--delete"
+                       onclick="return confirm('¿Eliminar este tipo?')">
+                        <i class="bi bi-trash"></i>
                     </a>
-                    
                 }
-
-                </li>
-            }
-        </ul>
-} 
+            </li>
+        }
+    </ul>
+}
 else
 {
     <div class="empty-message">

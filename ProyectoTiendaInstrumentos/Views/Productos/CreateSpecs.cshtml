@@ -2,56 +2,81 @@
 @using ProyectoTiendaInstrumentos.Repositories
 @inject RepositorySubtipos repositorySubtipos
 
-<form method="post">
-    @{
-        SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
-        bool hasArbol = arbolTipos != null;
-    }
+@{
+    ViewData["Title"] = "Crear especificación";
+}
 
-    <select name="idFamilia" id="selectFamilia">
-        @if (hasArbol)
-        {
-            <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
-        }
-        else
-        {
-            <option value="">Selecciona familia...</option>
-        }
-    </select>
+<div class="product-create">
+    <div class="product-create__card">
+        <h1 class="product-create__title">Crear especificación</h1>
 
-    <select name="idTipo" id="selectTipo">
-        @if (hasArbol)
-        {
-            <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
-        }
-        else
-        {
-            <option value="">Selecciona tipo...</option>
-        }
-    </select>
+        <form method="post" class="product-create__form">
+            @{
+                SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
+                bool hasArbol = arbolTipos != null;
+            }
 
-    <select name="idSubtipo" id="selectSubtipo">
-        @if (hasArbol)
-        {
-            <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
-        }
-        else
-        {
-            <option value="">Selecciona subtipo...</option>
-        }
-    </select>
+            <div class="product-create__group product-create__group--4">
+                <label class="product-create__label" for="selectFamilia">Familia</label>
+                <select name="idFamilia" id="selectFamilia" class="form-select product-create__control">
+                    @if (hasArbol)
+                    {
+                        <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
+                    }
+                    else
+                    {
+                        <option value="">Selecciona familia...</option>
+                    }
+                </select>
+            </div>
 
-    <label>Nombre</label>
-    <input type="text" name="nombre" />
+            <div class="product-create__group product-create__group--4">
+                <label class="product-create__label" for="selectTipo">Tipo</label>
+                <select name="idTipo" id="selectTipo" class="form-select product-create__control">
+                    @if (hasArbol)
+                    {
+                        <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
+                    }
+                    else
+                    {
+                        <option value="">Selecciona tipo...</option>
+                    }
+                </select>
+            </div>
 
-    <label>Unidad de medida</label>
-    <select name="unidadMedida">
-        <option value="texto">Texto</option>
-        <option value="unidades">unidades</option>
-    </select>
+            <div class="product-create__group product-create__group--4">
+                <label class="product-create__label" for="selectSubtipo">Subtipo</label>
+                <select name="idSubtipo" id="selectSubtipo" class="form-select product-create__control">
+                    @if (hasArbol)
+                    {
+                        <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
+                    }
+                    else
+                    {
+                        <option value="">Selecciona subtipo...</option>
+                    }
+                </select>
+            </div>
 
-    <button type="submit">Crear especificación</button>
-</form>
+            <div class="product-create__group product-create__group--6">
+                <label class="product-create__label" for="nombre">Nombre</label>
+                <input id="nombre" type="text" name="nombre" class="form-control product-create__control" />
+            </div>
+
+            <div class="product-create__group product-create__group--6">
+                <label class="product-create__label" for="unidadMedida">Unidad de medida</label>
+                <select id="unidadMedida" name="unidadMedida" class="form-select product-create__control">
+                    <option value="">Texto</option>
+                    <option value="ud">Unidades (ud)</option>
+                </select>
+            </div>
+
+            <div class="product-create__actions">
+                <button type="submit" class="btn btn-primary product-create__submit">Crear especificación</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
     <script>
@@ -80,7 +105,6 @@
                 return v !== undefined && v !== null && String(v).trim() !== '';
             }
 
-            // --- Carga perezosa familias/tipos/subtipos ---
             var familiasLoaded = false;
             var tiposLoadedForFamilia = null;
             var subtiposLoadedForTipo = null;

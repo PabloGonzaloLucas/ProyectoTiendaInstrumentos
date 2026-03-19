@@ -1,49 +1,52 @@
 ﻿@model List<Usuario>
 
-<div>
-    <h1>Panel de Usuarios</h1>
-   
-        <table>
+<div class="usuarios-panel">
+    <h1 class="usuarios-panel__title">Panel de Usuarios</h1>
+
+    <div class="usuarios-panel__tablewrap">
+        <table class="usuarios-table">
             <thead>
                 <tr>
-                    <th></th>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Rol</th>
-                    <th>Teléfono</th>
-                    <th>Direccion</th>
-                    <th>Fecha de Registro</th>
-                    <th>Número de Compras</th>
+                    <th class="usuarios-table__th usuarios-table__th--avatar"></th>
+                    <th class="usuarios-table__th">ID</th>
+                    <th class="usuarios-table__th">Nombre</th>
+                    <th class="usuarios-table__th">Email</th>
+                    <th class="usuarios-table__th">Rol</th>
+                    <th class="usuarios-table__th">Teléfono</th>
+                    <th class="usuarios-table__th">Dirección</th>
+                    <th class="usuarios-table__th">Fecha de Registro</th>
+                    <th class="usuarios-table__th">Número de Compras</th>
                 </tr>
             </thead>
             <tbody>
-                 @foreach(Usuario usuario in Model)
-                 {
-                    <tr>
-                        <td>
-                            <img src="~/images/users/@usuario.Imagen" alt="imagen @usuario.Nombre"/>
+                @foreach (Usuario usuario in Model)
+                {
+                    <tr class="usuarios-table__row">
+                        <td class="usuarios-table__td usuarios-table__td--avatar">
+                            <img src="~/images/users/@usuario.Imagen"
+                                 alt="imagen @usuario.Nombre"
+                                 style="display:block;width:60px;height:60px;min-width:60px;min-height:60px;max-width:60px;max-height:60px;object-fit:cover;object-position:center;border-radius:999px;border:2px solid rgba(127,227,170,.45);background:#fff;" />
                         </td>
-                        <td>@usuario.IdUsuario</td>
-                        <td>@usuario.Nombre</td>
-                        <td>@usuario.Email</td>
-                        <td>
-                            @if(usuario.RolId == 1)
+                        <td class="usuarios-table__td">@usuario.IdUsuario</td>
+                        <td class="usuarios-table__td usuarios-table__td--name">@usuario.Nombre</td>
+                        <td class="usuarios-table__td usuarios-table__td--email">@usuario.Email</td>
+                        <td class="usuarios-table__td">
+                            @if (usuario.RolId == 1)
                             {
-                                <span class="badge badge-primary">Admin</span>
+                                <span class="usuarios-badge usuarios-badge--admin">Admin</span>
                             }
-                            else if(usuario.RolId == 2)
+                            else if (usuario.RolId == 2)
                             {
-                                <span class="badge badge-secondary">Usuario</span>
+                                <span class="usuarios-badge usuarios-badge--user">Usuario</span>
                             }
                         </td>
-                        <td>@usuario.Telefono</td>
-                        <td>@usuario.Direccion</td>
-                        <td>@usuario.FechaRegistro</td>
-                        <td>@usuario.NumPedidos</td>
+                        <td class="usuarios-table__td">@usuario.Telefono</td>
+                        <td class="usuarios-table__td">@usuario.Direccion</td>
+                        <td class="usuarios-table__td">@usuario.FechaRegistro</td>
+                        <td class="usuarios-table__td usuarios-table__td--num">@usuario.NumPedidos</td>
                     </tr>
-                 }
+                }
+            </tbody>
         </table>
-    
-
+    </div>
 </div>

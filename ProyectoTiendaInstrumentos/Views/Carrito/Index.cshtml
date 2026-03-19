@@ -1,7 +1,7 @@
 ﻿@model List<VwCatalogoProducto>
 @using ProyectoTiendaInstrumentos.Models
 @{
-    PagedResult<VwCatalogoProducto> paginacionCarrito = ViewBag.PaginacionCarrito as PagedResult<VwCatalogoProducto>;
+    PagedResult<VwCatalogoProducto>? paginacionCarrito = ViewBag.PaginacionCarrito as PagedResult<VwCatalogoProducto>;
     int offsetIndex = paginacionCarrito != null ? (paginacionCarrito.PaginaActual - 1) * paginacionCarrito.TamañoPagina : 0;
 }
 
@@ -16,11 +16,9 @@
                 int realIndex = offsetIndex + index;
                 <li class="carrito-item">
                     <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto" class="carrito-item-link">
-                        <img src="~/images/productosMain/@producto.ImagenPrincipal" alt="@producto.Modelo" class="carrito-item-img" />
                         <div class="carrito-item-info">
                             <span class="carrito-item-marca">@producto.Marca</span>
                             <span class="carrito-item-nombre">@producto.Modelo</span>
-                            <span class="carrito-item-precio precio-unitario" data-precio="@producto.Precio">@producto.Precio €</span>
                             @if (producto.Stock < 5 && producto.Stock > 0)
                             {
                                 <span class="carrito-item-stock-low"><i class="bi bi-exclamation-triangle"></i> Pocas unidades</span>
@@ -33,6 +31,17 @@
                             {
                                 <span class="carrito-item-stock-out"><i class="bi bi-x-circle"></i> Sin stock</span>
                             }
+                        </div>
+
+                        <div class="carrito-item-imgwrap">
+                            <img src="~/images/productosMain/@producto.ImagenPrincipal"
+                                 alt="@producto.Modelo"
+                                 class="carrito-item-img"
+                                 style="display:block;width:170px;height:170px;min-width:170px;min-height:170px;max-width:170px;max-height:170px;object-fit:contain;object-position:center;margin:0 auto;" />
+                        </div>
+
+                        <div class="carrito-item-price">
+                            <span class="carrito-item-precio precio-unitario" data-precio="@producto.Precio">@producto.Precio €</span>
                         </div>
                     </a>
 
@@ -52,9 +61,11 @@
                                 <option value="@i" selected="@(i == cantidadActual)">@i</option>
                             }
                         </select>
+
                         <span class="carrito-subtotal-linea subtotal-linea" data-idproducto="@producto.IdProducto">
                             @(producto.Precio * (producto.Cantidad ?? 1)) €
                         </span>
+
                         <button type="submit"
                                 asp-action="EliminarProducto"
                                 asp-route-idProducto="@producto.IdProducto"

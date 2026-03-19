@@ -1,7 +1,7 @@
 ﻿@model List<Pedido>
 @using ProyectoTiendaInstrumentos.Models
 @{
-    PagedResult<Pedido> paginacion = ViewBag.Paginacion as PagedResult<Pedido>;
+    PagedResult<Pedido>? paginacion = ViewBag.Paginacion as PagedResult<Pedido>;
 }
 
 <h1 class="mispedidos-titulo">Mis Pedidos</h1>
@@ -12,9 +12,6 @@
         <ul class="mispedidos-lista">
             @foreach(Pedido pedido in Model)
             {
-                @* bool entregado = pedido.FechaEntrega.HasValue && pedido.FechaEntrega.Value < DateTime.Now;
-                string estadoMostrar = entregado ? "Entregado" : pedido.Estado; *@
-
                 <li class="mispedidos-item">
                     <a asp-controller="Pedidos" asp-action="DetallesPedido" asp-route-idPedido="@pedido.IdPedido" class="mispedidos-card">
                         <div class="mispedidos-info">
@@ -25,10 +22,16 @@
                         </div>
                         <span class="mispedidos-total">@pedido.PrecioTotal.ToString("C")</span>
                         <span class="mispedidos-estado">@pedido.Estado</span>
-                        <div class="mispedidos-imagenes">
-                            @foreach(string imagen in pedido.ImagenesProductos)
+                        <div class="mispedidos-imagenes mispedidos-imagenes--center">
+                            @if (pedido.ImagenesProductos != null)
                             {
-                                <img src="~/images/productosMain/@imagen" alt="Imagen del producto" class="mispedidos-img" />
+                                @foreach(string imagen in pedido.ImagenesProductos)
+                                {
+                                    <img src="~/images/productosMain/@imagen"
+                                         alt="Imagen del producto"
+                                         class="mispedidos-img"
+                                         style="display:block;width:300px;height:300px;min-width:300px;min-height:300px;max-width:300px;max-height:300px;object-fit:contain;object-position:center;padding:3px;border-radius:10px;background:#fff;" />
+                                }
                             }
                         </div>
                     </a>

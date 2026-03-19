@@ -7,65 +7,68 @@
     align-items: center;
     gap: 0.4rem;
     font-weight: 700;
-    color: var(--dark-bg);
-    background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+    color: var(--color-bg-dark);
+    background: var(--grad-primary);
     padding: 0.5rem 1.2rem;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     margin-bottom: 1.5rem;
     text-decoration: none;
     font-size: 0.95rem;
-    transition: all 0.25s ease;
-    box-shadow: 0 3px 10px rgba(127, 227, 170, 0.25);
+    transition: var(--transition-fast);
+    box-shadow: 0 3px 10px var(--primary-a25);
 }
 
 .detpedido-volver:hover {
     transform: translateX(-3px);
-    box-shadow: 0 5px 15px rgba(127, 227, 170, 0.4);
-    color: var(--dark-bg);
+    box-shadow: 0 5px 15px var(--primary-a40);
+    color: var(--color-bg-dark);
     text-decoration: none;
 }
 
 .detpedido-titulo {
-    color: var(--dark-bg);
+    color: var(--color-bg-dark);
     font-size: 2rem;
     font-weight: 800;
     margin-bottom: 1.5rem;
     padding-bottom: 0.75rem;
-    border-bottom: 3px solid var(--primary-green);
+    border-bottom: 3px solid var(--color-primary);
 }
 
 .detpedido-resumen {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-gray) 100%);
+    background: var(--grad-dark);
     border-radius: 14px;
     padding: 1.25rem 1.75rem;
     margin-bottom: 2rem;
-    border: 2px solid var(--primary-green);
+    border: 2px solid var(--color-primary);
     flex-wrap: wrap;
 }
 
 .detpedido-total {
     font-size: 2rem;
     font-weight: 900;
-    color: var(--primary-green);
+    color: var(--color-primary);
 }
 
 .detpedido-estado {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.35rem 1rem;
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
-    color: var(--dark-bg);
+    background: var(--grad-primary);
+    color: var(--color-bg-dark);
+    white-space: nowrap;
 }
 
 .detpedido-fecha-entrega {
-    color: var(--text-light);
+    color: var(--color-text-light);
     font-size: 0.95rem;
     font-weight: 600;
     margin-left: auto;
@@ -80,100 +83,165 @@
     gap: 1rem;
 }
 
-.detpedido-producto-link {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center;
-    gap: 1.25rem;
-    background: var(--white);
-    border: 2px solid rgba(127, 227, 170, 0.2);
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-    text-decoration: none;
-    color: var(--dark-bg);
-    transition: all 0.25s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.detpedido-producto-link:hover {
-    border-color: var(--primary-green);
-    box-shadow: 0 5px 18px rgba(127, 227, 170, 0.2);
-    transform: translateY(-2px);
-    color: var(--dark-bg);
-    text-decoration: none;
-}
-
-.detpedido-producto-img {
-    width: 90px !important;
-    height: 90px !important;
-    min-width: 90px !important;
-    min-height: 90px !important;
-    max-width: 90px !important;
-    max-height: 90px !important;
-    object-fit: contain;
-    border-radius: 8px;
-    background: var(--light-gray);
-    padding: 4px;
-    flex-shrink: 0 !important;
+/* Card del producto -> estilo parecido a MisPedidos */
+.detpedido-lista > li {
     display: block;
 }
 
+.detpedido-producto-link {
+    display: grid;
+    grid-template-columns: 120px 1fr minmax(140px, max-content);
+    /* centra el contenido dentro de cada celda por defecto */
+    justify-items: center;
+    gap: 1.25rem;
+    align-items: center;
+    background: var(--color-surface);
+    border: 2px solid var(--primary-a20);
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    text-decoration: none;
+    color: var(--color-bg-dark);
+    transition: var(--transition-fast);
+    box-shadow: 0 3px 12px var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.detpedido-producto-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-dk) 100%);
+    border-radius: 14px 0 0 14px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.detpedido-producto-link:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 6px 22px var(--primary-a25);
+    transform: translateY(-2px);
+    color: var(--color-bg-dark);
+    text-decoration: none;
+}
+
+.detpedido-producto-link:hover::before {
+    opacity: 1;
+}
+
+/* Imagen uniforme y centrada (como MisPedidos) */
+.detpedido-producto-img {
+    width: 90px;
+    height: 90px;
+    min-width: 90px;
+    min-height: 90px;
+    max-width: 90px;
+    max-height: 90px;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 10px;
+    border: 1.5px solid var(--primary-a20);
+    background: var(--color-surface);
+    padding: 4px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Info centrada: marca, nombre, precio */
 .detpedido-producto-info {
-    flex: 1;
+    /* Centrado dentro de la celda del grid */
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     min-width: 0;
     align-self: center;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(182, 182, 182, 0.63);
+    box-shadow: 0 6px 22px var(--primary-a25);
+    border-radius: 10px;
+    background-color: rgba(245, 245, 245, 0.63);
 }
 
 .detpedido-producto-marca {
     font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--primary-green);
+    font-weight: 900;
+    color: var(--color-primary-dk);
     text-transform: uppercase;
     letter-spacing: 0.8px;
 }
 
 .detpedido-producto-nombre {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--dark-bg);
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--color-bg-dark);
+    line-height: 1.15;
 }
 
 .detpedido-producto-meta {
-    display: flex;
-    gap: 1.25rem;
+    display: inline-flex;
+    gap: 0.75rem;
     flex-wrap: wrap;
     margin-top: 0.25rem;
     font-size: 0.9rem;
-    color: var(--dark-gray);
-    font-weight: 600;
+    color: var(--color-bg-dark-2);
+    font-weight: 700;
+    justify-content: center;
+    align-items: center;
 }
 
 .detpedido-producto-precio {
-    color: var(--primary-green);
-    font-weight: 800;
-    font-size: 1rem;
+    color: var(--color-primary);
+    font-weight: 900;
+    font-size: 1.05rem;
 }
 
 .detpedido-producto-subtotal {
-    margin-left: auto;
+    width: 100%;
+    justify-self: stretch;
+    align-self: center;
+    text-align: center;
     font-size: 1.15rem;
-    font-weight: 900;
-    color: var(--dark-bg);
+    font-weight: 950;
+    color: var(--color-bg-dark);
     white-space: nowrap;
+    margin-left:47%;
 }
 
 .detpedido-footer {
     margin-top: 2rem;
     padding: 1rem 1.25rem;
-    background: var(--light-gray);
-    border-radius: 10px;
+    background: var(--color-bg-light);
+    border-radius: var(--radius-xl);
     font-size: 0.9rem;
-    color: var(--dark-gray);
+    color: var(--color-bg-dark-2);
     font-weight: 600;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .detpedido-producto-link {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+    }
+
+    .detpedido-producto-subtotal {
+        justify-self: center;
+    }
+
+    .detpedido-fecha-entrega {
+        margin-left: 0;
+        width: 100%;
+    }
 }

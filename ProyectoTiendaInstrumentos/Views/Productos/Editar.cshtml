@@ -1,169 +1,204 @@
 ﻿@using ProyectoTiendaInstrumentos.Models
 @using ProyectoTiendaInstrumentos.Repositories
 @inject RepositorySubtipos repositorySubtipos
+
 @{
+    ViewData["Title"] = "Editar producto";
+
     Producto producto = ViewBag.Producto as Producto;
     List<ProductoImagen> imagenesSecundariasExistentes = ViewBag.ImagenesProducto as List<ProductoImagen>;
     List<VwEspecificacionesProducto> specsExistentes = ViewBag.Especificaciones as List<VwEspecificacionesProducto>;
 }
-<form method="post" enctype="multipart/form-data">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="idProducto" value="@producto?.IdProducto" />
 
-    @{ 
-        SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
-        bool hasArbol = arbolTipos != null;
-    }
+<div class="product-edit">
+    <div class="product-edit__card">
+        <h1 class="product-edit__title">Editar producto</h1>
 
-    <select name="idFamilia" id="selectFamilia">
-        @if (hasArbol)
-        {
-            <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
-        }
-        else
-        {
-            <option value="">Selecciona familia...</option>
-        }
-    </select>
+        <form method="post" enctype="multipart/form-data" class="product-edit__form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="idProducto" value="@producto?.IdProducto" />
 
-    <select name="idTipo" id="selectTipo">
-        @if (hasArbol)
-        {
-            <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
-        }
-        else
-        {
-            <option value="">Selecciona tipo...</option>
-        }
-    </select>
-
-    <select name="idSubtipo" id="selectSubtipo">
-        @if (hasArbol)
-        {
-            <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
-        }
-        else
-        {
-            <option value="">Selecciona subtipo...</option>
-        }
-    </select>
-
-    <label>Modelo</label>
-    <input type="text" name="modelo" value="@producto?.Modelo" />
-
-    <label>Precio</label>
-    <input type="number" step="0.01" name="precio"
-       value="@(producto?.Precio.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "")" />
-
-    <label>Stock</label>
-    <input type="number" name="stock" value="@producto?.Stock" />
-
-    <label>Marca</label>
-    <select name="idMarca">
-        @foreach (var marca in ViewBag.Marcas as List<Marca>)
-        {
-            if (producto != null && producto.IdMarca == marca.IdMarca)
-            {
-                <option value="@marca.IdMarca" selected>@marca.Nombre</option>
+            @{
+                SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
+                bool hasArbol = arbolTipos != null;
             }
-            else
-            {
-                <option value="@marca.IdMarca">@marca.Nombre</option>
-            }
-        }
-    </select>
 
-    <label>Imagen principal (actual)</label>
-    @if (!string.IsNullOrEmpty(producto?.Imagen))
-    {
-        <img id="previewImagenPrincipal"
-             src="~/images/productosMain/@producto.Imagen"
-             style="width:140px; height:140px; object-fit:cover; display:block; margin-bottom:8px;" />
-    }
-    else
-    {
-        <img id="previewImagenPrincipal"
-             src="~/images/productosMain/default.png"
-             style="width:140px; height:140px; object-fit:cover; display:block; margin-bottom:8px;" />
-    }
-
-    <label>Cambiar imagen principal</label>
-    <input type="file" name="imagen" id="inputImagenPrincipal" accept="image/*" />
-
-    <button type="button" id="botonMostrarFormImagenes">
-        Imagenes del producto
-    </button>
-
-    <div id="zonaImagenes" style="display:none; margin-top: 12px;">
-        <div style="display:flex; gap: 16px; align-items:flex-start;">
-            <div id="contenedorImagenes" style="display:flex; flex-wrap:wrap; gap:10px;">
-                @if (imagenesSecundariasExistentes != null)
-                {
-                    foreach (var img in imagenesSecundariasExistentes)
+            <div class="product-edit__group product-edit__group--4">
+                <label class="product-edit__label" for="selectFamilia">Familia</label>
+                <select name="idFamilia" id="selectFamilia" class="form-select product-edit__control">
+                    @if (hasArbol)
                     {
-                        <div class="preview-item" data-id="@img.IdProductoImagen" style="position:relative; width:90px; height:90px; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
-                            <img src="~/images/productos/@img.Imagen" alt="Imagen secundaria" style="width:100%; height:100%; object-fit:cover;" />
-                            <input type="hidden" name="imagenesExistentesIds" value="@img.IdProductoImagen" />
-                            <button type="button" class="btnEliminarImagenExistente" style="position:absolute; top:4px; right:4px;">X</button>
-                        </div>
+                        <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
                     }
-                }
-            </div>
-
-            <div>
-                <label>Agregar imágenes</label>
-                <input type="file" id="inputImagenesProducto" name="imagenes" multiple accept="image/*" />
-                <small>Se pueden seleccionar varias veces; se acumulan.</small>
-            </div>
-        </div>
-    </div>
-
-    <textarea name="descripcion" placeholder="Descripción del producto">@producto?.Descripcion</textarea>
-
-    <button type="button" id="botonMostrarFormSpecs">
-        Especificaciones del producto
-    </button>
-
-    <div id="zonaSpecs" style="display:none; margin-top: 12px;">
-        <div style="display:flex; gap: 16px; align-items:flex-start;">
-            <div style="min-width: 260px;">
-                <label>Agregar especificación</label>
-
-                <select id="selectEspecificacionesSubtipo">
-                    <option value="">Selecciona especificación...</option>
-                </select>
-
-                <input type="text" id="inputSpecValor" placeholder="Valor" style="display:block; margin-top:8px;" />
-
-                <button type="button" id="botonAgregarSpec" style="margin-top:8px;">Agregar especificación</button>
-
-                <small id="hintUnidad" style="display:block; margin-top:6px; color:#666;"></small>
-            </div>
-
-            <div style="flex: 1;">
-                <label>Especificaciones añadidas</label>
-                <div id="contenedorSpecs" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-                    @if (specsExistentes != null)
+                    else
                     {
-                        foreach (var spec in specsExistentes)
+                        <option value="">Selecciona familia...</option>
+                    }
+                </select>
+            </div>
+
+            <div class="product-edit__group product-edit__group--4">
+                <label class="product-edit__label" for="selectTipo">Tipo</label>
+                <select name="idTipo" id="selectTipo" class="form-select product-edit__control">
+                    @if (hasArbol)
+                    {
+                        <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
+                    }
+                    else
+                    {
+                        <option value="">Selecciona tipo...</option>
+                    }
+                </select>
+            </div>
+
+            <div class="product-edit__group product-edit__group--4">
+                <label class="product-edit__label" for="selectSubtipo">Subtipo</label>
+                <select name="idSubtipo" id="selectSubtipo" class="form-select product-edit__control">
+                    @if (hasArbol)
+                    {
+                        <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
+                    }
+                    else
+                    {
+                        <option value="">Selecciona subtipo...</option>
+                    }
+                </select>
+            </div>
+
+            <div class="product-edit__group product-edit__group--6">
+                <label class="product-edit__label" for="modelo">Modelo</label>
+                <input id="modelo" type="text" name="modelo" value="@producto?.Modelo" class="form-control product-edit__control" />
+            </div>
+
+            <div class="product-edit__group product-edit__group--3">
+                <label class="product-edit__label" for="precio">Precio</label>
+                <input id="precio" type="number" step="0.01" name="precio"
+                       value="@(producto?.Precio.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "")"
+                       class="form-control product-edit__control" />
+            </div>
+
+            <div class="product-edit__group product-edit__group--3">
+                <label class="product-edit__label" for="stock">Stock</label>
+                <input id="stock" type="number" name="stock" value="@producto?.Stock" class="form-control product-edit__control" />
+            </div>
+
+            <div class="product-edit__group product-edit__group--6">
+                <label class="product-edit__label" for="marca">Marca</label>
+                <select id="marca" name="idMarca" class="form-select product-edit__control">
+                    @foreach (var marca in ViewBag.Marcas as List<Marca>)
+                    {
+                        if (producto != null && producto.IdMarca == marca.IdMarca)
                         {
-                            <div class="spec-row" data-specid="@spec.IdEspecificacion" style="display:flex; align-items:center; justify-content:space-between; gap:12px; border:1px solid #ddd; border-radius:8px; padding:8px 10px;">
-                                <div>@spec.Especificacion: @spec.Valor</div>
-                                <div>
-                                    <input type="hidden" name="specIds" value="@spec.IdEspecificacion" />
-                                    <input type="hidden" name="specValores" value="@spec.Valor" />
-                                </div>
-                                <button type="button" class="btnQuitarSpec">Quitar</button>
-                            </div>
+                            <option value="@marca.IdMarca" selected>@marca.Nombre</option>
+                        }
+                        else
+                        {
+                            <option value="@marca.IdMarca">@marca.Nombre</option>
                         }
                     }
+                </select>
+            </div>
+
+            <div class="product-edit__group product-edit__group--6">
+                <label class="product-edit__label">Imagen principal (actual)</label>
+                @if (!string.IsNullOrEmpty(producto?.Imagen))
+                {
+                    <img id="previewImagenPrincipal" src="~/images/productosMain/@producto.Imagen" class="product-edit__preview" />
+                }
+                else
+                {
+                    <img id="previewImagenPrincipal" src="~/images/productosMain/default.png" class="product-edit__preview" />
+                }
+
+                <label class="product-edit__label" for="inputImagenPrincipal">Cambiar imagen principal</label>
+                <input type="file" name="imagen" id="inputImagenPrincipal" accept="image/*" class="form-control product-edit__control" />
+            </div>
+
+            <div class="product-edit__group">
+                <button type="button" id="botonMostrarFormImagenes" class="admin-btn product-edit__section-btn">
+                    <i class="bi bi-images"></i> Imágenes del producto
+                </button>
+            </div>
+
+            <div id="zonaImagenes" class="product-edit__panel" style="display:none;">
+                <div style="display:flex; gap: 16px; align-items:flex-start; flex-wrap: wrap;">
+                    <div id="contenedorImagenes" style="display:flex; flex-wrap:wrap; gap:10px;">
+                        @if (imagenesSecundariasExistentes != null)
+                        {
+                            foreach (var img in imagenesSecundariasExistentes)
+                            {
+                                <div class="preview-item" data-id="@img.IdProductoImagen" style="position:relative; width:90px; height:90px; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
+                                    <img src="~/images/productos/@img.Imagen" alt="Imagen secundaria" style="width:100%; height:100%; object-fit:cover;" />
+                                    <input type="hidden" name="imagenesExistentesIds" value="@img.IdProductoImagen" />
+                                    <button type="button" class="btnEliminarImagenExistente" style="position:absolute; top:4px; right:4px;">X</button>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div style="min-width: 260px; flex: 1;">
+                        <label class="product-edit__label" for="inputImagenesProducto">Agregar imágenes</label>
+                        <input type="file" id="inputImagenesProducto" name="imagenes" multiple accept="image/*" class="form-control product-edit__control" />
+                        <small class="product-edit__hint">Se pueden seleccionar varias veces; se acumulan.</small>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <button type="submit">Guardar cambios</button>
-</form>
+            <div class="product-edit__group">
+                <label class="product-edit__label" for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion" placeholder="Descripción del producto" class="form-control product-edit__control">@producto?.Descripcion</textarea>
+            </div>
+
+            <div class="product-edit__group">
+                <button type="button" id="botonMostrarFormSpecs" class="admin-btn product-edit__section-btn">
+                    <i class="bi bi-list-check"></i> Especificaciones del producto
+                </button>
+            </div>
+
+            <div id="zonaSpecs" class="product-edit__panel" style="display:none;">
+                <div style="display:flex; gap: 16px; align-items:flex-start; flex-wrap: wrap;">
+                    <div style="min-width: 260px; flex: 1;">
+                        <label class="product-edit__label" for="selectEspecificacionesSubtipo">Agregar especificación</label>
+
+                        <select id="selectEspecificacionesSubtipo" class="form-select product-edit__control">
+                            <option value="">Selecciona especificación...</option>
+                        </select>
+
+                        <input type="text" id="inputSpecValor" placeholder="Valor" class="form-control product-edit__control" style="display:block; margin-top:8px;" />
+
+                        <button type="button" id="botonAgregarSpec" class="btn btn-secondary" style="margin-top:8px;">Agregar especificación</button>
+
+                        <small id="hintUnidad" class="product-edit__hint"></small>
+                    </div>
+
+                    <div style="flex: 2; min-width: 280px;">
+                        <label class="product-edit__label">Especificaciones añadidas</label>
+                        <div id="contenedorSpecs" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+                            @if (specsExistentes != null)
+                            {
+                                foreach (var spec in specsExistentes)
+                                {
+                                    <div class="spec-row" data-specid="@spec.IdEspecificacion" style="display:flex; align-items:center; justify-content:space-between; gap:12px; border:1px solid #ddd; border-radius:8px; padding:8px 10px;">
+                                        <div>@spec.Especificacion: @spec.Valor</div>
+                                        <div>
+                                            <input type="hidden" name="specIds" value="@spec.IdEspecificacion" />
+                                            <input type="hidden" name="specValores" value="@spec.Valor" />
+                                        </div>
+                                        <button type="button" class="btnQuitarSpec admin-btn admin-btn--lg admin-btn--delete">Quitar</button>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-edit__actions">
+                <button type="submit" class="btn btn-primary product-edit__submit">Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
     <script>
@@ -431,7 +466,7 @@
                 var $remove = $('<button/>', {
                     type: 'button',
                     text: 'Quitar',
-                    'class': 'btnQuitarSpec'
+                    'class': 'btnQuitarSpec admin-btn admin-btn--lg admin-btn--delete'
                 });
 
                 var $hidden = $('<div/>').html(buildHiddenInputs(specId, valor));

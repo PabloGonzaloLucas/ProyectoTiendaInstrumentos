@@ -22,8 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\css\components\" />
     <Folder Include="wwwroot\images\familias\" />
     <Folder Include="wwwroot\images\productos\" />
+    <Folder Include="wwwroot\js\components\" />
   </ItemGroup>
 
 </Project>

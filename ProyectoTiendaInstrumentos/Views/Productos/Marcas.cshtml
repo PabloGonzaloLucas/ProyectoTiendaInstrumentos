@@ -1,100 +1,90 @@
-﻿@model List<Marca>
+@model List<Marca>
+@using ProyectoTiendaInstrumentos.Models
 
+@{
+    ViewData["Title"] = "Marcas";
+}
 
-    <div>
+<div class="marcas-page">
+    <div class="marcas-header">
         <h1 class="page-title">Marcas</h1>
-        @if (Context.User.FindFirst("Admin") != null)
-        {
-            <button type="button">Añadir Marca</button>
-            <form method="post" asp-controller="Productos" asp-action="CreateMarca" enctype="multipart/form-data">
-                <label>Nombre</label>
-                <input type="text" name="Nombre" />
-                <label>Logo</label>
-                <input type="file" name="Logo" />
-                <button type="submit" name="accion" value="add">Añadir</button>
-                <button type="submit" name="accion" value="cancelar">Cancelar</button>
-            </form>
-        }
-        @if (Model.Count > 0)
-        {
-            @if (Context.User.FindFirst("Admin") != null)
-            {
-                @foreach (Marca marca in Model)
-                {
-                    <div>
-                        <a asp-controller="Productos" asp-action="Index" asp-route-idMarca="@marca.IdMarca">
-                            <img src="~/images/marcas/@marca.Logo" alt="Logo @marca.Nombre">
-                            <h1>
-                                @marca.Nombre
-                            </h1>
-                            @if (marca.Puntuacion > 0)
-                            {
-                                <div class="producto-rating">
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        if (i <= marca.Puntuacion)
-                                        {
-                                            <i class="bi bi-star-fill"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-star"></i>
-                                        }
-                                    }
-                                    <span class="rating-value">@marca.Puntuacion</span>
-                                </div>
-                            }
-                        </a>
-                        <a asp-controller="Productos" asp-action="EditMarca" asp-route-idMarca="@marca.IdMarca">
-                            Editar
-                        </a>
-                        <form method="post" asp-action="DeleteMarca" asp-controller="Productos">
-                            <input type="hidden" name="idMarca" value="@marca.IdMarca" />
-                            <button type="submit">Eliminar</button>
-                        </form>
+        <p class="page-subtitle">Trabajamos con los fabricantes más reconocidos del mundo de la música.</p>
+    </div>
+
+    @if (Context.User.FindFirst("Admin") != null)
+    {
+        <div class="admin-toolbar">
+            <button type="button" class="admin-btn" onclick="document.getElementById('form-add-marca').classList.toggle('admin-form--visible')">
+                <i class="bi bi-plus-circle"></i> Añadir Marca
+            </button>
+            <form id="form-add-marca" method="post" asp-controller="Productos" asp-action="CreateMarca"
+                  enctype="multipart/form-data" class="admin-form">
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label>Nombre</label>
+                        <input type="text" name="Nombre" class="admin-input" required placeholder="Nombre de la marca" />
                     </div>
-            }
-        }
-        else
-        {
+                    <div class="admin-form-group">
+                        <label>Logo</label>
+                        <input type="file" name="Logo" class="admin-input" accept="image/*" />
+                    </div>
+                    <div class="admin-form-actions">
+                        <button type="submit" name="accion" value="add" class="admin-btn admin-btn--primary">Añadir</button>
+                        <button type="submit" name="accion" value="cancelar" class="admin-btn admin-btn--secondary">Cancelar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    }
+
+    @if (Model.Count > 0)
+    {
+        <div class="marcas-grid">
             @foreach (Marca marca in Model)
             {
-                <div>
-                    <a asp-controller="Productos" asp-action="Index" asp-route-idMarca="@marca.IdMarca">
-                        <img src="~/images/marcas/@marca.Logo" alt="Logo @marca.Nombre">
-                        <h1>
-                            @marca.Nombre
-                        </h1>
-                        @if (marca.Puntuacion > 0)
-                        {
-                            <div class="producto-rating">
-                                @for (int i = 1; i <= 5; i++)
-                                {
-                                    if (i <= marca.Puntuacion)
+                <div class="marca-card-wrap">
+                    <a asp-controller="Productos" asp-action="Index" asp-route-idMarca="@marca.IdMarca" class="marca-card">
+                        <div class="marca-card-img-wrap">
+                            <img src="~/images/marcas/@marca.Logo" alt="@marca.Nombre" class="marca-card-img" />
+                        </div>
+                        <div class="marca-card-info">
+                            <span class="marca-card-nombre">@marca.Nombre</span>
+                            @if (marca.Puntuacion > 0)
+                            {
+                                <div class="marca-card-rating">
+                                    @for (int i = 1; i <= 5; i++)
                                     {
-                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star@(i <= marca.Puntuacion ? "-fill" : "")"></i>
                                     }
-                                    else
-                                    {
-                                        <i class="bi bi-star"></i>
-                                    }
-                                }
-                                <span class="rating-value">@marca.Puntuacion</span>
-                            </div>
-                        }
+                                    <span class="marca-card-rating-value">@marca.Puntuacion</span>
+                                </div>
+                            }
+                        </div>
                     </a>
 
+                    @if (Context.User.FindFirst("Admin") != null)
+                    {
+                        <div class="marca-admin-actions">
+                            <a asp-controller="Productos" asp-action="EditMarca" asp-route-idMarca="@marca.IdMarca" class="admin-btn admin-btn--sm admin-btn--edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form method="post" asp-action="DeleteMarca" asp-controller="Productos" style="display:inline;">
+                                <input type="hidden" name="idMarca" value="@marca.IdMarca" />
+                                <button type="submit" class="admin-btn admin-btn--sm admin-btn--delete" onclick="return confirm('¿Eliminar esta marca?')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    }
                 </div>
             }
-        }
-
-
+        </div>
     }
-        else
-        {
-            <div>
-                <h1>No hay marcas disponibles</h1>
-            </div>
-        }
-    </div>
-    
+    else
+    {
+        <div class="empty-message">
+            <i class="bi bi-award"></i>
+            <h2>No hay marcas disponibles</h2>
+        </div>
+    }
+</div>

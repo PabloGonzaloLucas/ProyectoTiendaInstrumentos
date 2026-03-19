@@ -1,4 +1,6 @@
-/* Perfil Styles */
+/* ================================================
+   PERFIL DE USUARIO
+   ================================================ */
 
 .register-container {
     display: flex;
@@ -8,18 +10,19 @@
     padding: 2rem 0;
 }
 
+/* Perfil usa max-width mayor para mostrar más campos */
 .register-card {
-    background: var(--white);
+    background: var(--color-surface);
     border-radius: 20px;
     padding: 3rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 40px var(--shadow-md);
     width: 100%;
     max-width: 980px;
-    border-top: 5px solid var(--primary-green);
+    border-top: 5px solid var(--color-primary);
 }
 
 .register-card h1 {
-    color: var(--dark-bg);
+    color: var(--color-bg-dark);
     font-size: 2.2rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
@@ -27,7 +30,7 @@
 }
 
 .register-card h4 {
-    color: var(--dark-gray);
+    color: var(--color-bg-dark-2);
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 2rem;
@@ -41,7 +44,7 @@
 }
 
 .form-group label {
-    color: var(--dark-bg);
+    color: var(--color-bg-dark);
     font-weight: 600;
     margin-bottom: 0.5rem;
     display: block;
@@ -55,77 +58,76 @@
 .register-card input[type="text"],
 .register-card input[type="email"],
 .register-card input[type="password"] {
-    width: 100% !important;
-    height: auto !important;
-    padding: 0.85rem 1rem !important;
-    border: 2px solid #dfdfdf !important;
-    border-radius: 10px !important;
-    font-size: 1rem !important;
-    line-height: 1.5 !important;
-    transition: all 0.3s ease !important;
-    background-color: var(--light-gray) !important;
-    box-sizing: border-box !important;
+    width: 100%;
+    height: auto;
+    padding: 0.85rem 1rem;
+    border: 2px solid #dfdfdf;
+    border-radius: var(--radius-xl);
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: var(--transition-base);
+    background-color: var(--color-bg-light);
+    box-sizing: border-box;
 }
 
 .register-card input:disabled {
-    background-color: #f0f0f0 !important;
+    background-color: #f0f0f0;
     cursor: not-allowed;
     opacity: 0.8;
 }
 
-.btn-primary {
+.register-card .form-control:focus,
+.register-card input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background-color: #dfdfdf;
+    box-shadow: 0 0 0 3px var(--primary-a10);
+}
+
+.register-card .btn-primary {
     padding: 0.85rem 2rem;
-    background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
-    border: none;
-    border-radius: 10px;
-    color: var(--dark-bg);
-    font-weight: 700;
+    border-radius: var(--radius-xl);
     font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(127, 227, 170, 0.3);
+    box-shadow: 0 4px 15px var(--primary-a30);
     text-decoration: none;
     display: inline-block;
     text-align: center;
 }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(127, 227, 170, 0.4);
-    background: linear-gradient(135deg, var(--accent-green) 0%, var(--primary-green) 100%);
-    color: var(--dark-bg);
+.register-card .btn-primary:hover {
+    box-shadow: 0 6px 20px var(--primary-a40);
 }
 
-.btn-secondary {
+.register-card .btn-secondary {
     padding: 0.85rem 2rem;
-    background-color: var(--dark-gray);
-    border: 2px solid var(--primary-green);
-    border-radius: 10px;
-    color: var(--white);
+    background-color: var(--color-bg-dark-2);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius-xl);
+    color: var(--color-surface);
     font-weight: 700;
     font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--transition-base);
     text-decoration: none;
     display: inline-block;
     text-align: center;
 }
 
-.btn-secondary:hover {
-    background-color: var(--primary-green);
-    color: var(--dark-bg);
+.register-card .btn-secondary:hover {
+    background-color: var(--color-primary);
+    color: var(--color-bg-dark);
     transform: translateY(-2px);
 }
 
 .error-message {
     background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
-    color: var(--white);
+    color: var(--color-surface);
     padding: 1rem;
-    border-radius: 10px;
+    border-radius: var(--radius-xl);
     text-align: center;
     margin-top: 1.5rem;
     font-weight: 600;
@@ -134,14 +136,8 @@
 }
 
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 768px) {
@@ -151,12 +147,10 @@
         max-width: 100%;
     }
 
-    .register-card h1 {
-        font-size: 1.8rem;
-    }
+    .register-card h1 { font-size: 1.8rem; }
 
-    .btn-primary,
-    .btn-secondary {
+    .register-card .btn-primary,
+    .register-card .btn-secondary {
         width: 100%;
         margin-bottom: 0.5rem;
     }

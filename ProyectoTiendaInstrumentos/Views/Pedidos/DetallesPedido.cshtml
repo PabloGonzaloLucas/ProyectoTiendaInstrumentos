@@ -1,7 +1,7 @@
 ﻿@model Pedido
 @using ProyectoTiendaInstrumentos.Models
 @{
-    PagedResult<VwProductosPedido> paginacionProductos = ViewBag.PaginacionProductos as PagedResult<VwProductosPedido>;
+    PagedResult<VwProductosPedido>? paginacionProductos = ViewBag.PaginacionProductos as PagedResult<VwProductosPedido>;
     // bool entregado = Model.FechaEntrega.HasValue && Model.FechaEntrega.Value < DateTime.Now;
     // string estadoMostrar = entregado ? "Entregado" : Model.Estado;
 }
@@ -19,22 +19,28 @@
 </div>
 
 <ul class="detpedido-lista">
-    @foreach (VwProductosPedido producto in Model.ProductosPedido)
+    @if (Model.ProductosPedido != null)
     {
-        <li>
-            <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto" class="detpedido-producto-link">
-                <img src="~/images/productosMain/@producto.Imagen" alt="@producto.Modelo" class="detpedido-producto-img" />
-                <div class="detpedido-producto-info">
-                    <span class="detpedido-producto-marca">@producto.Marca</span>
-                    <span class="detpedido-producto-nombre">@producto.Modelo</span>
-                    <div class="detpedido-producto-meta">
-                        <span class="detpedido-producto-precio">@producto.PrecioUnitario.ToString("C")</span>
-                        <span>x @producto.Cantidad</span>
+        @foreach (VwProductosPedido producto in Model.ProductosPedido)
+        {
+            <li>
+                <a asp-controller="Productos" asp-action="Details" asp-route-idProducto="@producto.IdProducto" class="detpedido-producto-link">
+                    <img src="~/images/productosMain/@producto.Imagen"
+                         alt="@producto.Modelo"
+                         class="detpedido-producto-img"
+                         style="display:block;width:250px;height:250px;min-width:250px;min-height:250px;max-width:250px;max-height:250px;object-fit:contain;object-position:center;margin:0 auto;padding:4px;border-radius:10px;" />
+                    <div class="detpedido-producto-info">
+                        <span class="detpedido-producto-marca">@producto.Marca</span>
+                        <span class="detpedido-producto-nombre">@producto.Modelo</span>
+                        <div class="detpedido-producto-meta">
+                            <span class="detpedido-producto-precio">@producto.PrecioUnitario.ToString("C")</span>
+                            <span>x @producto.Cantidad</span>
+                        </div>
                     </div>
-                </div>
-                <span class="detpedido-producto-subtotal">@producto.SubtotalLinea?.ToString("C")</span>
-            </a>
-        </li>
+                    <span class="detpedido-producto-subtotal">@producto.SubtotalLinea?.ToString("C")</span>
+                </a>
+            </li>
+        }
     }
 </ul>
 

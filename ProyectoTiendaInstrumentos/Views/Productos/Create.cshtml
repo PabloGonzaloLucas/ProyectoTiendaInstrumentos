@@ -1,112 +1,151 @@
 ﻿@using ProyectoTiendaInstrumentos.Models
 @using ProyectoTiendaInstrumentos.Repositories
 @inject RepositorySubtipos repositorySubtipos
-<form method="post" enctype="multipart/form-data">
-    @{ 
-        SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
-        bool hasArbol = arbolTipos != null;
-    }
 
-    <select name="idFamilia" id="selectFamilia">
-        @if (hasArbol)
-        {
-            <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
-        }
-        else
-        {
-            <option value="">Selecciona familia...</option>
-        }
-    </select>
+@{
+    ViewData["Title"] = "Crear producto";
+}
 
-    <select name="idTipo" id="selectTipo">
-        @if (hasArbol)
-        {
-            <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
-        }
-        else
-        {
-            <option value="">Selecciona tipo...</option>
-        }
-    </select>
+<div class="product-create">
+    <div class="product-create__card">
+        <h1 class="product-create__title">Crear producto</h1>
 
-    <select name="idSubtipo" id="selectSubtipo">
-        @if (hasArbol)
-        {
-            <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
-        }
-        else
-        {
-            <option value="">Selecciona subtipo...</option>
-        }
-    </select>
+        <form method="post" enctype="multipart/form-data" class="product-create__form">
+            @{
+                SelectSubtiposProducto arbolTipos = ViewBag.ArbolTipos as SelectSubtiposProducto;
+                bool hasArbol = arbolTipos != null;
+            }
 
-    <label>Modelo</label>
-    <input type="text" name="modelo" />
-
-    <label>Precio</label>
-    <input type="number" step="0.01" name="precio" />
-
-    <label>Stock</label>
-    <input type="number" name="stock" />
-
-    <label>Marca</label>
-    <select name="idMarca">
-        @foreach (var marca in ViewBag.Marcas as List<Marca>)
-        {
-            <option value="@marca.IdMarca">@marca.Nombre</option>
-        }
-    </select>
-
-    <label>Imagen principal</label>
-    <input type="file" name="imagen" />
-
-    <button type="button" id="botonMostrarFormImagenes">
-        Imagenes del producto
-    </button>
-
-    <div id="zonaImagenes" style="display:none; margin-top: 12px;">
-        <div style="display:flex; gap: 16px; align-items:flex-start;">
-            <div id="contenedorImagenes" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
-
-            <div>
-                <label>Agregar imágenes</label>
-                <input type="file" id="inputImagenesProducto" name="imagenes" multiple accept="image/*" />
-                <small>Se pueden seleccionar varias veces; se acumulan.</small>
-            </div>
-        </div>
-    </div>
-
-    <textarea name="descripcion" placeholder="Descripción del producto"></textarea>
-
-    <button type="button" id="botonMostrarFormSpecs">
-        Especificaciones del producto
-    </button>
-
-    <div id="zonaSpecs" style="display:none; margin-top: 12px;">
-        <div style="display:flex; gap: 16px; align-items:flex-start;">
-            <div style="min-width: 260px;">
-                <label>Agregar especificación</label>
-
-                <select id="selectEspecificacionesSubtipo">
-                    <option value="">Selecciona especificación...</option>
+            <div class="product-create__group product-create__group--4">
+                <label class="product-create__label" for="selectFamilia">Familia</label>
+                <select name="idFamilia" id="selectFamilia" class="form-select product-create__control">
+                    @if (hasArbol)
+                    {
+                        <option value="@arbolTipos.IdFamilia">@arbolTipos.NombreFamilia</option>
+                    }
+                    else
+                    {
+                        <option value="">Selecciona familia...</option>
+                    }
                 </select>
-
-                <input type="text" id="inputSpecValor" placeholder="Valor" style="display:block; margin-top:8px;" />
-
-                <button type="button" id="botonAgregarSpec" style="margin-top:8px;">Agregar especificación</button>
-
-                <small id="hintUnidad" style="display:block; margin-top:6px; color:#666;"></small>
             </div>
 
-            <div style="flex: 1;">
-                <label>Especificaciones añadidas</label>
-                <div id="contenedorSpecs" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;"></div>
+            <div class="product-create__group product-create__group--4">
+                <label class="product-create__label" for="selectTipo">Tipo</label>
+                <select name="idTipo" id="selectTipo" class="form-select product-create__control">
+                    @if (hasArbol)
+                    {
+                        <option value="@arbolTipos.IdTipo">@arbolTipos.NombreTipo</option>
+                    }
+                    else
+                    {
+                        <option value="">Selecciona tipo...</option>
+                    }
+                </select>
             </div>
-        </div>
+
+            <div class="product-create__group product-create__group--4">
+                <label class="product-create__label" for="selectSubtipo">Subtipo</label>
+                <select name="idSubtipo" id="selectSubtipo" class="form-select product-create__control">
+                    @if (hasArbol)
+                    {
+                        <option value="@arbolTipos.IdSubtipo">@arbolTipos.NombreSubtipo</option>
+                    }
+                    else
+                    {
+                        <option value="">Selecciona subtipo...</option>
+                    }
+                </select>
+            </div>
+
+            <div class="product-create__group product-create__group--6">
+                <label class="product-create__label" for="modelo">Modelo</label>
+                <input id="modelo" type="text" name="modelo" class="form-control product-create__control" />
+            </div>
+
+            <div class="product-create__group product-create__group--3">
+                <label class="product-create__label" for="precio">Precio</label>
+                <input id="precio" type="number" step="0.01" name="precio" class="form-control product-create__control" />
+            </div>
+
+            <div class="product-create__group product-create__group--3">
+                <label class="product-create__label" for="stock">Stock</label>
+                <input id="stock" type="number" name="stock" class="form-control product-create__control" />
+            </div>
+
+            <div class="product-create__group product-create__group--6">
+                <label class="product-create__label" for="marca">Marca</label>
+                <select id="marca" name="idMarca" class="form-select product-create__control">
+                    @foreach (var marca in ViewBag.Marcas as List<Marca>)
+                    {
+                        <option value="@marca.IdMarca">@marca.Nombre</option>
+                    }
+                </select>
+            </div>
+
+            <div class="product-create__group product-create__group--6">
+                <label class="product-create__label" for="imagen">Imagen principal</label>
+                <input id="imagen" type="file" name="imagen" class="form-control product-create__control" />
+            </div>
+
+            <div class="product-create__group">
+                <button type="button" id="botonMostrarFormImagenes" class="admin-btn product-create__section-btn">
+                    <i class="bi bi-images"></i> Imágenes del producto
+                </button>
+            </div>
+
+            <div id="zonaImagenes" class="product-create__panel" style="display:none;">
+                <div style="display:flex; gap: 16px; align-items:flex-start; flex-wrap: wrap;">
+                    <div id="contenedorImagenes" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+
+                    <div style="min-width: 260px; flex: 1;">
+                        <label class="product-create__label" for="inputImagenesProducto">Agregar imágenes</label>
+                        <input type="file" id="inputImagenesProducto" name="imagenes" multiple accept="image/*" class="form-control product-create__control" />
+                        <small class="product-create__hint">Se pueden seleccionar varias veces; se acumulan.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-create__group">
+                <label class="product-create__label" for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion" placeholder="Descripción del producto" class="form-control product-create__control"></textarea>
+            </div>
+
+            <div class="product-create__group">
+                <button type="button" id="botonMostrarFormSpecs" class="admin-btn product-create__section-btn">
+                    <i class="bi bi-list-check"></i> Especificaciones del producto
+                </button>
+            </div>
+
+            <div id="zonaSpecs" class="product-create__panel" style="display:none;">
+                <div style="display:flex; gap: 16px; align-items:flex-start; flex-wrap: wrap;">
+                    <div style="min-width: 260px; flex: 1;">
+                        <label class="product-create__label" for="selectEspecificacionesSubtipo">Agregar especificación</label>
+
+                        <select id="selectEspecificacionesSubtipo" class="form-select product-create__control">
+                            <option value="">Selecciona especificación...</option>
+                        </select>
+
+                        <input type="text" id="inputSpecValor" placeholder="Valor" class="form-control product-create__control" style="display:block; margin-top:8px;" />
+
+                        <button type="button" id="botonAgregarSpec" class="btn btn-secondary" style="margin-top:8px;">Agregar especificación</button>
+
+                        <small id="hintUnidad" class="product-create__hint"></small>
+                    </div>
+
+                    <div style="flex: 2; min-width: 280px;">
+                        <label class="product-create__label">Especificaciones añadidas</label>
+                        <div id="contenedorSpecs" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-create__actions">
+                <button type="submit" class="btn btn-primary product-create__submit">Crear producto</button>
+            </div>
+        </form>
     </div>
-
-    <button type="submit">Crear producto</button>
-</form>
+</div>
 
 @section Scripts {
     <script>
@@ -359,7 +398,8 @@
 
                 var $remove = $('<button/>', {
                     type: 'button',
-                    text: 'Quitar'
+                    text: 'Quitar',
+                    'class': 'admin-btn admin-btn--lg admin-btn--delete'
                 }).on('click', function () {
                     delete specsAdded[specId];
                     $row.remove();
@@ -418,7 +458,7 @@
                 var $remove = $('<button/>', {
                     type: 'button',
                     text: 'X',
-                    css: { position: 'absolute', top: '4px', right: '4px' }
+                    'css': { position: 'absolute', top: '4px', right: '4px' }
                 }).on('click', function () {
                     // reconstruimos DataTransfer sin el índice quitado
                     var removeIndex = parseInt($item.attr('data-index'));

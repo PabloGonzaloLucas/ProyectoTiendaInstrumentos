@@ -1,14 +1,16 @@
 /* ================================================
    CONFIRMAR COMPRA
+   (alineado con CARRITO/Index)
    ================================================ */
 
 .confirmar-titulo {
-    color: var(--dark-bg);
-    font-size: 2.2rem;
-    font-weight: 800;
-    margin-bottom: 2rem;
+    text-align: center;
+    color: var(--color-bg-dark);
+    font-size: 2.25rem;
+    font-weight: 900;
+    margin-bottom: 1.75rem;
     padding-bottom: 1rem;
-    border-bottom: 3px solid var(--primary-green);
+    border-bottom: 3px solid var(--color-primary);
 }
 
 .confirmar-lista {
@@ -17,168 +19,217 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.1rem;
+}
+
+.confirmar-item {
+    background: var(--color-surface);
+    border: 2px solid rgba(127, 227, 170, 0.35);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px var(--shadow-sm);
 }
 
 .confirmar-item-link {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center;
-    gap: 1.25rem;
-    background: var(--white);
-    border: 2px solid rgba(127, 227, 170, 0.2);
-    border-radius: 12px;
-    padding: 1.1rem 1.25rem;
+    display: block;
+    padding: 1.25rem 1.25rem;
     text-decoration: none;
-    color: var(--dark-bg);
-    transition: all 0.25s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    color: var(--color-bg-dark);
 }
 
 .confirmar-item-link:hover {
-    border-color: rgba(127, 227, 170, 0.5);
-    box-shadow: 0 5px 16px rgba(127, 227, 170, 0.18);
-    transform: translateY(-2px);
-    color: var(--dark-bg);
+    background: linear-gradient(135deg, rgba(127, 227, 170, 0.10) 0%, rgba(127, 227, 170, 0.05) 100%);
+    color: var(--color-bg-dark);
     text-decoration: none;
+}
+
+/* Columna única por item: info arriba + imagen debajo */
+.confirmar-item-main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    align-items: start;
+}
+
+.confirmar-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-width: 0;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+}
+
+.confirmar-item-marca,
+.confirmar-item-nombre,
+.confirmar-item-precio,
+.confirmar-item-cantidad {
+    width: 100%;
+    text-align: center;
+}
+
+.confirmar-item-marca {
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: var(--color-primary-dk);
+    text-transform: uppercase;
+    letter-spacing: 0.95px;
+}
+
+.confirmar-item-nombre {
+    font-size: 1.45rem;
+    font-weight: 950;
+    color: var(--color-bg-dark);
+    line-height: 1.12;
+}
+
+.confirmar-item-precio {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: var(--color-primary-dk);
+    line-height: 1;
+}
+
+.confirmar-item-cantidad {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: var(--color-bg-dark-2);
+}
+
+/* Wrapper para centrar y normalizar tamaños de imagen */
+.confirmar-item-imgwrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 0.75rem;
 }
 
 .confirmar-item-img {
     display: block;
-    width: 90px !important;
-    height: 90px !important;
-    min-width: 90px !important;
-    min-height: 90px !important;
-    max-width: 90px !important;
-    max-height: 90px !important;
+    width: 140px;
+    height: 140px;
+    min-width: 140px;
+    min-height: 140px;
+    max-width: 140px;
+    max-height: 140px;
     object-fit: contain;
-    border-radius: 8px;
-    background: var(--light-gray);
-    padding: 5px;
-    flex-shrink: 0 !important;
-}
-
-.confirmar-item-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    min-width: 0;
-    align-self: center;
-}
-
-.confirmar-item-marca {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--primary-green);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-}
-
-.confirmar-item-nombre {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--dark-bg);
-}
-
-.confirmar-item-precio {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--dark-gray);
-}
-
-.confirmar-item-cantidad {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--dark-gray);
+    object-position: center;
+    margin: 0 auto;
+    background: transparent;
 }
 
 .confirmar-resumen {
-    margin-top: 2rem;
-    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-gray) 100%);
-    border-radius: 14px;
-    padding: 1.5rem 2rem;
+    margin-top: 1.75rem;
+    background: var(--grad-dark);
+    border-radius: 16px;
+    padding: 1.35rem 1.6rem;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    border: 2px solid var(--primary-green);
+    gap: 1.25rem;
+    border: 2px solid var(--color-primary);
     flex-wrap: wrap;
+    box-shadow: var(--shadow-navbar);
 }
 
 .confirmar-resumen-label {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-light);
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: var(--color-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
 }
 
 .confirmar-resumen-total {
     font-size: 2rem;
     font-weight: 900;
-    color: var(--primary-green);
+    color: var(--color-primary);
 }
 
 .confirmar-acciones {
     margin-left: auto;
-    display: flex;
+    display: inline-flex;
     gap: 0.75rem;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .confirmar-btn-confirmar {
-    background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
-    color: var(--dark-bg);
+    background: var(--grad-primary);
+    color: var(--color-bg-dark);
     border: none;
     padding: 0.85rem 2rem;
-    font-size: 1.05rem;
-    font-weight: 800;
-    border-radius: 10px;
+    font-size: 1.02rem;
+    font-weight: 900;
+    border-radius: var(--radius-xl);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--transition-base);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 5px 18px rgba(127, 227, 170, 0.3);
+    letter-spacing: 0.6px;
+    box-shadow: 0 8px 24px rgba(127, 227, 170, 0.28);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
 }
 
 .confirmar-btn-confirmar:hover {
-    background: linear-gradient(135deg, var(--accent-green) 0%, var(--primary-green) 100%);
+    background: var(--grad-primary-h);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(127, 227, 170, 0.45);
+    box-shadow: 0 12px 30px rgba(127, 227, 170, 0.40);
 }
 
 .confirmar-btn-cancelar {
     background: transparent;
-    border: 2px solid rgba(127, 227, 170, 0.4);
-    color: var(--text-light);
-    padding: 0.85rem 1.5rem;
-    font-size: 1.05rem;
-    font-weight: 700;
-    border-radius: 10px;
+    border: 2px solid rgba(127, 227, 170, 0.45);
+    color: var(--color-text-light);
+    padding: 0.85rem 1.6rem;
+    border-radius: var(--radius-xl);
+    font-weight: 900;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition-fast);
 }
 
 .confirmar-btn-cancelar:hover {
-    border-color: #dc3545;
+    border-color: var(--color-danger);
     color: #f5a0a8;
     background: rgba(220, 53, 69, 0.08);
 }
 
 .confirmar-error {
     text-align: center;
-    padding: 4rem 2rem;
-    background: var(--light-gray);
-    border-radius: 15px;
+    padding: 5rem 2rem;
+    background: var(--color-bg-light);
+    border-radius: var(--radius-xl);
+    margin-top: 1rem;
 }
 
 .confirmar-error i {
-    font-size: 4rem;
-    color: #dc3545;
+    font-size: 5rem;
+    color: var(--color-danger);
     display: block;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .confirmar-error h2 {
-    color: var(--dark-bg);
-    font-size: 1.8rem;
-    font-weight: 700;
+    color: var(--color-bg-dark);
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.75rem;
+}
+
+@media (max-width: 992px) {
+    .confirmar-acciones {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .confirmar-btn-confirmar,
+    .confirmar-btn-cancelar {
+        width: 100%;
+        justify-content: center;
+    }
 }
