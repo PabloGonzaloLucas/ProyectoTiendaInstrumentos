@@ -18,8 +18,16 @@ namespace ProyectoTiendaInstrumentos.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var familias = await _context.Familias.ToListAsync();
-            return View(familias);
+            try
+            {
+                var familias = await _context.Familias.ToListAsync();
+                return View(familias);
+            }
+            catch
+            {
+                // Evita romper el layout si falla la BD.
+                return View(Enumerable.Empty<ProyectoTiendaInstrumentos.Models.Familia>());
+            }
         }
     }
 }

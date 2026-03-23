@@ -2,8 +2,15 @@
 @using ProyectoTiendaInstrumentos.Models
 @{
     PagedResult<VwProductosPedido>? paginacionProductos = ViewBag.PaginacionProductos as PagedResult<VwProductosPedido>;
-    // bool entregado = Model.FechaEntrega.HasValue && Model.FechaEntrega.Value < DateTime.Now;
-    // string estadoMostrar = entregado ? "Entregado" : Model.Estado;
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger" role="alert">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" role="alert">@TempData["Success"]</div>
 }
 
 <a asp-controller="Pedidos" asp-action="MisPedidos" class="detpedido-volver">
@@ -18,9 +25,9 @@
     <span class="detpedido-fecha-entrega"><i class="bi bi-truck"></i> Entrega: @Model.FechaEntrega?.ToString("dd/MM/yyyy")</span>
 </div>
 
-<ul class="detpedido-lista">
-    @if (Model.ProductosPedido != null)
-    {
+@if (Model.ProductosPedido != null && Model.ProductosPedido.Count > 0)
+{
+    <ul class="detpedido-lista">
         @foreach (VwProductosPedido producto in Model.ProductosPedido)
         {
             <li>
@@ -41,18 +48,25 @@
                 </a>
             </li>
         }
-    }
-</ul>
+    </ul>
 
-@if (paginacionProductos != null)
+    @if (paginacionProductos != null)
+    {
+        @await Html.PartialAsync("_Paginacion", (
+            paginacionProductos.PaginaActual,
+            paginacionProductos.TotalPaginas,
+            "DetallesPedido",
+            "Pedidos",
+            (object)(new { idPedido = Model.IdPedido })
+        ))
+    }
+}
+else
 {
-    @await Html.PartialAsync("_Paginacion", (
-        paginacionProductos.PaginaActual,
-        paginacionProductos.TotalPaginas,
-        "DetallesPedido",
-        "Pedidos",
-        (object)(new { idPedido = Model.IdPedido })
-    ))
+    <div class="empty-message">
+        <i class="bi bi-inbox"></i>
+        <h2>Este pedido no tiene productos</h2>
+    </div>
 }
 
 <div class="detpedido-footer">

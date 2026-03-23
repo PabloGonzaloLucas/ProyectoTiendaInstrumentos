@@ -7,10 +7,10 @@
 <h1 class="mispedidos-titulo">Mis Pedidos</h1>
 
 <div>
-    @if(Model.Count > 0)
+    @if (Model != null && Model.Count > 0)
     {
         <ul class="mispedidos-lista">
-            @foreach(Pedido pedido in Model)
+            @foreach (Pedido pedido in Model)
             {
                 <li class="mispedidos-item">
                     <a asp-controller="Pedidos" asp-action="DetallesPedido" asp-route-idPedido="@pedido.IdPedido" class="mispedidos-card">
@@ -25,7 +25,7 @@
                         <div class="mispedidos-imagenes mispedidos-imagenes--center">
                             @if (pedido.ImagenesProductos != null)
                             {
-                                @foreach(string imagen in pedido.ImagenesProductos)
+                                @foreach (string imagen in pedido.ImagenesProductos)
                                 {
                                     <img src="~/images/productosMain/@imagen"
                                          alt="Imagen del producto"

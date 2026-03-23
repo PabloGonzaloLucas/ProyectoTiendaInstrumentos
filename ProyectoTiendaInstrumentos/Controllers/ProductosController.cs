@@ -305,21 +305,50 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         public async Task<IActionResult> Eliminar(int idProducto, int? idSubtipo)
         {
-            if (!await this.repo.TieneComprasAsync(idProducto))
-            {
-                await this.repo.DeleteProductoAsync(idProducto);
-            }
-            else
-            {
-                return RedirectToAction("Details", "Productos", new { idProducto = idProducto });
-            }
-
+            TempData["Error"] = "Operación no permitida por GET. Confirma la eliminación desde el botón.";
             if (idSubtipo.HasValue)
             {
                 return RedirectToAction("Index", "Productos", new { idSubtipo = idSubtipo.Value });
             }
+            return RedirectToAction("Details", "Productos", new { idProducto });
+        }
 
-            return RedirectToAction("Index", "Home");
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarPost(int idProducto, int? idSubtipo)
+        {
+            try
+            {
+                if (idProducto <= 0)
+                {
+                    TempData["Error"] = "Identificador de producto inválido.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                if (!await this.repo.TieneComprasAsync(idProducto))
+                {
+                    await this.repo.DeleteProductoAsync(idProducto);
+                    TempData["Success"] = "Producto eliminado correctamente.";
+                }
+                else
+                {
+                    TempData["Error"] = "No se puede eliminar un producto con compras asociadas.";
+                    return RedirectToAction("Details", "Productos", new { idProducto = idProducto });
+                }
+
+                if (idSubtipo.HasValue)
+                {
+                    return RedirectToAction("Index", "Productos", new { idSubtipo = idSubtipo.Value });
+                }
+
+                return RedirectToAction("Index", "Home");
+            }
+            catch
+            {
+                TempData["Error"] = "No se pudo eliminar el producto.";
+                return RedirectToAction("Details", "Productos", new { idProducto = idProducto });
+            }
         }
         [AuthorizeUsuarios(Policy = "AdminOnly")]
         public async Task<IActionResult> Create(int? idSubtipo)

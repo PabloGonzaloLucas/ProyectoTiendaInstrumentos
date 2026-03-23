@@ -16,24 +16,62 @@ namespace ProyectoTiendaInstrumentos.Controllers
         [HttpPost]
         [AuthorizeUsuarios(Policy = "AdminOnly")]
         [ValidateAntiForgeryToken]
-
         public async Task<IActionResult> Create(string nombre, IFormFile imagenBanner)
         {
-            await this.repo.InsertFamiliaAsync(nombre, imagenBanner);
-
-            // Vuelve a la página desde la que se envió el formulario
-            string? referer = Request.Headers.Referer.ToString();
-            if (!string.IsNullOrWhiteSpace(referer))
+            try
             {
-                return Redirect(referer);
-            }
+                if (string.IsNullOrWhiteSpace(nombre))
+                {
+                    TempData["Error"] = "El nombre de la familia es obligatorio.";
+                    return RedirectBackOrHome();
+                }
 
-            return RedirectToAction("Index", "Home");
+                await this.repo.InsertFamiliaAsync(nombre, imagenBanner);
+                TempData["Success"] = "Familia creada correctamente.";
+                return RedirectBackOrHome();
+            }
+            catch
+            {
+                TempData["Error"] = "No se pudo crear la familia. Inténtalo de nuevo.";
+                return RedirectBackOrHome();
+            }
         }
 
-        public async Task<IActionResult> Eliminar(int idFamilia)
+        // GET: compatibilidad / evitar borrados por enlace
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        [HttpGet]
+        public IActionResult Eliminar(int idFamilia)
         {
-            await this.repo.DeleteFamiliaAsync(idFamilia);
+            TempData["Error"] = "Operación no permitida por GET. Confirma la eliminación desde el botón.";
+            return RedirectBackOrHome();
+        }
+
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarPost(int idFamilia)
+        {
+            try
+            {
+                if (idFamilia <= 0)
+                {
+                    TempData["Error"] = "Identificador de familia inválido.";
+                    return RedirectBackOrHome();
+                }
+
+                await this.repo.DeleteFamiliaAsync(idFamilia);
+                TempData["Success"] = "Familia eliminada correctamente.";
+                return RedirectBackOrHome();
+            }
+            catch
+            {
+                TempData["Error"] = "No se pudo eliminar la familia. Es posible que tenga tipos asociados.";
+                return RedirectBackOrHome();
+            }
+        }
+
+        private IActionResult RedirectBackOrHome()
+        {
             string? referer = Request.Headers.Referer.ToString();
             if (!string.IsNullOrWhiteSpace(referer))
             {

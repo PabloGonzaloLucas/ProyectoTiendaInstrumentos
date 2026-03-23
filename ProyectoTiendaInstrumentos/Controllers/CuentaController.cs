@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProyectoTiendaInstrumentos.Extensions;
 using ProyectoTiendaInstrumentos.Filters;
 using ProyectoTiendaInstrumentos.Models;
+using ProyectoTiendaInstrumentos.Models.ViewModels;
 using ProyectoTiendaInstrumentos.Repositories;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -106,82 +107,83 @@ namespace ProyectoTiendaInstrumentos.Controllers
 
         public IActionResult Register()
         {
-            return View();
+            return View(new RegisterViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> Register(string nombre, string email, IFormFile imagen, string password, string telefono, string direccion)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            await this.repo.RegisterUserFakePassAsync(nombre, email, imagen, password, telefono, direccion);
-            ViewBag.MENSAJE = "Usuario en el sistema!!";
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            await this.repo.RegisterUserFakePassAsync(model.Nombre, model.Email, model.Imagen, model.Password, model.Telefono, model.Direccion);
+            TempData["Success"] = "Usuario registrado correctamente.";
             return RedirectToAction("Login");
         }
 
         public IActionResult Login()
         {
-            return View();
+            return View(new LoginViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> Login(string email, string password)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            Usuario user = await this.repo.LogInUserAsync(email, password);
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            Usuario user = await this.repo.LogInUserAsync(model.Email, model.Password);
             if (user == null)
             {
-                ViewData["MENSAJE"] = "Credenciales incorrectas";
-                return View();
+                ModelState.AddModelError(string.Empty, "Credenciales incorrectas");
+                return View(model);
             }
-            else
+
+            ClaimsIdentity identity = new ClaimsIdentity(
+               CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role
+            );
+            if (user.RolId == 1)
             {
-                ClaimsIdentity identity = new ClaimsIdentity(
-                   CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role
-                );
-                if (user.RolId == 1)
-                {
-                    Claim claimAdmin = new Claim("Admin", "Soy admin");
-                    identity.AddClaim(claimAdmin);
-                }
-                Claim claimName = new Claim(ClaimTypes.Name, user.Nombre);
-                identity.AddClaim(claimName);
-                Claim claimId = new Claim(ClaimTypes.NameIdentifier, user.IdUsuario.ToString());
-                identity.AddClaim(claimId);
-                Claim claimRole = new Claim(ClaimTypes.Role, user.RolId.ToString());
-                identity.AddClaim(claimRole);
-                ClaimsPrincipal userPrincipal = new ClaimsPrincipal(identity);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, userPrincipal);
-                HttpContext.Session.SetObject("Usuario", user);
-                if (TempData["controller"] != null && TempData["action"] != null)
-                {
-                    string controller = TempData["controller"].ToString();
-                    string action = TempData["action"].ToString();
-                    if (action == "Logout")
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
+                Claim claimAdmin = new Claim("Admin", "Soy admin");
+                identity.AddClaim(claimAdmin);
+            }
+            Claim claimName = new Claim(ClaimTypes.Name, user.Nombre);
+            identity.AddClaim(claimName);
+            Claim claimId = new Claim(ClaimTypes.NameIdentifier, user.IdUsuario.ToString());
+            identity.AddClaim(claimId);
+            Claim claimRole = new Claim(ClaimTypes.Role, user.RolId.ToString());
+            identity.AddClaim(claimRole);
+            ClaimsPrincipal userPrincipal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, userPrincipal);
+            HttpContext.Session.SetObject("Usuario", user);
 
-                    if (TempData["id"] != null)
-                    {
-                        string id = TempData["id"].ToString();
-                        return RedirectToAction(action, controller, new { id = id });
-                    }
-                    else
-                    {
-
-                        return RedirectToAction(action, controller);
-                    }
-                }
-                else
+            if (TempData["controller"] != null && TempData["action"] != null)
+            {
+                string controller = TempData["controller"].ToString();
+                string action = TempData["action"].ToString();
+                if (action == "Logout")
                 {
                     return RedirectToAction("Index", "Home");
                 }
-                ///////////
-                //HttpContext.Session.SetObject("Usuario", user);
-                // return RedirectToAction("Index", "Home");
+
+                if (TempData["id"] != null)
+                {
+                    string id = TempData["id"].ToString();
+                    return RedirectToAction(action, controller, new { id = id });
+                }
+                else
+                {
+                    return RedirectToAction(action, controller);
+                }
             }
+
+            return RedirectToAction("Index", "Home");
         }
 
         [AuthorizeUsuarios]

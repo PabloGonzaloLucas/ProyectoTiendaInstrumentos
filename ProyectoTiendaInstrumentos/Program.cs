@@ -71,6 +71,8 @@ app.UseSession();
 //    .WithStaticAssets();
 app.UseMvc(routes =>
 {
+    routes.MapRoute(name: "productocantidad",
+        template: "{controller=Home}/{action=Index}/{idProducto?}/{idCantidad?}");
     routes.MapRoute(name: "pagina",
         template: "{controller=Home}/{action=Index}/{pagina?}");
     routes.MapRoute(name: "familia",

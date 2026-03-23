@@ -2,7 +2,20 @@
 
 <div class="familias-menu-wrapper">
 
-    @if (Context.User.FindFirst("Admin") != null)
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" role="alert">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success" role="alert">@TempData["Success"]</div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-secondary" role="status">No hay familias disponibles.</div>
+    }
+    else if (Context.User.FindFirst("Admin") != null)
     {
         <div class="familias-admin">
             <div class="familias-admin__top">
@@ -13,10 +26,16 @@
                             <a class="familias-link" asp-controller="Tipos" asp-action="Index" asp-route-idFamilia="@familia.IdFamilia">
                                 @familia.Nombre
                             </a>
-                            <a class="familias-delete familias-delete--danger" asp-controller="Familias" asp-action="Eliminar" asp-route-idFamilia="@familia.IdFamilia"
-                               onclick="return confirm('¿Eliminar esta familia?')" aria-label="Eliminar familia @familia.Nombre">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </a>
+                            <form method="post" asp-controller="Familias" asp-action="EliminarPost" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="idFamilia" value="@familia.IdFamilia" />
+                                <button type="submit"
+                                        class="familias-delete familias-delete--danger"
+                                        onclick="return confirm('¿Eliminar esta familia?')"
+                                        aria-label="Eliminar familia @familia.Nombre">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </form>
                         </li>
                     }
                 </ul>
@@ -27,10 +46,11 @@
             </div>
 
             <form id="form-add-familia" method="post" asp-controller="Familias" asp-action="Create" enctype="multipart/form-data" class="familias-admin__form">
+                @Html.AntiForgeryToken()
                 <div class="familias-admin__row">
                     <div class="familias-admin__group">
                         <label class="familias-admin__label">Nombre</label>
-                        <input type="text" name="nombre" class="familias-admin__input form-control" required />
+                        <input type="text" name="nombre" class="familias-admin__input form-control" required minlength="2" maxlength="100" />
                     </div>
                     <div class="familias-admin__group">
                         <label class="familias-admin__label">Imagen</label>

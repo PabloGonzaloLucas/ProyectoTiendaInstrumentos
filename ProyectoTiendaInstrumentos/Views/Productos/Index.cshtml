@@ -226,6 +226,15 @@ else if (esBusqueda)
         <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Volver al inicio</a>
     </div>
 }
+else
+{
+    <div class="sin-resultados">
+        <i class="bi bi-bag"></i>
+        <h2>No hay productos disponibles</h2>
+        <p>No hay productos para mostrar en esta categoría.</p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Volver al inicio</a>
+    </div>
+}
 
 @section Scripts {
     <script>

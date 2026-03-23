@@ -7,6 +7,15 @@
 
 <h1 class="page-title">Tipos de Instrumentos</h1>
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger" role="alert">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" role="alert">@TempData["Success"]</div>
+}
+
 @if (Context.User.FindFirst("Admin") != null)
 {
     <div class="admin-toolbar">
@@ -15,10 +24,11 @@
         </button>
         <form id="form-add-tipo" method="post" asp-controller="Tipos" asp-action="Index"
               enctype="multipart/form-data" class="admin-form">
+            @Html.AntiForgeryToken()
             <div class="admin-form-row">
                 <div class="admin-form-group">
                     <label>Nombre del tipo</label>
-                    <input type="text" name="Nombre" class="admin-input" required placeholder="Ej: Cuerdas, Viento..." />
+                    <input type="text" name="Nombre" class="admin-input" required minlength="2" maxlength="100" placeholder="Ej: Cuerdas, Viento..." />
                     <input type="hidden" name="IdFamilia" value="@idFamilia" />
                 </div>
                 <div class="admin-form-actions">
@@ -30,7 +40,7 @@
     </div>
 }
 
-@if (Model.Count > 0)
+@if (Model != null && Model.Count > 0)
 {
     <ul class="tipos-grid">
         @foreach (Tipo tipo in Model)
@@ -42,13 +52,17 @@
                 </a>
                 @if (Context.User.FindFirst("Admin") != null)
                 {
-                    <a asp-controller="Tipos" asp-action="Eliminar"
-                       asp-route-idTipo="@tipo.IdTipo"
-                       asp-route-idFamilia="@tipo.IdFamilia"
-                       class="admin-btn admin-btn--lg admin-btn--delete"
-                       onclick="return confirm('¿Eliminar este tipo?')">
-                        <i class="bi bi-trash"></i>
-                    </a>
+                    <form method="post" asp-controller="Tipos" asp-action="EliminarPost" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="idTipo" value="@tipo.IdTipo" />
+                        <input type="hidden" name="idFamilia" value="@(tipo.IdFamilia ?? 0)" />
+                        <button type="submit"
+                                class="admin-btn admin-btn--lg admin-btn--delete"
+                                onclick="return confirm('¿Eliminar este tipo?')"
+                                aria-label="Eliminar tipo @tipo.Nombre">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
                 }
             </li>
         }

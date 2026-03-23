@@ -12,39 +12,103 @@ namespace ProyectoTiendaInstrumentos.Controllers
         {
             this.repo = repo;
         }
+
         public async Task<IActionResult> Index(int idTipo)
         {
-            ViewBag.Tipo = await this.repo.GetTipoByIdAsync(idTipo); 
-            List<Subtipo> subtipos = await this.repo.GetSubtiposByTipoAsync(idTipo);
+            try
+            {
+                if (idTipo <= 0)
+                {
+                    TempData["Error"] = "Identificador de tipo inválido.";
+                    ViewBag.Tipo = null;
+                    return View(new List<Subtipo>());
+                }
 
-            return View(subtipos);
+                ViewBag.Tipo = await this.repo.GetTipoByIdAsync(idTipo);
+                List<Subtipo> subtipos = await this.repo.GetSubtiposByTipoAsync(idTipo);
+                return View(subtipos);
+            }
+            catch
+            {
+                TempData["Error"] = "No se pudieron cargar los subtipos.";
+                ViewBag.Tipo = null;
+                return View(new List<Subtipo>());
+            }
         }
-        [AuthorizeUsuarios(Policy = "AdminOnly")]
 
-        public async Task<IActionResult> Eliminar(int idSubtipo, int idTipo)
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        [HttpGet]
+        public IActionResult Eliminar(int idSubtipo, int idTipo)
         {
-            await this.repo.DeleteSubtipoAsync(idSubtipo);
-            //ViewBag.Tipo = await this.repo.GetTipoByIdAsync(idTipo); 
-            //List<Subtipo> subtipos = await this.repo.GetSubtiposByTipoAsync(idTipo);
+            TempData["Error"] = "Operación no permitida por GET. Confirma la eliminación desde el botón.";
             return RedirectToAction("Index", "Subtipos", new { idTipo = idTipo });
+        }
+
+        [AuthorizeUsuarios(Policy = "AdminOnly")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarPost(int idSubtipo, int idTipo)
+        {
+            try
+            {
+                if (idSubtipo <= 0 || idTipo <= 0)
+                {
+                    TempData["Error"] = "Parámetros inválidos para eliminar.";
+                    return RedirectToAction("Index", "Subtipos", new { idTipo = idTipo });
+                }
+
+                await this.repo.DeleteSubtipoAsync(idSubtipo);
+                TempData["Success"] = "Subtipo eliminado correctamente.";
+                return RedirectToAction("Index", "Subtipos", new { idTipo = idTipo });
+            }
+            catch
+            {
+                TempData["Error"] = "No se pudo eliminar el subtipo.";
+                return RedirectToAction("Index", "Subtipos", new { idTipo = idTipo });
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-
         public async Task<IActionResult> Index(string Nombre, int IdTipo, string accion)
         {
-            if (accion == "cancelar")
+            try
             {
+                if (IdTipo <= 0)
+                {
+                    TempData["Error"] = "Identificador de tipo inválido.";
+                    ViewBag.Tipo = null;
+                    return View(new List<Subtipo>());
+                }
 
+                if (accion == "cancelar")
+                {
+                    // no-op
+                }
+                else if (accion == "add")
+                {
+                    if (string.IsNullOrWhiteSpace(Nombre))
+                    {
+                        TempData["Error"] = "El nombre del subtipo es obligatorio.";
+                    }
+                    else
+                    {
+                        await this.repo.InsertSubtipoAsync(Nombre, IdTipo);
+                        TempData["Success"] = "Subtipo añadido correctamente.";
+                    }
+                }
+
+                ViewBag.Tipo = await this.repo.GetTipoByIdAsync(IdTipo);
+                List<Subtipo> subtipos = await this.repo.GetSubtiposByTipoAsync(IdTipo);
+                return View(subtipos);
             }
-            else if (accion == "add")
+            catch
             {
-                await this.repo.InsertSubtipoAsync(Nombre, IdTipo);
+                TempData["Error"] = "No se pudo procesar la operación.";
+                ViewBag.Tipo = await this.repo.GetTipoByIdAsync(IdTipo);
+                List<Subtipo> subtipos = await this.repo.GetSubtiposByTipoAsync(IdTipo);
+                return View(subtipos);
             }
-            ViewBag.Tipo = await this.repo.GetTipoByIdAsync(IdTipo);
-            List<Subtipo> subtipos = await this.repo.GetSubtiposByTipoAsync(IdTipo);
-            return View(subtipos);
         }
 
     }

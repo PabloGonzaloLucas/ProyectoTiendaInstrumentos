@@ -1,4 +1,4 @@
-﻿@model Usuario
+﻿@model ProyectoTiendaInstrumentos.Models.ViewModels.LoginViewModel
 @{
     ViewData["Title"] = "Login";
 }
@@ -6,19 +6,23 @@
 <div class="login-container">
     <div class="login-card">
         <h1>Inicio de sesión</h1>
-        
+
         <form method="post">
-        
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group">
-                <label class="control-label">Email</label>
-                <input type="email" name="Email" class="form-control" />
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            
+
             <div class="form-group">
-                <label class="control-label">Password</label>
-                <input type="password" class="form-control" name="password" />
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-            
+
             <div class="form-group">
                 <input type="submit" value="Iniciar Sesión" class="btn btn-primary" />
             </div>
@@ -26,16 +30,13 @@
 
         <div class="register-link">
             <p>
-                ¿No tienes una cuenta? 
+                ¿No tienes una cuenta?
                 <a asp-controller="Cuenta" asp-action="Register">Regístrate aquí</a>
             </p>
         </div>
-
-        @if (ViewBag.MENSAJE != null)
-        {
-            <div class="error-message">
-                @ViewBag.MENSAJE
-            </div>
-        }
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

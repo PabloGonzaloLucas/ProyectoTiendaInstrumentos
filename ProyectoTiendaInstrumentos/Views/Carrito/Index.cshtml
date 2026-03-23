@@ -6,9 +6,24 @@
 }
 
 <h1 class="carrito-titulo">Carrito</h1>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger" role="alert">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" role="alert">@TempData["Success"]</div>
+}
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-info" role="alert">@TempData["Mensaje"]</div>
+}
+
 @if (Model != null && Model.Count > 0)
 {
     <form method="post" asp-action="ProcesarCompra">
+        @Html.AntiForgeryToken()
         <ul class="carrito-lista">
             @for (int index = 0; index < Model.Count; index++)
             {
@@ -69,7 +84,8 @@
                         <button type="submit"
                                 asp-action="EliminarProducto"
                                 asp-route-idProducto="@producto.IdProducto"
-                                class="carrito-btn-eliminar">
+                                class="carrito-btn-eliminar"
+                                onclick="return confirm('¿Eliminar este producto del carrito?')">
                             <i class="bi bi-trash"></i> Eliminar
                         </button>
                     </div>
@@ -100,7 +116,8 @@
     }
 
     <form method="post" asp-action="VaciarCarrito" style="margin-top: 0.75rem;">
-        <button type="submit" class="carrito-btn-vaciar">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="carrito-btn-vaciar" onclick="return confirm('¿Vaciar el carrito?')">
             <i class="bi bi-trash3"></i> Vaciar carrito
         </button>
     </form>
