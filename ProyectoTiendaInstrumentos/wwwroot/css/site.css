@@ -2115,7 +2115,9 @@ main {
   display: block;
 }
 
-a.familias-delete.familias-delete--danger {
+/* Antes estaba limitado a `a...` pero en la vista se usa `<button>` */
+a.familias-delete.familias-delete--danger,
+button.familias-delete.familias-delete--danger {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -2129,16 +2131,19 @@ a.familias-delete.familias-delete--danger {
   transition: var(--transition-fast);
   margin-top: 10px;
   margin-bottom: 10px;
+  cursor: pointer;
 }
 
-a.familias-delete.familias-delete--danger:hover {
+a.familias-delete.familias-delete--danger:hover,
+button.familias-delete.familias-delete--danger:hover {
   background: rgba(220, 53, 69, 0.16);
   border-color: rgba(220, 53, 69, 0.6);
   transform: translateY(-1px);
   color: #dc3545;
 }
 
-a.familias-delete.familias-delete--danger:focus-visible {
+a.familias-delete.familias-delete--danger:focus-visible,
+button.familias-delete.familias-delete--danger:focus-visible {
   outline: none;
   box-shadow: 0 0 0 0.22rem rgba(220, 53, 69, 0.18);
 }
